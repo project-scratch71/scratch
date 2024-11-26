@@ -98,7 +98,8 @@ Box.propTypes = {
     className: PropTypes.string,
     /**
      * A callback function whose first parameter is the underlying dom elements.
-     * This call back will be executed immediately after the component is mounted or unmounted
+     * This call back will be executed immediately after the component is mounted or unmounted.
+     * Also accepts component refs created with createRef() and useRef()
      */
     componentRef: PropTypes.oneOfType([
         PropTypes.func,
