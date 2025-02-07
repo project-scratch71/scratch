@@ -296,7 +296,6 @@ class MenuBarGuiSub extends React.Component {
 
   async onLocalStorageFileUpload() {
     const projectData = await localforage.getItem(this.state.projectName);
-    console.log('console projectdata',projectData)
     if (projectData) {
         const buffer = new Uint8Array(
             projectData.split("").map((char) => char.charCodeAt(0)),

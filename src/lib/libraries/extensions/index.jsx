@@ -22,6 +22,9 @@ import makeymakeyInsetIconURL from './makeymakey/makeymakey-small.svg'
 import poseFaceBlocksIconURL from './poseFace/pose-face.png'
 import poseFaceInsetIconUR from './poseFace/pose-face-small.svg'
 
+import poseHandBlocksIconURL from './poseHand/pose-hand.png'
+import poseHandInsetIconUR from './poseHand/pose-hand-small-3.svg'
+
 import teachableMachineIconURL from './teachableMachine/teachable-machine-blocks.png'
 import teachableMachineInsetIconURL from './teachableMachine/teachable-machine-blocks-small.svg'
 
@@ -356,5 +359,19 @@ export default [
         />
     ),
     featured: true
+},
+{
+  name: 'Hand Sensing',
+  extensionId: 'poseHand',
+  iconURL: poseHandBlocksIconURL,
+  insetIconURL: poseHandInsetIconUR,
+  description: (
+      <FormattedMessage
+          defaultMessage="Sense hand movement with the camera."
+          description="PoseNet Description"
+          id="gui.extension.hand.description"
+      />
+  ),
+  featured: true
 },
 ]
