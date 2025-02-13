@@ -74,10 +74,9 @@ jobs:
               with:
                 name: test-output
                 path: ./test-results/* # Both unit and integration test results
-            - run: |
-                if [[ ${{contains(github.ref, 'hotfix')}}  ]]; then
-                sed -e "s|hotfix/REPLACE|${{ github.ref_name }}|" --in-place release.config.js
-                fi
+            - name: Insert hotfix branch name into release config
+              if: startsWith(github.ref, 'hotfix/')
+              run: sed -e "s|hotfix/REPLACE|${{ github.ref_name }}|" --in-place release.config.js
             - name: Semantic Release
               env:
                 NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
