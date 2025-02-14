@@ -322,11 +322,11 @@ export default [
         helpLink: 'https://scratch.mit.edu/vernier'
     },
     {
-        name: '天気予報',
-        extensionId: 'openmeteo',
+        name: '天気予報(てんきよほう)',
+        extensionId: 'openMeteo',
         iconURL: openMeteoIconURL,
         insetIconURL: openMeteoInsetIconURL,
-        description: '天気予報を取得します',
+        description: '天気予報を取得します（てんきよほうをしゅとくします）',
         internetConnectionRequired: true,
         featured: true
     }
