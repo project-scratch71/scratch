@@ -152,7 +152,7 @@ const GUIComponent = (props) => {
   if (isRendererSupported === null) {
     isRendererSupported = Renderer.isSupported()
   }
-  const [currentLayout, setCurrentLayout] = React.useState('normal')
+  const [currentLayout, setCurrentLayout] = React.useState('student')
 
   useEffect(() => {
     localforage.getItem('currentLayout').then(value => {

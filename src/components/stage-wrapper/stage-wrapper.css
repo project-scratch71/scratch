@@ -30,7 +30,7 @@
 
 .stage-current-student{
     position: absolute;
-    left: 25%;
+    left: 0;
     bottom: 0;
     z-index: 100;
   }
@@ -129,9 +129,9 @@
 
 .stage-position-student{
     position: absolute;
-    width: 70vw;
+    width: 99vw;
     bottom: 0;
-    left: 2rem;
+    left: 0;
     height: 24.2rem;
     z-index: 999;
     visibility: visible;

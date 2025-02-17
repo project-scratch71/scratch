@@ -12,7 +12,6 @@ import { connect } from 'react-redux'
 import { setFlagClickedState } from './../../reducers/vm-status.js'
 
 import styles from './stage-wrapper.css'
-import Reload from '../customi-cons/reload.jsx'
 
 
 const StageWrapperComponent = function (props) {

@@ -3,13 +3,15 @@
 .reload-container {
   width: 34px;
   height: 34px;
-  padding: 0.375rem;
+  padding: 0.5rem;
   user-select: none;
   user-drag: none;
   cursor: pointer;
   border:1px solid #dedede;
   border-radius: 4px;
-  background-color: 'green';
+  display: flex;
+  justify-content: center;
+  align-items: center;
   }
   .reload-container svg {
     stroke: #801d80 !important;
