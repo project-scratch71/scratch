@@ -150,6 +150,15 @@
       "raf/polyfill",
       "<rootDir>/test/helpers/enzyme-setup.js"
     ],
+    "reporters": [
+      "default",
+      [
+        "jest-junit",
+        {
+          "outputDirectory": "test-results"
+        }
+      ]
+    ],
     "testPathIgnorePatterns": [
       "src/test.js"
     ],
