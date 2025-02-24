@@ -100,7 +100,7 @@ import oldtimeyLogo from "./oldtimey-logo.svg";
 import sharedMessages from "../../lib/shared-messages";
 import { ChevronDoubleDownIcon, FolderIcon } from "@heroicons/react/24/outline";
 import localforage from 'localforage';
-import data from './content.json';
+// import data from './content.json';
 import { config } from "../../../config.js";
 
 
