@@ -96,7 +96,6 @@ const Controls = function (props) {
             onClick={onStopAllClick}
           />
         </div>
-        {/* <div>asd</div> */}
       </div>
       {turbo ? <TurboMode /> : null}
     </div>

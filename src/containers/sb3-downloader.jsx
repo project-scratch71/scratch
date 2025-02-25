@@ -42,6 +42,7 @@ class SB3Downloader extends React.Component {
     const projectId = url.get('projectid')
     const currentprojectName = url.get('projectname')
     const inputLayout = url.get('inputLayout')
+    const fetchapiurl = url.get('fetchapiurl');
 
     if (inputLayout === 'myprojects') {
       if (this.props.isFirst) {
@@ -88,10 +89,11 @@ class SB3Downloader extends React.Component {
 
             const structureString = JSON.stringify(structure)
 
-            const apiUrl = `https://api.stage-uae.myqubit.co/projects/${projectId}`
+            const apiUrl = `${fetchapiurl}projects/${projectId}`
 
             try {
               this.props.setIsSavingState(true)
+              localforage.setItem('savingStatus',true)
               await fetch(apiUrl, {
                 method: 'PUT',
                 headers: {
@@ -103,8 +105,10 @@ class SB3Downloader extends React.Component {
               })
             } catch (error) {
               console.error('Error:', error)
+              localforage.setItem('savingStatus',false)
             } finally {
               this.props.setIsSavingState(false)
+              localforage.setItem('savingStatus',false)
             }
           }
           reader.readAsArrayBuffer(content)
