@@ -89,7 +89,7 @@ class SB3Downloader extends React.Component {
 
             const structureString = JSON.stringify(structure)
 
-            const apiUrl = `${fetchapiurl}projects/${projectId}`
+            const apiUrl = `${fetchapiurl}/projects/${projectId}`
 
             try {
               this.props.setIsSavingState(true)
