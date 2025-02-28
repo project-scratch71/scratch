@@ -44,6 +44,7 @@ class SB3Downloader extends React.Component {
     const inputLayout = url.get('inputLayout')
     const fetchapiurl = url.get('fetchapiurl');
 
+    console.log('console debug', projectId, currentprojectName, inputLayout, fetchapiurl)
     if (inputLayout === 'myprojects') {
       if (this.props.isFirst) {
         return
@@ -52,7 +53,7 @@ class SB3Downloader extends React.Component {
       if (this.debounceTimeout) {
         clearTimeout(this.debounceTimeout)
       }
-
+      console.log('console debug', projectId, currentprojectName, inputLayout, fetchapiurl, this.props.isFirst)
       this.debounceTimeout = setTimeout(async () => {
         if (this.abortController) {
           this.abortController.abort()
@@ -104,7 +105,7 @@ class SB3Downloader extends React.Component {
                 signal,
               })
             } catch (error) {
-              console.error('Error:', error)
+              console.error('Error in sb3:', error)
               localforage.setItem('savingStatus',false)
             } finally {
               this.props.setIsSavingState(false)
