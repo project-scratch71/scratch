@@ -365,7 +365,6 @@ class MenuBarGuiSub extends React.Component {
         credentials: 'include',
       })
       const data = await response.json()
-      console.log('Chapter data:', data)
       return data
     } catch (error) {
       console.error('Error fetching project:', error)
