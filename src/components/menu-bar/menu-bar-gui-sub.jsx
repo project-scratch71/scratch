@@ -321,7 +321,8 @@ class MenuBarGuiSub extends React.Component {
     }
   }
 
-  async fetchStudentSubmissionData(challengeId, chapterId, unitId, courseId, fetchapiurl) {
+  async fetchStudentChallengeSubmissionData(challengeId, chapterId, unitId, courseId, fetchapiurl) {
+    this.props.onClickLoadingTrue()
     try {
       const apiUrl = `${fetchapiurl}/challenges/details/${challengeId}?chapter=${chapterId}&unit=${unitId}&course=${courseId}`
       const data = await fetch(apiUrl, {
@@ -349,9 +350,11 @@ class MenuBarGuiSub extends React.Component {
       } else {
         return response?.challengeSettings[0]?.challengeSubmissions[0]?.submission
       }
-    } catch (error) {
-      console.log('Error fetching student submission:', error)
-    } 
+    }  catch (error) {
+      this.props.onClickLoadingFalse()
+    } finally {
+      this.props.onClickLoadingFalse()
+    }
   }
 
   async fetchChpaterData(scratchUrl) {
@@ -371,6 +374,25 @@ class MenuBarGuiSub extends React.Component {
     }
   }
 
+  async fetchStudentSubmissionData(fetchapiurl, submissionId, challengeSubmissionType) {
+    this.props.onClickLoadingTrue()
+    try {
+      const apiUrl = `${fetchapiurl}/challenges/submission/${submissionId}?type=${challengeSubmissionType}`
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+      const data = await response.json()
+      return data
+    } catch (error) {
+      this.props.onClickLoadingFalse()
+    } finally {
+      this.props.onClickLoadingFalse()
+    }
+  }
   async componentDidMount() {
     document.addEventListener('keydown', this.handleKeyPress)
     const url = new URLSearchParams(window.location.search)
@@ -392,6 +414,8 @@ class MenuBarGuiSub extends React.Component {
     const unitId = url.get('unitId')
     const courseId = url.get('courseId')
 
+    const submissionId = url.get('submissionId')
+    const challengeSubmissionType = url.get('challengeSubmissionType')
 
     const scratchUrl = url.get('scratchUrl')
 
@@ -410,13 +434,16 @@ class MenuBarGuiSub extends React.Component {
         this.onLocalStorageFileUploadTeacher(result)
       } else if (currentLayout === 'myprojects') {
         result = await this.fetchProjectData(projectId, fetchapiurl)
-        this.onLocalStorageFileUploadStudentICO(result.content)
+        this.onLocalStorageFileUploadStudentmyproject(result.content)
       } else if (currentLayout === 'chapter') {
         result = await this.fetchChpaterData(scratchUrl, fetchapiurl)
-        this.onLocalStorageFileUploadStudentICO(result.content)
-      } else if (currentLayout === 'student') {
-        result = await this.fetchStudentSubmissionData(challengeId, chapterId, unitId, courseId, fetchapiurl)
-        this.onLocalStorageFileUploadStudent(result)
+        this.onLocalStorageFileUploadStudentmyproject(result.content)
+      } else if (currentLayout === 'studentChallenge') {
+        result = await this.fetchStudentChallengeSubmissionData(challengeId, chapterId, unitId, courseId, fetchapiurl)
+        this.onLocalStorageFileUploadStudentChallenge(result)
+      } else if(currentLayout === 'student'){
+        result = await this.fetchStudentSubmissionData(fetchapiurl, submissionId, challengeSubmissionType)
+        this.onLocalStorageFileUploadStudentChallenge(result.submission)
       } else {
         const projectName = await localforage.getItem('Current_Project_Name')
         this.setState({ projectName })
@@ -436,7 +463,7 @@ class MenuBarGuiSub extends React.Component {
     }
   }
 
-  async onLocalStorageFileUploadStudent(base64blocks) {
+  async onLocalStorageFileUploadStudentChallenge(base64blocks) {
     let binaryString = atob(base64blocks)
     let bytes = new Uint8Array(binaryString.length)
     for (let i = 0; i < binaryString.length; i++) {
@@ -446,7 +473,7 @@ class MenuBarGuiSub extends React.Component {
     await this.props.vm.loadProject(bytes.buffer)
   }
 
-  async onLocalStorageFileUploadStudentICO(base64blocks) {
+  async onLocalStorageFileUploadStudentmyproject(base64blocks) {
     if(base64blocks === null) {
       this.props.onClickFirstFalse()
     }
