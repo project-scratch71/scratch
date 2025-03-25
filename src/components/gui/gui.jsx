@@ -154,7 +154,7 @@ const GUIComponent = (props) => {
   if (isRendererSupported === null) {
     isRendererSupported = Renderer.isSupported()
   }
-  const [currentLayout, setCurrentLayout] = React.useState('student')
+  const [currentLayout, setCurrentLayout] = React.useState('normal')
   const [message, setMessage] = React.useState('');
   const [value, setValue] = React.useState(0);
   const { parentMethods, connection } = usePenpalParent({
