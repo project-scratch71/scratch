@@ -57,7 +57,7 @@ describe('Menu bar settings', () => {
         await loadUri(uri);
         await clickXpath('//img[@alt="Scratch"]');
         const currentUrl = await driver.getCurrentUrl();
-        await expect(currentUrl).toEqual('https://rbel12b.github.io/Scratch/');
+        await expect(currentUrl).toEqual('https://scratch.samlabseurope.com');
     });
 
     test('(GH#4064) Project name should be editable', async () => {
