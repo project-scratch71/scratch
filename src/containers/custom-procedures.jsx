@@ -1,14 +1,14 @@
-import bindAll from 'lodash.bindall';
-import defaultsDeep from 'lodash.defaultsdeep';
-import PropTypes from 'prop-types';
-import React from 'react';
-import CustomProceduresComponent from '../components/custom-procedures/custom-procedures.jsx';
-import ScratchBlocks from 'scratch-blocks';
-import { connect } from 'react-redux';
+import bindAll from 'lodash.bindall'
+import defaultsDeep from 'lodash.defaultsdeep'
+import PropTypes from 'prop-types'
+import React from 'react'
+import CustomProceduresComponent from '../components/custom-procedures/custom-procedures.jsx'
+import ScratchBlocks from 'scratch-blocks'
+import { connect } from 'react-redux'
 
 class CustomProcedures extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     bindAll(this, [
       'handleAddLabel',
       'handleAddBoolean',
@@ -17,107 +17,107 @@ class CustomProcedures extends React.Component {
       'handleCancel',
       'handleOk',
       'setBlocks',
-    ]);
+    ])
     this.state = {
       rtlOffset: 0,
       warp: false,
-    };
+    }
   }
 
   componentWillUnmount() {
     if (this.workspace) {
-      this.workspace.dispose();
+      this.workspace.dispose()
     }
   }
 
   setBlocks(blocksRef) {
-    if (!blocksRef) return;
-    this.blocks = blocksRef;
+    if (!blocksRef) return
+    this.blocks = blocksRef
     const workspaceConfig = defaultsDeep({}, CustomProcedures.defaultOptions, this.props.options, {
       rtl: this.props.isRtl,
-    });
+    })
 
-    const oldDefaultToolbox = ScratchBlocks.Blocks.defaultToolbox;
-    ScratchBlocks.Blocks.defaultToolbox = null;
-    this.workspace = ScratchBlocks.inject(this.blocks, workspaceConfig);
-    ScratchBlocks.Blocks.defaultToolbox = oldDefaultToolbox;
+    const oldDefaultToolbox = ScratchBlocks.Blocks.defaultToolbox
+    ScratchBlocks.Blocks.defaultToolbox = null
+    this.workspace = ScratchBlocks.inject(this.blocks, workspaceConfig)
+    ScratchBlocks.Blocks.defaultToolbox = oldDefaultToolbox
 
-    this.mutationRoot = this.workspace.newBlock('procedures_declaration');
-    this.mutationRoot.setMovable(false);
-    this.mutationRoot.setDeletable(false);
-    this.mutationRoot.contextMenu = false;
+    this.mutationRoot = this.workspace.newBlock('procedures_declaration')
+    this.mutationRoot.setMovable(false)
+    this.mutationRoot.setDeletable(false)
+    this.mutationRoot.contextMenu = false
 
     this.workspace.addChangeListener(() => {
-      this.mutationRoot.onChangeFn();
-      const metrics = this.workspace.getMetrics();
-      const { x, y } = this.mutationRoot.getRelativeToSurfaceXY();
-      const dy = metrics.viewHeight / 2 - this.mutationRoot.height / 2 - y;
-      let dx;
+      this.mutationRoot.onChangeFn()
+      const metrics = this.workspace.getMetrics()
+      const { x, y } = this.mutationRoot.getRelativeToSurfaceXY()
+      const dy = metrics.viewHeight / 2 - this.mutationRoot.height / 2 - y
+      let dx
 
       if (this.props.isRtl) {
-        const ltrX = metrics.viewWidth / 2 - this.mutationRoot.width / 2 + 25;
-        const mirrorX = x - (x - this.state.rtlOffset) * 2;
+        const ltrX = metrics.viewWidth / 2 - this.mutationRoot.width / 2 + 25
+        const mirrorX = x - (x - this.state.rtlOffset) * 2
         if (mirrorX !== ltrX) {
-          dx = mirrorX - ltrX;
-          this.mutationRoot.moveBy(dx, dy);
-          this.setState({ rtlOffset: this.mutationRoot.getRelativeToSurfaceXY().x });
+          dx = mirrorX - ltrX
+          this.mutationRoot.moveBy(dx, dy)
+          this.setState({ rtlOffset: this.mutationRoot.getRelativeToSurfaceXY().x })
         }
       } else {
-        dx = metrics.viewWidth / 2 - this.mutationRoot.width / 2 - x;
+        dx = metrics.viewWidth / 2 - this.mutationRoot.width / 2 - x
         if (this.mutationRoot.width > metrics.viewWidth) {
-          dx = metrics.viewWidth - this.mutationRoot.width - x;
+          dx = metrics.viewWidth - this.mutationRoot.width - x
         }
-        this.mutationRoot.moveBy(dx, dy);
+        this.mutationRoot.moveBy(dx, dy)
       }
-    });
+    })
 
-    this.mutationRoot.domToMutation(this.props.mutator);
-    this.mutationRoot.initSvg();
-    this.mutationRoot.render();
-    this.setState({ warp: this.mutationRoot.getWarp() });
+    this.mutationRoot.domToMutation(this.props.mutator)
+    this.mutationRoot.initSvg()
+    this.mutationRoot.render()
+    this.setState({ warp: this.mutationRoot.getWarp() })
 
     setTimeout(() => {
-      this.mutationRoot.focusLastEditor_();
-    });
+      this.mutationRoot.focusLastEditor_()
+    })
   }
 
   handleCancel() {
-    this.props.onRequestClose();
+    this.props.onRequestClose()
   }
 
   handleOk() {
-    const newMutation = this.mutationRoot ? this.mutationRoot.mutationToDom(true) : null;
+    const newMutation = this.mutationRoot ? this.mutationRoot.mutationToDom(true) : null
 
     if (this.props.mutatorCallback && newMutation) {
-      this.props.mutatorCallback(newMutation);
+      this.props.mutatorCallback(newMutation)
     }
 
-    this.props.onRequestClose();
+    this.props.onRequestClose()
   }
 
   handleAddLabel() {
     if (this.mutationRoot) {
-      this.mutationRoot.addLabelExternal();
+      this.mutationRoot.addLabelExternal()
     }
   }
 
   handleAddBoolean() {
     if (this.mutationRoot) {
-      this.mutationRoot.addBooleanExternal();
+      this.mutationRoot.addBooleanExternal()
     }
   }
 
   handleAddTextNumber() {
     if (this.mutationRoot) {
-      this.mutationRoot.addStringNumberExternal();
+      this.mutationRoot.addStringNumberExternal()
     }
   }
 
   handleToggleWarp() {
     if (this.mutationRoot) {
-      const newWarp = !this.mutationRoot.getWarp();
-      this.mutationRoot.setWarp(newWarp);
-      this.setState({ warp: newWarp });
+      const newWarp = !this.mutationRoot.getWarp()
+      this.mutationRoot.setWarp(newWarp)
+      this.setState({ warp: newWarp })
     }
   }
 
@@ -133,7 +133,7 @@ class CustomProcedures extends React.Component {
         onOk={this.handleOk}
         onToggleWarp={this.handleToggleWarp}
       />
-    );
+    )
   }
 }
 
@@ -152,16 +152,16 @@ CustomProcedures.propTypes = {
     comments: PropTypes.bool,
     collapse: PropTypes.bool,
   }),
-};
+}
 
 CustomProcedures.defaultProps = {
   options: CustomProcedures.defaultOptions,
-};
+}
 
 const mapStateToProps = (state) => ({
   isRtl: state.locales.isRtl,
   mutator: state.scratchGui.customProcedures.mutator,
   mutatorCallback: state.scratchGui.customProcedures.callback,
-});
+})
 
-export default connect(mapStateToProps)(CustomProcedures);
+export default connect(mapStateToProps)(CustomProcedures)
