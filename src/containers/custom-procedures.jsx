@@ -112,7 +112,12 @@ class CustomProcedures extends React.Component {
   }
   handleOk() {
     const newMutation = this.mutationRoot ? this.mutationRoot.mutationToDom(true) : null
-    this.props.onRequestClose(newMutation)
+
+    if (this.props.mutatorCallback && newMutation) {
+      this.props.mutatorCallback(newMutation)
+    }
+
+    this.props.onRequestClose()
   }
   handleAddLabel() {
     if (this.mutationRoot) {
@@ -186,6 +191,7 @@ CustomProcedures.defaultProps = {
 const mapStateToProps = (state) => ({
   isRtl: state.locales.isRtl,
   mutator: state.scratchGui.customProcedures.mutator,
+  mutatorCallback: state.scratchGui.customProcedures.callback,
 })
 
 export default connect(mapStateToProps)(CustomProcedures)
