@@ -2,6 +2,7 @@ import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
 import samlabsIconURL from './samlabs/samlabs.png';
+import sambotIconURL from './samlabs/sambot.png';
 import samlabsInsetIconURL from './samlabs/samlabs-small.svg';
 
 import musicIconURL from './music/music.png';
@@ -66,6 +67,28 @@ export default [
                 defaultMessage="SAM Labs"
                 description="Description for the 'SAM Labs' extension"
                 id="gui.extension.samlabs.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="BabyBot"
+                description="Name for the 'BabyBot' extension"
+                id="gui.extension.sambot.name"
+            />
+        ),
+        extensionId: 'sambot',
+        iconURL: sambotIconURL,
+        insetIconURL: samlabsInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="BabyBot"
+                description="Description for the 'BabyBot' extension"
+                id="gui.extension.sambot.description"
             />
         ),
         featured: true,
