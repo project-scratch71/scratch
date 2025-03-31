@@ -76,8 +76,8 @@ export default [
     {
         name: (
             <FormattedMessage
-                defaultMessage="BabyBot"
-                description="Name for the 'BabyBot' extension"
+                defaultMessage="Baby SAM Bot"
+                description="Name for the 'Baby SAM Bot' extension"
                 id="gui.extension.sambot.name"
             />
         ),
@@ -86,8 +86,8 @@ export default [
         insetIconURL: samlabsInsetIconURL,
         description: (
             <FormattedMessage
-                defaultMessage="BabyBot"
-                description="Description for the 'BabyBot' extension"
+                defaultMessage="Baby SAM Bot"
+                description="Description for the 'Baby SAM Bot' extension"
                 id="gui.extension.sambot.description"
             />
         ),
