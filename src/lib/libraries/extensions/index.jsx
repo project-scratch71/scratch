@@ -1,10 +1,6 @@
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import samlabsIconURL from './samlabs/samlabs.png';
-import sambotIconURL from './samlabs/sambot.png';
-import samlabsInsetIconURL from './samlabs/samlabs-small.svg';
-
 import musicIconURL from './music/music.png';
 import musicInsetIconURL from './music/music-small.svg';
 
@@ -50,51 +46,7 @@ import gdxforInsetIconURL from './gdxfor/gdxfor-small.svg';
 import gdxforConnectionIconURL from './gdxfor/gdxfor-illustration.svg';
 import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
-export default [
-    {
-        name: (
-            <FormattedMessage
-                defaultMessage="SAM Labs"
-                description="Name for the 'SAM Labs' extension"
-                id="gui.extension.samlabs.name"
-            />
-        ),
-        extensionId: 'samlabs',
-        iconURL: samlabsIconURL,
-        insetIconURL: samlabsInsetIconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="SAM Labs"
-                description="Description for the 'SAM Labs' extension"
-                id="gui.extension.samlabs.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: true
-    },
-    {
-        name: (
-            <FormattedMessage
-                defaultMessage="Baby SAM Bot"
-                description="Name for the 'Baby SAM Bot' extension"
-                id="gui.extension.sambot.name"
-            />
-        ),
-        extensionId: 'sambot',
-        iconURL: sambotIconURL,
-        insetIconURL: samlabsInsetIconURL,
-        description: (
-            <FormattedMessage
-                defaultMessage="Baby SAM Bot"
-                description="Description for the 'Baby SAM Bot' extension"
-                id="gui.extension.sambot.description"
-            />
-        ),
-        featured: true,
-        disabled: false,
-        bluetoothRequired: true
-    },
+const extensions = [
     {
         name: (
             <FormattedMessage
@@ -367,3 +319,8 @@ export default [
         helpLink: 'https://scratch.mit.edu/vernier'
     }
 ];
+
+export default extensions;
+
+import extensionLoader from './extensionLoader/index.jsx';
+extensions.unshift(extensionLoader);
