@@ -1,6 +1,10 @@
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
+import samlabsIconURL from './samlabs/samlabs.png';
+import sambotIconURL from './samlabs/sambot.png';
+import samlabsInsetIconURL from './samlabs/samlabs-small.svg';
+
 import musicIconURL from './music/music.png';
 import musicInsetIconURL from './music/music-small.svg';
 
@@ -47,6 +51,52 @@ import gdxforConnectionIconURL from './gdxfor/gdxfor-illustration.svg';
 import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
 const extensions = [
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="SAM Labs"
+                description="Name for the 'SAM Labs' extension"
+                id="gui.extension.samlabs.name"
+            />
+        ),
+        extensionId: 'https://rbel12b.github.io/Scratch/dist/samlabs.mjs',
+        extensionURL: 'https://rbel12b.github.io/Scratch/dist/samlabs.mjs',
+        iconURL: samlabsIconURL,
+        insetIconURL: samlabsInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="SAM Labs"
+                description="Description for the 'SAM Labs' extension"
+                id="gui.extension.samlabs.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Baby SAM Bot"
+                description="Name for the 'Baby SAM Bot' extension"
+                id="gui.extension.sambot.name"
+            />
+        ),
+        extensionId: 'https://rbel12b.github.io/Scratch/dist/sambot.mjs',
+        extensionURL: 'https://rbel12b.github.io/Scratch/dist/sambot.mjs',
+        iconURL: sambotIconURL,
+        insetIconURL: samlabsInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Baby SAM Bot"
+                description="Description for the 'Baby SAM Bot' extension"
+                id="gui.extension.sambot.description"
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: true
+    },
     {
         name: (
             <FormattedMessage
