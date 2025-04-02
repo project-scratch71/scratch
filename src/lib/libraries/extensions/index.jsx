@@ -5,6 +5,12 @@ import samlabsIconURL from './samlabs/samlabs.png';
 import sambotIconURL from './samlabs/sambot.png';
 import samlabsInsetIconURL from './samlabs/samlabs-small.svg';
 
+import microbitMoreIconURL from './microbitmore/entry-icon.png';
+import microbitMoreInsetIconURL from './microbitmore/inset-icon.svg';
+import microbitMoreConnectionIconURL from './microbitmore/connection-icon.svg';
+import microbitMoreConnectionSmallIconURL from './microbitmore/connection-small-icon.svg';
+import translations from './microbitmore/translations.json';
+
 import musicIconURL from './music/music.png';
 import musicInsetIconURL from './music/music-small.svg';
 
@@ -59,8 +65,7 @@ const extensions = [
                 id="gui.extension.samlabs.name"
             />
         ),
-        extensionId: 'https://rbel12b.github.io/Scratch/dist/samlabs.mjs',
-        extensionURL: 'https://rbel12b.github.io/Scratch/dist/samlabs.mjs',
+        extensionId: 'samlabs',
         iconURL: samlabsIconURL,
         insetIconURL: samlabsInsetIconURL,
         description: (
@@ -82,8 +87,7 @@ const extensions = [
                 id="gui.extension.sambot.name"
             />
         ),
-        extensionId: 'https://rbel12b.github.io/Scratch/dist/sambot.mjs',
-        extensionURL: 'https://rbel12b.github.io/Scratch/dist/sambot.mjs',
+        extensionId: 'sambot',
         iconURL: sambotIconURL,
         insetIconURL: samlabsInsetIconURL,
         description: (
@@ -96,6 +100,44 @@ const extensions = [
         featured: true,
         disabled: false,
         bluetoothRequired: true
+    },
+    {
+        translationMap: translations,
+        name: (
+            <FormattedMessage
+                defaultMessage='MicroBit More'
+                description='Name of this extension'
+                id='mbitMore.entry.name'
+            />
+        ),
+        extensionId: 'microbitMore',
+        extensionURL: 'https://microbit-more.github.io/dist/microbitMore.mjs',
+        collaborator: 'Yengawa Lab',
+        iconURL: microbitMoreIconURL,
+        insetIconURL: microbitMoreInsetIconURL,
+        description: (
+            <formatMessage
+                defaultMessage='Play with all functions of micro:bit.'
+                description="Description for the 'Microbit More' extension"
+                id='mbitMore.entry.description'
+            />
+        ),
+        featured: true,
+        disabled: false,
+        bluetoothRequired: true,
+        internetConnectionRequired: false,
+        launchPeripheralConnectionFlow: true,
+        useAutoScan: false,
+        connectionIconURL: microbitMoreConnectionIconURL,
+        connectionSmallIconURL: microbitMoreConnectionSmallIconURL,
+        connectingMessage: (
+            <formatMessage
+                defaultMessage='Connecting'
+                description='Message to help people connect to their micro:bit.'
+                id='gui.extension.microbit.connectingMessage'
+            />
+        ),
+        helpLink: 'https://microbit-more.github.io/',
     },
     {
         name: (
