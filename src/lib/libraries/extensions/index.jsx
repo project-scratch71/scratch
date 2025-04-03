@@ -9,7 +9,18 @@ import microbitMoreIconURL from './microbitmore/entry-icon.png';
 import microbitMoreInsetIconURL from './microbitmore/inset-icon.svg';
 import microbitMoreConnectionIconURL from './microbitmore/connection-icon.svg';
 import microbitMoreConnectionSmallIconURL from './microbitmore/connection-small-icon.svg';
-import translations from './microbitmore/translations.json';
+import microbitMoreTranslations from './microbitmore/translations.json';
+
+import controlplus from './controlplus';
+import duplotrain from './duplotrain';
+import legoble from './legoble';
+import legoluigi from './legoluigi';
+import legomario from './legomario';
+import legopeach from './legopeach';
+import legoremote from './legoremote';
+import poweredup from './poweredup';
+import spikeessential from './spikeessential';
+// import spikeprime from './spikeprime';
 
 import musicIconURL from './music/music.png';
 import musicInsetIconURL from './music/music-small.svg';
@@ -102,7 +113,7 @@ const extensions = [
         bluetoothRequired: true
     },
     {
-        translationMap: translations,
+        translationMap: microbitMoreTranslations,
         name: (
             <FormattedMessage
                 defaultMessage='MicroBit More'
@@ -139,6 +150,16 @@ const extensions = [
         ),
         helpLink: 'https://microbit-more.github.io/',
     },
+    controlplus,
+    duplotrain,
+    legoble,
+    legoluigi,
+    legomario,
+    legopeach,
+    legoremote,
+    poweredup,
+    spikeessential,
+    // spikeprime,
     {
         name: (
             <FormattedMessage
