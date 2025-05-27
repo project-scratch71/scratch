@@ -34,8 +34,15 @@ const languageNames = {
     css: 'CSS',
     json: 'JSON',
     bash: 'Bash',
-    shell: 'Shell'
+    shell: 'Shell',
+    scratch: 'Scratch',
+    text: 'Text'
 };
+
+// Define which languages are supported by highlight.js
+const supportedLanguages = new Set([
+    'javascript', 'js', 'python', 'py', 'html', 'xml', 'css', 'json', 'bash', 'shell'
+]);
 
 /**
  * Simple function to convert a message with code blocks to highlighted HTML
@@ -65,14 +72,16 @@ const processMessageWithCodeBlocks = text => {
         // Add code block
         const language = match[1] || 'text';
         const code = match[2].trim();
+        const normalizedLanguage = language.toLowerCase();
         
         segments.push({
             type: 'code',
             language,
             content: code,
-            highlighted: language !== 'text' ? 
-                hljs.highlight(code, {language: language.toLowerCase(), ignoreIllegals: true}).value :
-                code
+            // 如果语言不支持，不进行高亮，直接使用原始代码
+            highlighted: supportedLanguages.has(normalizedLanguage) ? 
+                hljs.highlight(code, {language: normalizedLanguage, ignoreIllegals: true}).value :
+                hljs.highlightAuto(code).value // 使用自动检测作为默认
         });
         
         lastIndex = match.index + match[0].length;
@@ -134,6 +143,7 @@ const processInlineCode = text => {
 const CodeBlock = ({language, content}) => {
     const [copied, setCopied] = useState(false);
     const displayName = languageNames[language] || language;
+    const normalizedLanguage = language.toLowerCase();
     
     // Handle copy to clipboard
     const handleCopy = () => {
@@ -167,9 +177,9 @@ const CodeBlock = ({language, content}) => {
             <pre>
                 <code 
                     className={`language-${language}`}
-                    dangerouslySetInnerHTML={{__html: language !== 'text' ? 
-                        hljs.highlight(content, {language, ignoreIllegals: true}).value : 
-                        content}}
+                    dangerouslySetInnerHTML={{__html: supportedLanguages.has(normalizedLanguage) ? 
+                        hljs.highlight(content, {language: normalizedLanguage, ignoreIllegals: true}).value : 
+                        hljs.highlightAuto(content).value}} // 使用自动检测作为默认
                 />
             </pre>
         </div>

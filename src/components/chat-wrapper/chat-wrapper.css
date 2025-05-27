@@ -31,7 +31,7 @@
     display: flex;
     align-items: center;
     height: 2.75rem; /* 与stage-header高度一致 $stage-menu-height */
-    padding: 0 0.6rem; /* 使用水平内边距，垂直方向由高度控制 */
+    padding: 0 0.75rem; /* 增加两侧内边距，使视觉更平衡 */
     background: linear-gradient(to bottom, 
         hsla(215, 100%, 95%, 1), /* $ui-primary */
         hsla(215, 75%, 95%, 1)   /* $ui-secondary */
@@ -41,22 +41,26 @@
 
 .chatTitle {
     flex-grow: 1; /* 标题占据剩余空间 */
-    color: hsla(225, 15%, 40%, 1); /* $text-primary */
-    font-weight: 500;
-    font-size: 1rem;
-    margin: 0;
+    color: hsla(245, 55%, 40%, 1); /* 更鲜艳的颜色 */
+    font-weight: 600; /* 更粗一点的字体 */
+    font-size: 1.1rem; /* 稍微大一点 */
+    margin: 0 0 0 0.5rem; /* 与图标的距离 */
+    /* 使用多个备选字体，确保跨平台兼容性，同时保持卡通风格 */
+    font-family: "Comic Sans MS", "Marker Felt", "Comic Neue", "Chalkboard SE", "Krungthep", "Snell Roundhand", "Baloo", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: 0.02em; /* 字母间距稍微增加 */
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8); /* 轻微文字阴影增加立体感 */
 }
 
 .toggleButton {
     position: absolute;
     left: 0;
-    top: 50%;
+    top: calc(50% - 24px); /* 向上偏移更多，为expand按钮留出足够空间 */
     transform: translateY(-50%);
-    width: 20px;
-    height: 80px;
+    width: 22px;
+    height: 40px; /* 稍微增加高度 */
     background-color: hsla(215, 100%, 65%, 1); /* $motion-primary */
     border: none;
-    border-radius: 0 6px 6px 0;
+    border-radius: 0 6px 0 0; /* 上方为圆角，下方方形以便与expand按钮结合 */
     cursor: pointer;
     z-index: 10;
     display: flex;
@@ -72,7 +76,7 @@
 
 .toggleButton:hover {
     background-color: hsla(215, 60%, 50%, 1); /* $motion-tertiary */
-    width: 24px;
+    width: 26px;
 }
 
 .toggleButtonIcon {
@@ -122,7 +126,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 10px 15px;
+    padding: 10px 4px; /* 减少左右padding到最小 */
     scrollbar-width: thin;
     scrollbar-color: hsla(215, 100%, 65%, 0.5) transparent;
     scroll-behavior: smooth; /* 平滑滚动 */
@@ -169,22 +173,30 @@
 
 .messageBot, .messageUser {
     display: flex;
-    max-width: 80%;
 }
 
 .messageBot {
+    width: 100%; /* 机器人消息总是占最大宽度 */
+    max-width: 100%;
     align-self: flex-start;
 }
 
 .messageUser {
+    max-width: 80%; /* 用户消息保持原来的宽度限制 */
     align-self: flex-end;
+}
+
+/* 包含代码块的机器人消息保持100%宽度 */
+.messageBot.hasCodeBlock {
+    width: 100%;
+    max-width: 100%;
 }
 
 .messageContent {
     position: relative;
     padding: 8px 12px;
     border-radius: 16px;
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
     line-height: 1.4;
     width: 100%;
 }
@@ -193,6 +205,12 @@
     background-color: hsla(215, 100%, 65%, 0.15); /* 15% transparent version of motion-primary */
     color: hsla(225, 15%, 40%, 1); /* $text-primary */
     border-top-left-radius: 4px;
+}
+
+/* 包含代码块的机器人消息去掉背景色 */
+.messageBot.hasCodeBlock .messageContent {
+    background-color: transparent;
+    padding: 4px 8px;
 }
 
 .messageUser .messageContent {
@@ -206,12 +224,13 @@
     align-items: center; /* 确保子元素垂直居中 */
     background-color: hsla(215, 50%, 97%, 1); /* 浅灰蓝背景 */
     border-radius: 20px;
-    padding: 6px;
+    padding: 4px; /* 减少padding避免遮挡按钮 */
     box-shadow: 0 2px 5px hsla(0, 0%, 0%, 0.05);
     border: 1px solid hsla(0, 0%, 0%, 0.05);
     transition: all 0.2s ease;
-    width: calc(100% - 20px); /* 左右各留10px边距 */
+    width: calc(100% - 8px); /* 减少左右边距 */
     margin: 0 auto;
+    min-height: 44px; /* 确保最小高度容纳发送按钮 */
 }
 
 .chatInput:focus-within {
@@ -222,14 +241,14 @@
 .chatInputField {
     flex-grow: 1;
     border: none;
-    padding: 8px 10px;
-    font-size: 0.875rem;
+    padding: 8px 12px;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
     background: transparent;
     outline: none;
     color: hsla(225, 15%, 40%, 1); /* $text-primary */
     resize: none;
-    min-height: 20px;
-    max-height: 120px;
+    min-height: 22px; /* 调整最小高度 */
+    max-height: 100px; /* 减少最大高度 */
     overflow-y: auto;
     line-height: 1.4;
     word-wrap: break-word;
@@ -243,38 +262,33 @@
     color: white;
     border: none;
     border-radius: 100%;
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
+    width: 2.75rem; /* 与action-menu按钮大小一致 */
+    height: 2.75rem; /* 与action-menu按钮大小一致 */
+    min-width: 2.75rem;
     padding: 0;
-    margin-left: 8px;
+    margin-left: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease; /* 简化过渡效果，与action-menu一致 */
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 0 2px hsla(215, 100%, 65%, 0.25);
+    box-shadow: 0 0 0 4px hsla(215, 100%, 65%, 0.25); /* 模仿action-menu的透明边框 */
     align-self: center; /* 确保按钮在父容器中垂直居中 */
     flex-shrink: 0; /* 防止按钮被压缩 */
 }
 
 .sendButton:hover {
-    background-color: hsla(215, 60%, 50%, 1); /* $motion-tertiary */
-    transform: scale(1.1);
-    box-shadow: 0 0 0 4px hsla(215, 100%, 65%, 0.3);
+    background-color: hsla(163, 85%, 40%, 1); /* 使用extensions-primary颜色，与action-menu一致 */
 }
 
 .sendButton:disabled {
     background-color: hsla(215, 30%, 80%, 1);
     cursor: not-allowed;
     box-shadow: none;
-    transform: scale(1);
 }
 
 .sendButton:disabled:hover {
     background-color: hsla(215, 30%, 80%, 1);
-    transform: scale(1);
-    box-shadow: none;
 }
 
 .sendIcon {
@@ -310,6 +324,37 @@
     margin-right: 0;
     width: 28px;
     height: 28px;
+    transition: transform 0.3s ease;
+}
+
+/* 通用chatIcon样式 */
+.chatIcon {
+    cursor: pointer;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    width: 28px; /* 保持适当大小 */
+    height: 28px; /* 保持适当大小 */
+    margin-right: 0.5rem; /* 增加与标题间距 */
+    transition: transform 0.3s ease; /* 只保留基本过渡效果 */
+}
+
+.chatIcon:hover {
+    transform: scale(1.1); /* 悬停时稍微放大 */
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
+    /* 这里可以在hover时添加动画 */
+    animation: chatIconPulse 1s ease-in-out; /* 只在hover时添加动画 */
+}
+
+/* 只保留一个简单的脉动动画，并只在hover时触发 */
+@keyframes chatIconPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1.1);
+    }
 }
 
 .verticalText {
@@ -384,7 +429,6 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    margin-left: auto; /* 推到右侧 */
 }
 
 .clearChatButton:hover {
@@ -472,7 +516,7 @@
     border: 1px solid hsla(215, 100%, 65%, 0.3);
     border-radius: 16px;
     padding: 6px 12px;
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
     color: hsla(215, 100%, 65%, 1);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -496,7 +540,51 @@
 
 .followUpHeading {
     width: 100%;
-    font-size: 0.8rem;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
     color: hsla(225, 15%, 40%, 0.8);
     margin: 0 0 4px 0;
+}
+
+.headerButtons {
+    display: flex;
+    gap: 0.5rem; /* 增加按钮之间的间距 */
+    align-items: center;
+    margin-left: auto; /* 将按钮推到右侧 */
+    padding-left: 0.5rem; /* 与左侧保持一定距离 */
+}
+
+.expandButton {
+    position: absolute;
+    left: 0; /* 与toggle按钮对齐 */
+    top: calc(50% + 16px); /* 紧贴toggle按钮底部 */
+    transform: translateY(-50%);
+    width: 22px;
+    height: 40px; /* 与toggle按钮相同高度 */
+    background-color: hsla(215, 100%, 65%, 1); /* 与toggle按钮相同的蓝色 $motion-primary */
+    border: none;
+    border-radius: 0 0 6px 0; /* 只在右下角有圆角，顶部与toggle按钮相连 */
+    cursor: pointer;
+    z-index: 9; /* 略低于toggle按钮 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 5px hsla(0, 0%, 0%, 0.15);
+}
+
+.expandButton:hover {
+    background-color: hsla(215, 60%, 50%, 1); /* 与toggle按钮相同的hover颜色 $motion-tertiary */
+    width: 26px;
+}
+
+/* 包含任何Markdown内容的消息样式 */
+.messageBot.hasMarkdown .messageContent {
+    background-color: transparent;
+    padding: 8px;
+}
+
+/* 当包含Markdown内容时，增加一些边距，让内容更清晰 */
+.messageBot.hasMarkdown {
+    padding: 4px 0;
 }

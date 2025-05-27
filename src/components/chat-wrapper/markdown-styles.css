@@ -2,7 +2,7 @@
 .inlineCode {
     font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
     padding: 0.2em 0.4em;
-    font-size: 85%;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
     background-color: hsla(215, 100%, 95%, 0.5);
     border-radius: 3px;
 }
@@ -16,7 +16,7 @@
 .codeHeader {
     background-color: hsla(220, 13%, 22%, 1);
     color: hsla(220, 14%, 71%, 0.8);
-    font-size: 0.75rem;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
     padding: 0.25rem 0.75rem;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
@@ -41,7 +41,7 @@
     background-color: transparent;
     padding: 0;
     color: inherit;
-    font-size: 0.85rem;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
     line-height: 1.45;
     tab-size: 2;
     font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
@@ -50,12 +50,12 @@
 
 /* Copy code button */
 .copyCodeButton {
-    padding: 0.25rem 0.5rem;
+    padding: 0.2rem 0.4rem;
     background-color: hsla(220, 13%, 28%, 1);
     color: hsla(220, 14%, 71%, 0.8);
     border: none;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -70,9 +70,117 @@
 
 /* Markdown styles */
 .markdown {
-    line-height: 1.6;
+    line-height: 1.5;
     word-break: break-word;
     overflow-wrap: break-word;
+    font-size: 0.75rem; /* 与 menu-bar 标准字体大小一致 */
+}
+
+.markdown h1, 
+.markdown h2, 
+.markdown h3, 
+.markdown h4, 
+.markdown h5, 
+.markdown h6 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    line-height: 1.2;
+    color: hsla(225, 15%, 30%, 1);
+}
+
+.markdown h1 {
+    font-size: 1.1rem;
+    border-bottom: 1px solid hsla(215, 20%, 90%, 1);
+    padding-bottom: 0.3em;
+}
+
+.markdown h2 {
+    font-size: 1rem;
+    border-bottom: 1px solid hsla(215, 20%, 90%, 1);
+    padding-bottom: 0.2em;
+}
+
+.markdown h3 {
+    font-size: 0.9rem;
+}
+
+.markdown h4 {
+    font-size: 0.85rem;
+}
+
+.markdown h5 {
+    font-size: 0.8rem;
+}
+
+.markdown h6 {
+    font-size: 0.75rem;
+    color: hsla(225, 15%, 50%, 1);
+}
+
+.markdown p {
+    margin: 0.5em 0;
+}
+
+.markdown ul,
+.markdown ol {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+}
+
+.markdown li {
+    margin: 0.15em 0;
+}
+
+.markdown blockquote {
+    border-left: 0.25em solid hsla(215, 100%, 65%, 0.5);
+    padding: 0 1em;
+    margin: 0.8em 0;
+    color: hsla(225, 15%, 40%, 0.8);
+}
+
+.markdown hr {
+    height: 0.15em;
+    padding: 0;
+    margin: 1.5em 0;
+    background-color: hsla(215, 20%, 90%, 1);
+    border: 0;
+}
+
+.markdown a {
+    color: hsla(215, 100%, 65%, 1);
+    text-decoration: none;
+}
+
+.markdown a:hover {
+    text-decoration: underline;
+}
+
+.markdown table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8em 0;
+    overflow: auto;
+}
+
+.markdown table th {
+    padding: 0.5em;
+    background-color: hsla(215, 100%, 95%, 0.5);
+    border: 1px solid hsla(215, 20%, 90%, 1);
+    font-weight: bold;
+}
+
+.markdown table td {
+    padding: 0.5em;
+    border: 1px solid hsla(215, 20%, 90%, 1);
+}
+
+.markdown table tr:nth-child(2n) {
+    background-color: hsla(215, 100%, 98%, 0.5);
+}
+
+.markdown img {
+    max-width: 100%;
+    border-radius: 4px;
 }
 
 /* Syntax highlighting styles (derived from VS Code dark theme) */

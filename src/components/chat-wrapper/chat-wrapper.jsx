@@ -5,6 +5,8 @@ import Box from '../box/box.jsx';
 import layout from '../../lib/layout-constants';
 import deepseekAPI from '../../lib/deepseek-api';
 import MessageWithCodeHighlighting from './code-highlighter.jsx';
+import MessageWithMarkdown from './MessageWithMarkdown.jsx';  // 导入新的Markdown渲染组件
+import {hasCodeBlocks, hasMarkdown} from './markdown-utils';  // 导入Markdown检测工具
 
 import styles from './chat-wrapper.css';
 
@@ -88,40 +90,86 @@ const SearchIcon = () => (
 const ChatIcon = () => (
     <svg 
         className={styles.chatIcon} 
-        width="32" 
-        height="32" 
+        width="28" 
+        height="28" 
         viewBox="0 0 32 32" 
         xmlns="http://www.w3.org/2000/svg"
     >
-        {/* 超简洁儿童友好的圆形机器人图标 */}
-        <defs>
-            <linearGradient id="robotGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#4C97FF" /> {/* $motion-primary */}
-                <stop offset="100%" stopColor="#855CD6" /> {/* $looks-secondary */}
-            </linearGradient>
-        </defs>
-        {/* 圆形背景 */}
-        <circle cx="16" cy="16" r="15" fill="white" stroke="#E5F0FF" strokeWidth="0.5" />
+        {/* 卡通现代风格的聊天机器人图标 */}
         
-        {/* 圆形机器人头部 */}
-        <circle cx="16" cy="16" r="10" fill="url(#robotGradient)" />
+        {/* 背景圆形 - 更鲜艳的背景 */}
+        <circle cx="16" cy="16" r="15" fill="#5CD6FF" stroke="#4AAFFF" strokeWidth="1" />
         
-        {/* 机器人眼睛 - 更大更明显 */}
-        <circle cx="12" cy="13" r="2.5" fill="white" />
-        <circle cx="20" cy="13" r="2.5" fill="white" />
+        {/* 机器人主体 - 更现代的颜色 */}
+        <rect x="7" y="9" width="18" height="16" fill="#6E64FF" rx="2" />
         
-        {/* 机器人嘴巴 - 简单的笑脸 */}
-        <path d="M12,19 Q16,23 20,19" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" />
+        {/* 主体顶部高光 */}
+        <rect x="7" y="9" width="18" height="2" fill="#8A7DFF" rx="2" />
         
-        {/* 机器人天线 */}
-        <circle cx="16" cy="3" r="1.5" fill="#4C97FF" />
-        <line x1="16" y1="3" x2="16" y2="6" stroke="#4C97FF" strokeWidth="2" strokeLinecap="round" />
+        {/* 主体左侧高光 */}
+        <rect x="7" y="9" width="2" height="16" fill="#8A7DFF" rx="2" />
+        
+        {/* 主体底部阴影 */}
+        <rect x="7" y="23" width="18" height="2" fill="#5A52CC" rx="2" />
+        
+        {/* 主体右侧阴影 */}
+        <rect x="23" y="9" width="2" height="16" fill="#5A52CC" rx="2" />
+        
+        {/* 显示屏区域 - 更卡通的深色背景 */}
+        <rect x="9" y="11" width="14" height="8" fill="#483D8B" rx="1" />
+        
+        {/* 显示屏边框 - 更现代的亮蓝色 */}
+        <rect x="9" y="11" width="14" height="1" fill="#8BE9FD" rx="1" />
+        <rect x="9" y="11" width="1" height="8" fill="#8BE9FD" rx="1" />
+        <rect x="22" y="11" width="1" height="8" fill="#5A52CC" rx="1" />
+        <rect x="9" y="18" width="14" height="1" fill="#5A52CC" rx="1" />
+        
+        {/* 眼睛 - 白色圆形眼睛 */}
+        <circle cx="13" cy="14" r="2" fill="#FFFFFF" />
+        <circle cx="19" cy="14" r="2" fill="#FFFFFF" />
+        
+        {/* 眼睛高光 - 更卡通的瞳孔 */}
+        <circle cx="13" cy="14" r="1" fill="#FF618C" />
+        <circle cx="19" cy="14" r="1" fill="#FF618C" />
+        
+        {/* 嘴巴 - 更现代的笑脸 */}
+        <path d="M13,17 Q16,19 19,17" stroke="#FFFFFF" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        
+        {/* 天线基座 */}
+        <rect x="15" y="7" width="2" height="2" fill="#8A7DFF" rx="1" />
+        
+        {/* 天线顶部 - 更亮的颜色 */}
+        <circle cx="16" cy="5" r="2" fill="#FF618C" />
+        
+        {/* 控制面板 - 更现代的按钮 */}
+        <rect x="10" y="21" width="12" height="2" fill="#8A7DFF" rx="1" />
+        
+        {/* 按钮点缀 */}
+        <circle cx="11" cy="22" r="0.5" fill="#FFFFFF" />
+        <circle cx="16" cy="22" r="0.5" fill="#FFFFFF" />
+        <circle cx="21" cy="22" r="0.5" fill="#FFFFFF" />
+        
+        {/* 聊天气泡装饰 - 更现代的风格 */}
+        <circle cx="24" cy="8" r="3" fill="#FFFFFF" stroke="#4AAFFF" strokeWidth="1" />
+        <circle cx="23" cy="8" r="0.7" fill="#5CD6FF" />
+        <circle cx="25" cy="8" r="0.7" fill="#5CD6FF" />
+        
+        {/* 添加小三角形指示聊天 */}
+        <polygon points="22,10 24,13 26,10" fill="#FFFFFF" stroke="#4AAFFF" strokeWidth="0.5" />
+        
+        {/* 小装饰光点 */}
+        <circle cx="7" cy="7" r="1" fill="#8BE9FD" opacity="0.6" />
+        <circle cx="25" cy="24" r="1" fill="#FF618C" opacity="0.6" />
+        
+        {/* 更现代的底部装饰 */}
+        <rect x="9" y="25" width="14" height="1" fill="#5A52CC" rx="0.5" />
     </svg>
 );
 
 const ChatWrapperComponent = props => {
     const {vm, mcpServer, className} = props;
     const [collapsed, setCollapsed] = useState(false);
+    const [expanded, setExpanded] = useState(false); // 添加放大状态
     const [width, setWidth] = useState(layout.standardStageWidth); // 使用标准舞台宽度作为默认宽度
     const [lastWidth, setLastWidth] = useState(layout.standardStageWidth); // 记住上一次展开时的宽度
     const [messages, setMessages] = useState(() => {
@@ -143,23 +191,23 @@ const ChatWrapperComponent = props => {
             
             // 根据视口宽度自适应调整聊天区域宽度
             const viewportWidth = window.innerWidth;
+            let baseWidth;
             
             // 根据不同的视口宽度设置不同的聊天区域宽度
             if (viewportWidth >= 1400) {
                 // 较大屏幕，使用较大宽度
-                const newWidth = Math.min(500, viewportWidth * 0.25);
-                setWidth(newWidth);
-                setLastWidth(newWidth);
+                baseWidth = Math.min(500, viewportWidth * 0.25);
             } else if (viewportWidth >= layout.fullSizeMinWidth) {
                 // 中等屏幕，使用标准舞台宽度
-                setWidth(layout.standardStageWidth);
-                setLastWidth(layout.standardStageWidth);
+                baseWidth = layout.standardStageWidth;
             } else {
                 // 较小屏幕，使用更窄的宽度以适应
-                const newWidth = Math.max(280, Math.min(layout.standardStageWidth, viewportWidth * 0.3));
-                setWidth(newWidth);
-                setLastWidth(newWidth);
+                baseWidth = Math.max(280, Math.min(layout.standardStageWidth, viewportWidth * 0.3));
             }
+            
+            // 如果是放大状态，宽度加倍
+            const finalWidth = expanded ? baseWidth * 2 : baseWidth;
+            setWidth(finalWidth);
         };
         
         // 初始化调整一次
@@ -172,7 +220,7 @@ const ChatWrapperComponent = props => {
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, [collapsed]);
+    }, [collapsed, expanded]); // 添加 expanded 依赖
     
     // 每当消息列表变化时，滚动到最新消息
     useEffect(() => {
@@ -374,6 +422,30 @@ const ChatWrapperComponent = props => {
         setCollapsed(!collapsed);
     };
     
+    // 处理放大/缩小状态
+    const toggleExpand = () => {
+        // 切换放大状态
+        const newExpandedState = !expanded;
+        setExpanded(newExpandedState);
+        
+        // 根据视口宽度调整聊天区域宽度
+        const viewportWidth = window.innerWidth;
+        let baseWidth;
+        
+        // 根据不同的视口宽度设置不同的聊天区域宽度
+        if (viewportWidth >= 1400) {
+            baseWidth = Math.min(500, viewportWidth * 0.25);
+        } else if (viewportWidth >= layout.fullSizeMinWidth) {
+            baseWidth = layout.standardStageWidth;
+        } else {
+            baseWidth = Math.max(280, Math.min(layout.standardStageWidth, viewportWidth * 0.3));
+        }
+        
+        // 更新宽度
+        const newWidth = newExpandedState ? baseWidth * 2 : baseWidth;
+        setWidth(newWidth);
+    };
+    
     return (
         <Box 
             className={`${styles.chatWrapper} ${collapsed ? styles.collapsed : ''} ${className || ''}`}
@@ -389,16 +461,42 @@ const ChatWrapperComponent = props => {
             >
                 <div className={styles.toggleButtonIcon}>
                     {collapsed ? (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                        /* 折叠状态：显示向右箭头，表示可以展开聊天区域 */
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                            <path d="M18.12 4.12L10.24 12l7.88 7.88L16 22L6 12l10-10z" />
+                            <path d="M22.12 4.12L14.24 12l7.88 7.88L20 22l-10-10 10-10z" />
                         </svg>
                     ) : (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                        /* 展开状态：显示向左箭头，表示可以收起聊天区域 */
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                            <path d="M5.88 4.12L13.76 12l-7.88 7.88L8 22l10-10L8 2z" />
+                            <path d="M1.88 4.12L9.76 12l-7.88 7.88L4 22l10-10L4 2z" />
                         </svg>
                     )}
                 </div>
             </button>
+            
+            {/* 展开按钮移动到toggle按钮旁边 */}
+            {!collapsed && (
+                <button 
+                    className={styles.expandButton}
+                    onClick={toggleExpand}
+                    title={expanded ? "缩小聊天区域" : "放大聊天区域"}
+                    aria-label={expanded ? "缩小聊天区域" : "放大聊天区域"}
+                >
+                    {expanded ? (
+                        /* 缩小图标 - 减号 */
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                            <rect x="6" y="11" width="12" height="2" rx="1" />
+                        </svg>
+                    ) : (
+                        /* 放大图标 - 加号 */
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                    )}
+                </button>
+            )}
             
             {!collapsed ? (
                 <React.Fragment>
@@ -412,16 +510,18 @@ const ChatWrapperComponent = props => {
                                     id="gui.chatWrapper.chatScratch"
                                 />
                             </h1>
-                            <button 
-                                className={styles.clearChatButton}
-                                onClick={handleClearChat}
-                                title="清空聊天记录"
-                                aria-label="清空聊天记录"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                                </svg>
-                            </button>
+                            <div className={styles.headerButtons}>
+                                <button 
+                                    className={styles.clearChatButton}
+                                    onClick={handleClearChat}
+                                    title="清空聊天记录"
+                                    aria-label="清空聊天记录"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </Box>
                     <Box className={styles.chatCanvasWrapper}>
@@ -449,11 +549,15 @@ const ChatWrapperComponent = props => {
                                 return (
                                     <div 
                                         key={index} 
-                                        className={message.role === 'assistant' ? styles.messageBot : styles.messageUser}
+                                        className={`${message.role === 'assistant' ? styles.messageBot : styles.messageUser} ${
+                                            message.role === 'assistant' && hasMarkdown(message.content) ? styles.hasMarkdown : ''
+                                        } ${
+                                            message.role === 'assistant' && hasCodeBlocks(message.content) ? styles.hasCodeBlock : ''
+                                        }`}
                                     >
                                         <div className={styles.messageContent}>
                                             {message.role === 'assistant' ? (
-                                                <MessageWithCodeHighlighting content={message.content} />
+                                                <MessageWithMarkdown content={message.content} />
                                             ) : (
                                                 message.content
                                             )}
