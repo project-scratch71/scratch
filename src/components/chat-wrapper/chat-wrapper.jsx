@@ -4,8 +4,86 @@ import {FormattedMessage} from 'react-intl';
 import Box from '../box/box.jsx';
 import layout from '../../lib/layout-constants';
 import deepseekAPI from '../../lib/deepseek-api';
+import MessageWithCodeHighlighting from './code-highlighter.jsx';
 
 import styles from './chat-wrapper.css';
+
+/**
+ * 从AI回复中提取或生成后续问题建议
+ * @param {string} content - AI回复的内容
+ * @return {Array<string>} - 后续问题数组，最多3个
+ */
+const generateFollowUpQuestions = content => {
+    // 检查是否有特定格式的后续问题标记
+    const followUpRegex = /后续问题[：:]\s*([\s\S]*?)(?:\n\n|$)/i;
+    const match = content.match(followUpRegex);
+    
+    if (match && match[1]) {
+        // 提取后续问题列表
+        const questionsText = match[1];
+        const questions = questionsText
+            .split(/\n/)  // 按行分割
+            .map(q => q.replace(/^[0-9\-\*\.\s]+/, '').trim())  // 移除数字、破折号、星号等列表标记
+            .filter(q => q && q.length > 0);  // 过滤空行
+            
+        // 最多返回3个问题
+        return questions.slice(0, 3);
+    }
+    
+    // 基于常见后续交互的默认问题
+    const defaultQuestions = [
+        "还能进一步完善这个程序吗？",
+        "如何修改这些积木？",
+        "能解释一下这段代码是如何工作的吗？"
+    ];
+    
+    // 根据内容选择合适的后续问题
+    if (content.includes("创建") || content.includes("添加")) {
+        return [
+            "如何让角色移动？",
+            "怎么添加声音效果？",
+            "能让角色说话吗？"
+        ];
+    } else if (content.includes("移动") || content.includes("旋转")) {
+        return [
+            "如何控制移动速度？",
+            "怎样让角色碰到边缘时反弹？",
+            "能让角色跟随鼠标移动吗？"
+        ];
+    } else if (content.includes("变量") || content.includes("计分")) {
+        return [
+            "如何显示分数？",
+            "能制作一个计时器吗？",
+            "怎样让游戏难度随着分数增加？"
+        ];
+    }
+    
+    return defaultQuestions;
+};
+
+// MCP Tool Icon component
+const ToolIcon = () => (
+    <svg 
+        width="16" 
+        height="16" 
+        viewBox="0 0 24 24" 
+        fill="currentColor"
+    >
+        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" />
+    </svg>
+);
+
+// Search Icon component
+const SearchIcon = () => (
+    <svg 
+        width="16" 
+        height="16" 
+        viewBox="0 0 24 24" 
+        fill="currentColor"
+    >
+        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+    </svg>
+);
 
 const ChatIcon = () => (
     <svg 
@@ -42,7 +120,7 @@ const ChatIcon = () => (
 );
 
 const ChatWrapperComponent = props => {
-    const {vm, className} = props;
+    const {vm, mcpServer, className} = props;
     const [collapsed, setCollapsed] = useState(false);
     const [width, setWidth] = useState(layout.standardStageWidth); // 使用标准舞台宽度作为默认宽度
     const [lastWidth, setLastWidth] = useState(layout.standardStageWidth); // 记住上一次展开时的宽度
@@ -52,6 +130,8 @@ const ChatWrapperComponent = props => {
     });
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [toolExecuting, setToolExecuting] = useState(false);  // 工具执行状态
+    const [searchExecuting, setSearchExecuting] = useState(false);  // 搜索执行状态
     const chatRef = React.useRef(null);
     const messagesEndRef = useRef(null);
     const textareaRef = useRef(null);
@@ -121,13 +201,17 @@ const ChatWrapperComponent = props => {
         }
     };
     
-    // 处理发送消息
-    const handleSendMessage = async () => {
-        if (inputValue.trim() === '' || isLoading) return;
+    /**
+     * 处理发送消息
+     * @param {string} [content] - 可选，如果传入则使用该内容而不是输入框的内容
+     */
+    const handleSendMessage = async (content) => {
+        const messageToSend = content || inputValue;
+        if (messageToSend.trim() === '' || isLoading) return;
         
         const userMessage = {
             role: 'user',
-            content: inputValue
+            content: messageToSend
         };
         
         // 更新消息列表，添加用户消息
@@ -151,14 +235,100 @@ const ChatWrapperComponent = props => {
             // 调用 DeepSeek API
             const response = await deepseekAPI.sendMessage(messageHistory);
             
-            // 获取回复并更新消息列表
-            if (response.choices && response.choices.length > 0) {
-                const assistantMessage = {
+            // 检查是否有工具调用
+            if (response.choices && 
+                response.choices[0] && 
+                response.choices[0].message && 
+                response.choices[0].message.tool_calls && 
+                response.choices[0].message.tool_calls.length > 0) {
+                
+                // 显示工具调用开始消息
+                const toolCallsCount = response.choices[0].message.tool_calls.length;
+                
+                // 检查是否有搜索工具调用
+                const hasSearchCall = response.choices[0].message.tool_calls.some(
+                    tc => tc.function?.name === 'bingSearch'
+                );
+                
+                // 根据工具类型显示适当的消息
+                let toolType = '操作';
+                if (hasSearchCall) {
+                    setSearchExecuting(true);
+                    toolType = hasSearchCall && toolCallsCount === 1 ? '搜索' : '搜索和操作';
+                } else {
+                    setToolExecuting(true);
+                }
+                
+                const toolNames = response.choices[0].message.tool_calls
+                    .map(tc => tc.function?.name)
+                    .filter(Boolean)
+                    .join(', ');
+                
+                const toolCallMsg = {
                     role: 'assistant',
-                    content: response.choices[0].message.content
+                    content: `正在执行 ${toolCallsCount} 个 Scratch ${toolType}: ${toolNames}...`,
+                    isToolCall: true
                 };
                 
-                setMessages(prev => [...prev, assistantMessage]);
+                setMessages(prev => [...prev, toolCallMsg]);
+                setToolExecuting(true);
+                
+                // 收到带工具调用的最终响应后
+                if (response.choices && response.choices.length > 0) {
+                    const assistantMessage = {
+                        role: 'assistant',
+                        content: response.choices[0].message.content,
+                        followUpQuestions: generateFollowUpQuestions(response.choices[0].message.content)
+                    };
+                    
+                    // 检查是否有工具操作摘要
+                    if (response.toolSummary && response.toolSummary.operations) {
+                        // 添加工具操作摘要（仅在开发模式下）
+                        if (process.env.NODE_ENV === 'development') {
+                            const summaryMsg = {
+                                role: 'system',
+                                content: `工具操作结果:\n${response.toolSummary.operations.join('\n')}`,
+                                isToolSummary: true
+                            };
+                            
+                            // 添加工具摘要，仅在开发模式下显示
+                            setMessages(prev => {
+                                // 删除临时工具调用消息，添加摘要和最终回复
+                                const filtered = prev.filter(msg => !msg.isToolCall);
+                                return [...filtered, summaryMsg, assistantMessage];
+                            });
+                        } else {
+                            // 生产模式下只显示最终回复
+                            setMessages(prev => {
+                                // 删除临时工具调用消息，添加最终回复
+                                const filtered = prev.filter(msg => !msg.isToolCall);
+                                return [...filtered, assistantMessage];
+                            });
+                        }
+                    } else {
+                        // 没有工具摘要，只添加最终回复
+                        setMessages(prev => {
+                            // 删除临时工具调用消息，添加最终回复
+                            const filtered = prev.filter(msg => !msg.isToolCall);
+                            return [...filtered, assistantMessage];
+                        });
+                    }
+                    
+                    // 更新工具执行状态
+                    setToolExecuting(false);
+                    setSearchExecuting(false);
+                }
+            } else {
+                // 常规消息处理（无工具调用）
+                if (response.choices && response.choices.length > 0) {
+                    const assistantMessage = {
+                        role: 'assistant',
+                        content: response.choices[0].message.content,
+                        followUpQuestions: generateFollowUpQuestions(response.choices[0].message.content)
+                    };
+                    
+                    setMessages(prev => [...prev, assistantMessage]);
+                }
             }
         } catch (error) {
             console.error('发送消息失败:', error);
@@ -169,6 +339,8 @@ const ChatWrapperComponent = props => {
             }]);
         } finally {
             setIsLoading(false);
+            setToolExecuting(false);
+            setSearchExecuting(false);
         }
     };
     
@@ -254,36 +426,102 @@ const ChatWrapperComponent = props => {
                     </Box>
                     <Box className={styles.chatCanvasWrapper}>
                         <div className={styles.chatMessages}>
-                            {messages.map((message, index) => (
-                                <div 
-                                    key={index} 
-                                    className={message.role === 'assistant' ? styles.messageBot : styles.messageUser}
-                                >
-                                    <div className={styles.messageContent}>
-                                        {message.content}
-                                        {message.content.length > 10 && message.role === 'assistant' && (
-                                            <button 
-                                                className={styles.copyButton}
-                                                onClick={() => handleCopyMessage(message.content)}
-                                                title="复制消息"
-                                                aria-label="复制消息"
-                                            >
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
-                                                </svg>
-                                            </button>
-                                        )}
+                            {messages.map((message, index) => {
+                                // Skip system messages in regular mode (show in development only)
+                                if (message.role === 'system' && !message.isToolSummary && process.env.NODE_ENV !== 'development') {
+                                    return null;
+                                }
+                                
+                                // For tool summaries, show a different style
+                                if (message.isToolSummary) {
+                                    return (
+                                        <div 
+                                            key={index} 
+                                            className={styles.messageSystem}
+                                        >
+                                            <div className={styles.messageContent}>
+                                                <pre className={styles.toolSummary}>{message.content}</pre>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                
+                                return (
+                                    <div 
+                                        key={index} 
+                                        className={message.role === 'assistant' ? styles.messageBot : styles.messageUser}
+                                    >
+                                        <div className={styles.messageContent}>
+                                            {message.role === 'assistant' ? (
+                                                <MessageWithCodeHighlighting content={message.content} />
+                                            ) : (
+                                                message.content
+                                            )}
+                                            {message.content.length > 10 && message.role === 'assistant' && (
+                                                <button 
+                                                    className={styles.copyButton}
+                                                    onClick={() => handleCopyMessage(message.content)}
+                                                    title="复制消息"
+                                                    aria-label="复制消息"
+                                                >
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            
+                                            {/* 后续问题按钮 */}
+                                            {message.role === 'assistant' && message.followUpQuestions && message.followUpQuestions.length > 0 && (
+                                                <div className={styles.followUpContainer}>
+                                                    <h4 className={styles.followUpHeading}>尝试问:</h4>
+                                                    {message.followUpQuestions.map((question, qIndex) => (
+                                                        <button
+                                                            key={`followup-${index}-${qIndex}`}
+                                                            className={styles.followUpButton}
+                                                            onClick={() => handleSendMessage(question)}
+                                                            disabled={isLoading}
+                                                        >
+                                                            {question}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                             {isLoading && (
                                 <div className={styles.messageBot}>
                                     <div className={styles.messageContent}>
-                                        思考中<span className={styles.loadingDots}>
-                                            <span>.</span>
-                                            <span>.</span>
-                                            <span>.</span>
-                                        </span>
+                                        {searchExecuting ? (
+                                            <>
+                                                <SearchIcon />
+                                                <span style={{marginLeft: '8px'}}>正在搜索网络信息</span>
+                                                <span className={styles.loadingDots}>
+                                                    <span>.</span>
+                                                    <span>.</span>
+                                                    <span>.</span>
+                                                </span>
+                                            </>
+                                        ) : toolExecuting ? (
+                                            <>
+                                                <ToolIcon />
+                                                <span style={{marginLeft: '8px'}}>正在执行 Scratch 操作</span>
+                                                <span className={styles.loadingDots}>
+                                                    <span>.</span>
+                                                    <span>.</span>
+                                                    <span>.</span>
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                思考中<span className={styles.loadingDots}>
+                                                    <span>.</span>
+                                                    <span>.</span>
+                                                    <span>.</span>
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -342,6 +580,7 @@ const ChatWrapperComponent = props => {
 
 ChatWrapperComponent.propTypes = {
     vm: PropTypes.instanceOf(PropTypes.object).isRequired,
+    mcpServer: PropTypes.shape({}), // MCP server is optional as it's initialized after component mount
     className: PropTypes.string
 };
 

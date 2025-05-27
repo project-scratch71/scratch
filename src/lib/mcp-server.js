@@ -1,0 +1,920 @@
+/**
+ * Model Context Protocol (MCP) Server for Scratch
+ * Provides a standardized interface for DeepSeek to interact with Scratch
+ * through function calls.
+ */
+
+import log from './log.js';
+
+class MCPServer {
+    /**
+     * Creates a new MCP Server instance
+     * @param {Object} vm - The Scratch virtual machine instance
+     * @param {Object} blocks - The ScratchBlocks instance 
+     * @param {Object} props - Additional properties and components
+     */
+    constructor (vm, blocks, props = {}) {
+        this.vm = vm;
+        this.blocks = blocks;
+        this.props = props;
+
+        // Store registered tools
+        this.tools = {};
+
+        // Initialize default tool sets
+        this._initBlockTools();
+        this._initSpriteTools();
+        this._initProjectTools();
+        this._initExecutionTools();
+        
+        log.info('MCP Server initialized');
+    }
+
+    /**
+     * Initialize block manipulation tools
+     * @private
+     */
+    _initBlockTools() {
+        // Block creation and manipulation
+        this.registerTool('createBlock', {
+            description: 'Creates a new block in the current sprite',
+            parameters: {
+                type: 'object',
+                properties: {
+                    blockType: {
+                        type: 'string',
+                        description: 'Type of block to create (e.g., "motion_movesteps")'
+                    },
+                    inputs: {
+                        type: 'object',
+                        description: 'Inputs for the block, as key-value pairs'
+                    },
+                    position: {
+                        type: 'object',
+                        description: 'Position of the block (x and y coordinates)'
+                    }
+                },
+                required: ['blockType']
+            },
+            handler: async (params) => {
+                try {
+                    if (!this.vm.editingTarget) {
+                        return { success: false, error: 'No active sprite selected' };
+                    }
+
+                    const { blockType, inputs = {}, position = { x: 0, y: 0 } } = params;
+                    
+                    // Creating block in the VM
+                    const blockId = this.vm.runtime.makeBlock({
+                        opcode: blockType,
+                        fields: {},
+                        inputs: this._formatBlockInputs(inputs),
+                        topLevel: true,
+                        shadow: false,
+                        x: position.x,
+                        y: position.y
+                    });
+
+                    return { 
+                        success: true, 
+                        blockId,
+                        message: `Created ${blockType} block with ID ${blockId}`
+                    };
+                } catch (error) {
+                    log.error('Error creating block:', error);
+                    return {
+                        success: false,
+                        error: `Failed to create block: ${error.message}`
+                    };
+                }
+            }
+        });
+
+        this.registerTool('deleteBlock', {
+            description: 'Deletes a block by its ID',
+            parameters: {
+                type: 'object',
+                properties: {
+                    blockId: {
+                        type: 'string',
+                        description: 'ID of the block to delete'
+                    }
+                },
+                required: ['blockId']
+            },
+            handler: async (params) => {
+                try {
+                    const { blockId } = params;
+                    this.vm.deleteBlock(blockId);
+                    return { 
+                        success: true,
+                        message: `Block ${blockId} deleted successfully` 
+                    };
+                } catch (error) {
+                    return { 
+                        success: false, 
+                        error: `Failed to delete block: ${error.message}` 
+                    };
+                }
+            }
+        });
+
+        this.registerTool('connectBlocks', {
+            description: 'Connects two blocks together',
+            parameters: {
+                type: 'object',
+                properties: {
+                    parentBlockId: {
+                        type: 'string',
+                        description: 'ID of the parent/container block'
+                    },
+                    childBlockId: {
+                        type: 'string',
+                        description: 'ID of the child/next block'
+                    },
+                    inputName: {
+                        type: 'string',
+                        description: 'Name of the input to connect to (for C-shaped blocks)'
+                    },
+                    connectionType: {
+                        type: 'string',
+                        description: 'Type of connection: "next" (sequence) or "input" (nested)',
+                        enum: ['next', 'input']
+                    }
+                },
+                required: ['parentBlockId', 'childBlockId']
+            },
+            handler: async (params) => {
+                try {
+                    const { parentBlockId, childBlockId, inputName, connectionType = 'next' } = params;
+                    
+                    if (!this.vm.editingTarget) {
+                        return { success: false, error: 'No active sprite selected' };
+                    }
+                    
+                    // Get both blocks from the current editing target
+                    const target = this.vm.editingTarget;
+                    const blocks = target.blocks;
+                    
+                    const parentBlock = blocks.getBlock(parentBlockId);
+                    const childBlock = blocks.getBlock(childBlockId);
+                    
+                    if (!parentBlock) {
+                        return { success: false, error: `Parent block ${parentBlockId} not found` };
+                    }
+                    
+                    if (!childBlock) {
+                        return { success: false, error: `Child block ${childBlockId} not found` };
+                    }
+                    
+                    // Connect blocks based on connection type
+                    if (connectionType === 'next') {
+                        // Connect as a sequence (below the parent)
+                        blocks.connect(parentBlockId, childBlockId, 'next');
+                    } else if (connectionType === 'input') {
+                        // Connect as an input (inside the parent)
+                        if (!inputName) {
+                            return { success: false, error: 'Input name required for input connection type' };
+                        }
+                        blocks.connect(parentBlockId, childBlockId, inputName);
+                    }
+                    
+                    return { 
+                        success: true,
+                        message: `Connected block ${childBlockId} to ${parentBlockId} (${connectionType})`
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to connect blocks: ${error.message}` 
+                    };
+                }
+            }
+        });
+    }
+
+    /**
+     * Initialize sprite manipulation tools
+     * @private
+     */
+    _initSpriteTools() {
+        this.registerTool('createSprite', {
+            description: 'Creates a new sprite',
+            parameters: {
+                type: 'object',
+                properties: {
+                    name: {
+                        type: 'string',
+                        description: 'Name for the new sprite'
+                    },
+                    costume: {
+                        type: 'string',
+                        description: 'Name of costume to use (optional)'
+                    },
+                    libraryItem: {
+                        type: 'string',
+                        description: 'Library item ID to use as base sprite'
+                    },
+                    x: {
+                        type: 'number',
+                        description: 'Initial X position'
+                    },
+                    y: {
+                        type: 'number',
+                        description: 'Initial Y position'
+                    },
+                    size: {
+                        type: 'number',
+                        description: 'Initial size (percentage)'
+                    }
+                },
+                required: []
+            },
+            handler: async (params) => {
+                try {
+                    const { name, costume, libraryItem, x, y, size } = params;
+                    let sprite = null;
+                    
+                    // Create sprite using the appropriate method
+                    if (libraryItem) {
+                        // Create from library item if specified
+                        try {
+                            if (this.props.assetLibrary && this.props.assetLibrary.sprites) {
+                                const item = this.props.assetLibrary.sprites.find(s => 
+                                    s.id === libraryItem || s.name === libraryItem
+                                );
+                                
+                                if (item) {
+                                    sprite = await this.vm.addSprite(item.json);
+                                } else {
+                                    return {
+                                        success: false,
+                                        error: `Library item "${libraryItem}" not found`
+                                    };
+                                }
+                            } else {
+                                return {
+                                    success: false,
+                                    error: 'Sprite library not available'
+                                };
+                            }
+                        } catch (e) {
+                            return {
+                                success: false,
+                                error: `Failed to add sprite from library: ${e.message}`
+                            };
+                        }
+                    } else {
+                        // Create empty sprite if no library item specified
+                        sprite = await this.vm.addSprite('{}');
+                    }
+                    
+                    // If we have a sprite, configure it
+                    if (sprite) {
+                        // Rename if name specified
+                        if (name) {
+                            this.vm.renameSprite(sprite.id, name);
+                        }
+                        
+                        // Add costume if specified and not from library
+                        if (costume && !libraryItem) {
+                            try {
+                                if (this.props.assetLibrary && this.props.assetLibrary.costumes) {
+                                    const costumeAsset = this.props.assetLibrary.costumes.find(c => 
+                                        c.name === costume
+                                    );
+                                    
+                                    if (costumeAsset) {
+                                        await this.vm.addCostume(
+                                            costumeAsset.name,
+                                            costumeAsset.md5,
+                                            costumeAsset.rotationCenterX,
+                                            costumeAsset.rotationCenterY,
+                                            sprite.id
+                                        );
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn(`Failed to add costume "${costume}": ${e.message}`);
+                                // Don't fail the entire operation if costume addition fails
+                            }
+                        }
+                        
+                        // Set position if specified
+                        if (typeof x === 'number' && typeof y === 'number') {
+                            this.vm.setXYPosition(sprite.id, x, y);
+                        }
+                        
+                        // Set size if specified
+                        if (typeof size === 'number') {
+                            this.vm.renderer.updateDrawableSpriteScale(sprite.id, size / 100);
+                        }
+                        
+                        // Get the updated sprite info
+                        const target = this.vm.runtime.getTargetById(sprite.id);
+                        const spriteInfo = target ? {
+                            id: target.id,
+                            name: target.sprite.name,
+                            visible: target.visible,
+                            x: target.x,
+                            y: target.y,
+                            size: target.size,
+                            direction: target.direction,
+                            currentCostume: target.currentCostume,
+                            costumeCount: target.sprite.costumes.length
+                        } : { id: sprite.id };
+                        
+                        return { 
+                            success: true,
+                            sprite: spriteInfo,
+                            message: `Created sprite "${spriteInfo.name}" with ID ${spriteInfo.id}`
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            error: 'Failed to create sprite'
+                        };
+                    }
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to create sprite: ${error.message}` 
+                    };
+                }
+            }
+        });
+
+        this.registerTool('setSpritePosition', {
+            description: 'Sets the position of a sprite',
+            parameters: {
+                type: 'object',
+                properties: {
+                    spriteId: {
+                        type: 'string', 
+                        description: 'ID of the sprite to position (optional, uses current sprite if not provided)'
+                    },
+                    x: {
+                        type: 'number',
+                        description: 'X coordinate'
+                    },
+                    y: {
+                        type: 'number',
+                        description: 'Y coordinate'
+                    }
+                },
+                required: ['x', 'y']
+            },
+            handler: async (params) => {
+                try {
+                    let { spriteId, x, y } = params;
+                    
+                    // Use current sprite if spriteId not provided
+                    if (!spriteId && this.vm.editingTarget) {
+                        spriteId = this.vm.editingTarget.id;
+                    }
+                    
+                    if (!spriteId) {
+                        return { success: false, error: 'No sprite specified or selected' };
+                    }
+                    
+                    // Set sprite position using VM
+                    this.vm.setXYPosition(spriteId, x, y);
+                    
+                    return { 
+                        success: true,
+                        message: `Set sprite position to (${x}, ${y})` 
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to set sprite position: ${error.message}` 
+                    };
+                }
+            }
+        });
+
+        this.registerTool('setSpriteSize', {
+            description: 'Sets the size of a sprite',
+            parameters: {
+                type: 'object',
+                properties: {
+                    spriteId: {
+                        type: 'string',
+                        description: 'ID of the sprite to resize (optional, uses current sprite if not provided)'
+                    },
+                    size: {
+                        type: 'number',
+                        description: 'Size percentage (100 is normal size)'
+                    }
+                },
+                required: ['size']
+            },
+            handler: async (params) => {
+                try {
+                    let { spriteId, size } = params;
+                    
+                    // Use current sprite if spriteId not provided
+                    if (!spriteId && this.vm.editingTarget) {
+                        spriteId = this.vm.editingTarget.id;
+                    }
+                    
+                    if (!spriteId) {
+                        return { success: false, error: 'No sprite specified or selected' };
+                    }
+                    
+                    // Set sprite size
+                    this.vm.postSpriteInfo({ size: size });
+                    
+                    return { 
+                        success: true,
+                        message: `Set sprite size to ${size}%` 
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to set sprite size: ${error.message}` 
+                    };
+                }
+            }
+        });
+
+        this.registerTool('setSpriteDirection', {
+            description: 'Sets the direction of a sprite',
+            parameters: {
+                type: 'object',
+                properties: {
+                    spriteId: {
+                        type: 'string',
+                        description: 'ID of the sprite (optional, uses current sprite if not provided)'
+                    },
+                    direction: {
+                        type: 'number',
+                        description: 'Direction in degrees (0-360)'
+                    }
+                },
+                required: ['direction']
+            },
+            handler: async (params) => {
+                try {
+                    let { spriteId, direction } = params;
+                    
+                    // Use current sprite if spriteId not provided
+                    if (!spriteId && this.vm.editingTarget) {
+                        spriteId = this.vm.editingTarget.id;
+                    }
+                    
+                    if (!spriteId) {
+                        return { success: false, error: 'No sprite specified or selected' };
+                    }
+                    
+                    // Set sprite direction
+                    this.vm.postSpriteInfo({ direction: direction });
+                    
+                    return { 
+                        success: true,
+                        message: `Set sprite direction to ${direction} degrees` 
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to set sprite direction: ${error.message}` 
+                    };
+                }
+            }
+        });
+    }
+
+    /**
+     * Initialize project management tools
+     * @private
+     */
+    _initProjectTools() {
+        this.registerTool('loadProject', {
+            description: 'Loads a Scratch project',
+            parameters: {
+                type: 'object',
+                properties: {
+                    projectId: {
+                        type: 'string',
+                        description: 'ID of the project to load'
+                    },
+                    projectData: {
+                        type: 'string',
+                        description: 'JSON string of project data (alternative to projectId)'
+                    }
+                },
+                required: []
+            },
+            handler: async (params) => {
+                try {
+                    const { projectId, projectData } = params;
+                    
+                    if (!projectId && !projectData) {
+                        return { 
+                            success: false, 
+                            error: 'Either projectId or projectData must be provided' 
+                        };
+                    }
+                    
+                    if (projectData) {
+                        // Load project from provided data
+                        try {
+                            const projectDataObj = JSON.parse(projectData);
+                            await this.vm.loadProject(projectDataObj);
+                            return { 
+                                success: true,
+                                message: 'Project loaded from provided data' 
+                            };
+                        } catch (e) {
+                            return { 
+                                success: false, 
+                                error: `Invalid project data: ${e.message}` 
+                            };
+                        }
+                    }
+                    
+                    // If we get here, we're loading by ID (which may require network access)
+                    // Implementation depends on project loading mechanism and where projects are stored
+                    if (this.props.onLoadProject && typeof this.props.onLoadProject === 'function') {
+                        try {
+                            await this.props.onLoadProject(projectId);
+                            return { 
+                                success: true,
+                                message: `Project ${projectId} loaded successfully` 
+                            };
+                        } catch (e) {
+                            return { 
+                                success: false, 
+                                error: `Failed to load project by ID: ${e.message}` 
+                            };
+                        }
+                    } else {
+                        return { 
+                            success: false, 
+                            error: 'Project loading by ID not implemented in this environment' 
+                        };
+                    }
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to load project: ${error.message}` 
+                    };
+                }
+            }
+        });
+
+        this.registerTool('saveProject', {
+            description: 'Saves the current Scratch project',
+            parameters: {
+                type: 'object',
+                properties: {
+                    name: {
+                        type: 'string',
+                        description: 'Name to save the project as'
+                    },
+                    asNew: {
+                        type: 'boolean',
+                        description: 'Whether to save as a new project'
+                    }
+                }
+            },
+            handler: async (params) => {
+                try {
+                    const { name, asNew } = params;
+                    
+                    // Get project data
+                    const projectData = this.vm.saveProjectSb3();
+                    
+                    // Use provided save handler if available
+                    if (this.props.onSaveProject && typeof this.props.onSaveProject === 'function') {
+                        try {
+                            const savedProjectInfo = await this.props.onSaveProject({
+                                projectData,
+                                name,
+                                asNew: asNew || false
+                            });
+                            
+                            return { 
+                                success: true,
+                                message: `Project saved${name ? ` as "${name}"` : ''}`,
+                                projectInfo: savedProjectInfo
+                            };
+                        } catch (e) {
+                            return { 
+                                success: false, 
+                                error: `Failed to save project: ${e.message}` 
+                            };
+                        }
+                    }
+                    
+                    // If no save handler, just return the project data
+                    return { 
+                        success: true,
+                        message: `Project data generated${name ? ` for "${name}"` : ''}`,
+                        // Don't return actual binary data in the response as it would be too large
+                        dataAvailable: true
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to save project: ${error.message}` 
+                    };
+                }
+            }
+        });
+
+        this.registerTool('getProjectInfo', {
+            description: 'Gets information about the current project',
+            parameters: {
+                type: 'object',
+                properties: {}
+            },
+            handler: async () => {
+                try {
+                    // Get sprites information
+                    const sprites = this.vm.runtime.targets
+                        .filter(target => !target.isStage && target.isOriginal)
+                        .map(target => ({
+                            id: target.id,
+                            name: target.sprite.name,
+                            visible: target.visible,
+                            x: target.x,
+                            y: target.y,
+                            size: target.size,
+                            direction: target.direction,
+                            currentCostume: target.currentCostume,
+                            costumes: target.sprite.costumes.map(costume => ({
+                                name: costume.name,
+                                id: costume.assetId
+                            })),
+                            sounds: target.sprite.sounds.map(sound => ({
+                                name: sound.name,
+                                id: sound.assetId
+                            }))
+                        }));
+                    
+                    // Get stage information
+                    const stage = this.vm.runtime.targets.find(target => target.isStage);
+                    const stageInfo = stage ? {
+                        width: this.vm.runtime.stageWidth,
+                        height: this.vm.runtime.stageHeight,
+                        tempo: stage.tempo,
+                        videoState: stage.videoState,
+                        textToSpeechLanguage: stage.textToSpeechLanguage,
+                        volume: stage.volume,
+                        name: stage.sprite.name,
+                        costumes: stage.sprite.costumes.map(costume => ({
+                            name: costume.name,
+                            id: costume.assetId
+                        })),
+                        sounds: stage.sprite.sounds.map(sound => ({
+                            name: sound.name,
+                            id: sound.assetId
+                        })),
+                        currentCostume: stage.currentCostume
+                    } : null;
+                    
+                    // Project metadata
+                    const projectInfo = {
+                        sprites,
+                        stage: stageInfo,
+                        editingTarget: this.vm.editingTarget ? this.vm.editingTarget.id : null,
+                        meta: {
+                            semver: this.vm.runtime.version,
+                            vm: this.vm.runtime.version,
+                            agent: navigator.userAgent
+                        }
+                    };
+                    
+                    return { 
+                        success: true,
+                        project: projectInfo
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to get project info: ${error.message}` 
+                    };
+                }
+            }
+        });
+    }
+
+    /**
+     * Initialize execution control tools
+     * @private
+     */
+    _initExecutionTools() {
+        this.registerTool('runProject', {
+            description: 'Runs the Scratch project',
+            parameters: {
+                type: 'object',
+                properties: {}
+            },
+            handler: async () => {
+                try {
+                    this.vm.greenFlag();
+                    return { 
+                        success: true,
+                        message: 'Project started running' 
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to run project: ${error.message}` 
+                    };
+                }
+            }
+        });
+
+        this.registerTool('stopProject', {
+            description: 'Stops the Scratch project execution',
+            parameters: {
+                type: 'object',
+                properties: {}
+            },
+            handler: async () => {
+                try {
+                    this.vm.stopAll();
+                    return { 
+                        success: true,
+                        message: 'Project execution stopped' 
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to stop project: ${error.message}` 
+                    };
+                }
+            }
+        });
+
+        this.registerTool('getExecutionState', {
+            description: 'Gets the current execution state of the project',
+            parameters: {
+                type: 'object',
+                properties: {}
+            },
+            handler: async () => {
+                try {
+                    const isRunning = this.vm.runtime.isRunning;
+                    const activeThreads = this.vm.runtime.threads.filter(thread => thread.isRunning()).length;
+                    
+                    return { 
+                        success: true,
+                        state: {
+                            isRunning,
+                            activeThreads
+                        }
+                    };
+                } catch (error) {
+                    return { 
+                        success: false,
+                        error: `Failed to get execution state: ${error.message}` 
+                    };
+                }
+            }
+        });
+    }
+
+    /**
+     * Format block inputs into the structure expected by the VM
+     * @param {Object} inputs - Simple key-value pairs for inputs
+     * @returns {Object} - Formatted inputs for VM
+     * @private
+     */
+    _formatBlockInputs(inputs) {
+        const formattedInputs = {};
+        
+        Object.entries(inputs).forEach(([key, value]) => {
+            // Handle different value types
+            if (typeof value === 'object' && value !== null) {
+                if (value.blockId) {
+                    // Another block is being used as an input
+                    formattedInputs[key] = {
+                        type: 'block',
+                        block: value.blockId,
+                        shadow: value.shadow || false
+                    };
+                } else {
+                    // Complex object - likely a shadow block definition
+                    formattedInputs[key] = {
+                        type: 'shadow',
+                        shadow: true,
+                        value: value
+                    };
+                }
+            } else if (typeof value === 'string') {
+                // String values could be variables/fields or literal values
+                if (value.startsWith('$')) {
+                    // Variable reference (e.g., $variable1)
+                    formattedInputs[key] = {
+                        type: 'variable',
+                        variable: value.substring(1)
+                    };
+                } else {
+                    // String literal
+                    formattedInputs[key] = {
+                        type: 'text',
+                        value: value
+                    };
+                }
+            } else if (typeof value === 'number' || typeof value === 'boolean') {
+                // Number or boolean literal
+                formattedInputs[key] = {
+                    type: 'number',
+                    value: value
+                };
+            } else {
+                // Fallback for any other type
+                formattedInputs[key] = {
+                    type: 'text',
+                    value: String(value)
+                };
+            }
+        });
+        
+        return formattedInputs;
+    }
+
+    /**
+     * Register a new tool
+     * @param {string} name - Name of the tool
+     * @param {Object} toolSpec - Tool specification including description, parameters, and handler
+     */
+    registerTool(name, toolSpec) {
+        this.tools[name] = toolSpec;
+        log.info(`Registered tool: ${name}`);
+    }
+
+    /**
+     * Get all registered tools
+     * @returns {Array} Array of tool definitions formatted for MCP
+     */
+    getToolDefinitions() {
+        return Object.entries(this.tools).map(([name, tool]) => ({
+            name,
+            description: tool.description,
+            parameters: tool.parameters
+        }));
+    }
+
+    /**
+     * Execute a tool by name with provided parameters
+     * @param {string} toolName - Name of the tool to execute
+     * @param {Object} params - Parameters to pass to the tool
+     * @returns {Promise<Object>} Result of the tool execution
+     */
+    async executeTool(toolName, params) {
+        try {
+            const tool = this.tools[toolName];
+            
+            if (!tool) {
+                return { 
+                    success: false, 
+                    error: `Tool "${toolName}" not found` 
+                };
+            }
+            
+            log.info(`Executing tool: ${toolName}`, params);
+            const result = await tool.handler(params);
+            log.info(`Tool execution result:`, result);
+            
+            return result;
+        } catch (error) {
+            log.error(`Error executing tool ${toolName}:`, error);
+            return { 
+                success: false, 
+                error: `Tool execution failed: ${error.message}` 
+            };
+        }
+    }
+
+    /**
+     * Process a tool call from the MCP protocol
+     * @param {Object} toolCall - Tool call object from DeepSeek
+     * @returns {Promise<Object>} Result of the tool execution
+     */
+    async processToolCall(toolCall) {
+        try {
+            const { name, arguments: args } = toolCall;
+            
+            let params = {};
+            try {
+                params = typeof args === 'string' ? JSON.parse(args) : args;
+            } catch (e) {
+                return { success: false, error: `Invalid tool arguments: ${e.message}` };
+            }
+            
+            return await this.executeTool(name, params);
+        } catch (error) {
+            log.error('Error processing tool call:', error);
+            return { 
+                success: false, 
+                error: `Failed to process tool call: ${error.message}` 
+            };
+        }
+    }
+}
+
+export default MCPServer;

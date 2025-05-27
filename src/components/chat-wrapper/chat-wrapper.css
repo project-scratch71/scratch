@@ -186,6 +186,7 @@
     border-radius: 16px;
     font-size: 0.875rem;
     line-height: 1.4;
+    width: 100%;
 }
 
 .messageBot .messageContent {
@@ -418,4 +419,84 @@
     background-color: hsla(215, 50%, 90%, 1);
     color: hsla(215, 100%, 65%, 1); /* $motion-primary */
     transform: scale(1.1);
+}
+
+/* 工具执行样式 */
+.messageBot.toolExecuting .messageContent {
+    background-color: hsla(284, 100%, 65%, 0.15); /* 紫色背景表示工具执行 */
+    border-left: 3px solid hsla(284, 100%, 65%, 1);
+    display: flex;
+    align-items: center;
+}
+
+.toolIcon {
+    margin-right: 8px;
+    color: hsla(284, 100%, 65%, 1);
+}
+.messageSystem {
+    align-self: center;
+    width: 90%;
+    margin: 5px 0;
+}
+
+.messageSystem .messageContent {
+    background-color: hsla(215, 100%, 95%, 0.5);
+    color: hsla(225, 15%, 40%, 0.8);
+    border: 1px dashed hsla(215, 100%, 65%, 0.3);
+    font-size: 0.75rem;
+    padding: 6px 8px;
+    white-space: pre-wrap;
+}
+
+.toolSummary {
+    margin: 0;
+    font-family: monospace;
+    font-size: 0.75rem;
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: pre-wrap;
+}
+
+/* Follow-up questions styling */
+.followUpContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid hsla(215, 100%, 65%, 0.2);
+}
+
+.followUpButton {
+    background-color: hsla(215, 100%, 65%, 0.1);
+    border: 1px solid hsla(215, 100%, 65%, 0.3);
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    color: hsla(215, 100%, 65%, 1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: normal;
+    text-align: left;
+    margin: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.followUpButton:hover {
+    background-color: hsla(215, 100%, 65%, 0.2);
+    border-color: hsla(215, 100%, 65%, 0.5);
+    transform: translateY(-1px);
+}
+
+.followUpButton:active {
+    transform: translateY(0);
+}
+
+.followUpHeading {
+    width: 100%;
+    font-size: 0.8rem;
+    color: hsla(225, 15%, 40%, 0.8);
+    margin: 0 0 4px 0;
 }

@@ -1,0 +1,175 @@
+/* Inline code */
+.inlineCode {
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+    padding: 0.2em 0.4em;
+    font-size: 85%;
+    background-color: hsla(215, 100%, 95%, 0.5);
+    border-radius: 3px;
+}
+
+/* Code blocks */
+.codeBlockWrapper {
+    position: relative;
+    margin: 1rem 0;
+}
+
+.codeHeader {
+    background-color: hsla(220, 13%, 22%, 1);
+    color: hsla(220, 14%, 71%, 0.8);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom: 1px solid hsla(220, 13%, 24%, 1);
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.codeBlockWrapper pre {
+    background-color: hsla(220, 13%, 18%, 1); /* Dark background for code blocks */
+    color: hsla(220, 14%, 71%, 1);
+    padding: 1rem;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    overflow-x: auto;
+    margin: 0;
+}
+
+.codeBlockWrapper pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    tab-size: 2;
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+    white-space: pre;
+}
+
+/* Copy code button */
+.copyCodeButton {
+    padding: 0.25rem 0.5rem;
+    background-color: hsla(220, 13%, 28%, 1);
+    color: hsla(220, 14%, 71%, 0.8);
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.copyCodeButton:hover {
+    background-color: hsla(220, 13%, 35%, 1);
+    color: hsla(220, 14%, 90%, 1);
+}
+
+/* Markdown styles */
+.markdown {
+    line-height: 1.6;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Syntax highlighting styles (derived from VS Code dark theme) */
+code .hljs-keyword {
+    color: #569CD6; /* blue */
+}
+
+code .hljs-built_in {
+    color: #4EC9B0; /* teal */
+}
+
+code .hljs-type {
+    color: #4EC9B0; /* teal */
+}
+
+code .hljs-literal {
+    color: #569CD6; /* blue */
+}
+
+code .hljs-number {
+    color: #B5CEA8; /* light green */
+}
+
+code .hljs-regexp {
+    color: #D16969; /* red */
+}
+
+code .hljs-string {
+    color: #CE9178; /* orange */
+}
+
+code .hljs-subst {
+    color: #DCDCDC; /* light gray */
+}
+
+code .hljs-symbol {
+    color: #B5CEA8; /* light green */
+}
+
+code .hljs-class {
+    color: #4EC9B0; /* teal */
+}
+
+code .hljs-function {
+    color: #DCDCAA; /* yellow */
+}
+
+code .hljs-title {
+    color: #DCDCAA; /* yellow */
+}
+
+code .hljs-params {
+    color: #DCDCDC; /* light gray */
+}
+
+code .hljs-comment {
+    color: #608B4E; /* green */
+}
+
+code .hljs-doctag {
+    color: #608B4E; /* green */
+}
+
+code .hljs-meta {
+    color: #9B9B9B; /* gray */
+}
+
+code .hljs-section {
+    color: #DCDCAA; /* yellow */
+}
+
+code .hljs-attr {
+    color: #9CDCFE; /* light blue */
+}
+
+code .hljs-variable {
+    color: #9CDCFE; /* light blue */
+}
+
+code .hljs-name {
+    color: #569CD6; /* blue */
+}
+
+code .hljs-tag {
+    color: #569CD6; /* blue */
+}
+
+code .hljs-attribute {
+    color: #9CDCFE; /* light blue */
+}
+
+code .hljs-addition {
+    color: #6A9955; /* green */
+    background-color: rgba(40, 60, 40, 0.5);
+}
+
+code .hljs-deletion {
+    color: #F14C4C; /* red */
+    background-color: rgba(60, 40, 40, 0.5);
+}
