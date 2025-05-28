@@ -231,6 +231,36 @@
     width: calc(100% - 8px); /* 减少左右边距 */
     margin: 0 auto;
     min-height: 44px; /* 确保最小高度容纳发送按钮 */
+    position: relative; /* 为历史指示器定位 */
+}
+
+/* 历史导航指示器 */
+.historyIndicator {
+    position: absolute;
+    top: -20px;
+    right: 5px;
+    background-color: hsla(43, 100%, 70%, 0.9);
+    color: hsla(225, 15%, 40%, 1);
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px hsla(0, 0%, 0%, 0.2);
+    z-index: 10;
+    font-weight: bold;
+    transition: opacity 0.2s ease;
+    animation: fadeIn 0.2s ease;
+}
+
+/* 历史指示器淡入动画 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .chatInput:focus-within {
@@ -252,9 +282,17 @@
     overflow-y: auto;
     line-height: 1.4;
     word-wrap: break-word;
-    transition: height 0.1s ease;
+    transition: height 0.1s ease, background-color 0.2s ease;
     margin: 0; /* 确保没有外边距影响对齐 */
     vertical-align: middle; /* 确保文本垂直居中 */
+    position: relative;
+}
+
+/* 历史记录模式下的输入框样式 */
+.historyNavActive {
+    background-color: hsla(50, 100%, 95%, 0.5); /* 淡黄色背景提示用户正在浏览历史记录 */
+    border-left: 3px solid hsla(43, 100%, 70%, 1); /* 左边框指示历史模式 */
+    padding-left: 9px; /* 补偿左边框宽度 */
 }
 
 .sendButton {
@@ -291,7 +329,21 @@
     background-color: hsla(215, 30%, 80%, 1);
 }
 
+.sendButton.cancelButton {
+    background-color: hsla(0, 90%, 65%, 1); /* 红色背景表示中断 */
+    box-shadow: 0 0 0 4px hsla(0, 90%, 65%, 0.25);
+}
+
+.sendButton.cancelButton:hover {
+    background-color: hsla(0, 90%, 60%, 1);
+}
+
 .sendIcon {
+    width: 16px;
+    height: 16px;
+}
+
+.cancelIcon {
     width: 16px;
     height: 16px;
 }
@@ -587,4 +639,212 @@
 /* 当包含Markdown内容时，增加一些边距，让内容更清晰 */
 .messageBot.hasMarkdown {
     padding: 4px 0;
+}
+
+/* 设置按钮样式 */
+.settingsButton {
+    background: none;
+    border: none;
+    color: hsla(215, 15%, 50%, 0.7); /* 与 clearChatButton 一致 */
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.settingsButton:hover {
+    background-color: hsla(215, 50%, 90%, 1);
+    color: hsla(215, 100%, 65%, 1); /* $motion-primary */
+}
+
+/* 设置模态框样式 */
+.settingsModalContent {
+    padding: 1rem;
+    width: 100%;
+    background-color: white;
+    font-size: 0.875rem;
+}
+
+.settingsModalContent h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: hsla(225, 15%, 40%, 1);
+}
+
+.settingsModalContent p {
+    margin-bottom: 1.5rem;
+    color: hsla(225, 15%, 40%, 0.8);
+}
+
+.settingItem {
+    margin-bottom: 1rem;
+}
+
+.settingLabel {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: hsla(225, 15%, 40%, 1);
+}
+
+.settingInput {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid hsla(0, 0%, 0%, 0.15);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    background-color: white;
+    color: #333;
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    margin-bottom: 0.5rem;
+    z-index: 10;
+    position: relative;
+}
+
+.settingInput:focus {
+    outline: none;
+    border-color: hsla(215, 100%, 65%, 0.8);
+    box-shadow: 0 0 0 2px hsla(215, 100%, 65%, 0.3);
+}
+
+.settingSlider {
+    width: 100%;
+    margin: 0.5rem 0;
+}
+
+.rangeLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: hsla(225, 15%, 40%, 0.8);
+    margin-top: 0.25rem;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.cancelButton,
+.saveButton {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelButton {
+    background-color: hsla(0, 0%, 95%, 1);
+    border: 1px solid hsla(0, 0%, 0%, 0.15);
+    color: hsla(225, 15%, 40%, 1);
+}
+
+.cancelButton:hover {
+    background-color: hsla(0, 0%, 90%, 1);
+}
+
+.saveButton {
+    background-color: hsla(215, 100%, 65%, 1); /* $motion-primary */
+    border: 1px solid hsla(215, 100%, 60%, 1);
+    color: white;
+}
+
+.saveButton:hover {
+    background-color: hsla(215, 100%, 60%, 1);
+}
+
+.testButton {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    background-color: hsla(180, 100%, 30%, 1);
+    border: 1px solid hsla(180, 100%, 25%, 1);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.testButton:hover {
+    background-color: hsla(180, 100%, 25%, 1);
+}
+
+.testButton:disabled {
+    background-color: hsla(180, 30%, 70%, 1);
+    border-color: hsla(180, 30%, 65%, 1);
+    cursor: not-allowed;
+}
+
+.testResult {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.3s ease;
+    text-align: center;
+}
+
+.testSuccess {
+    background-color: hsla(120, 70%, 90%, 1);
+    border: 1px solid hsla(120, 70%, 40%, 1);
+    color: hsla(120, 90%, 20%, 1);
+}
+
+.clearHistoryButton {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    background-color: hsla(0, 70%, 60%, 1);
+    border: 1px solid hsla(0, 70%, 50%, 1);
+    color: white;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+}
+
+.clearHistoryButton:hover {
+    background-color: hsla(0, 70%, 50%, 1);
+}
+
+.clearHistoryResult {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.testError {
+    background-color: hsla(0, 70%, 90%, 1);
+    border: 1px solid hsla(0, 70%, 40%, 1);
+    color: hsla(0, 90%, 30%, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 系统通知消息样式 */
+.messageBot.systemNotice .messageContent {
+    background-color: hsla(40, 100%, 90%, 1);
+    color: hsla(40, 100%, 30%, 1);
+    border: 1px solid hsla(40, 90%, 80%, 1);
+    font-style: italic;
 }

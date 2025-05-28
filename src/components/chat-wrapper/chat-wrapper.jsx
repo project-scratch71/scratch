@@ -2,10 +2,12 @@ import PropTypes from 'prop-types';
 import React, {useState, useEffect, useRef} from 'react';
 import {FormattedMessage} from 'react-intl';
 import Box from '../box/box.jsx';
+import Modal from '../modal/modal.jsx';  // 导入模态框组件
 import layout from '../../lib/layout-constants';
 import deepseekAPI from '../../lib/deepseek-api';
+import indexedDBHelper from '../../lib/indexed-db-helper';  // 导入 IndexedDB 助手
 import MessageWithCodeHighlighting from './code-highlighter.jsx';
-import MessageWithMarkdown from './MessageWithMarkdown.jsx';  // 导入新的Markdown渲染组件
+import MessageWithMarkdown from './message-with-markdown.jsx';  // 导入新的Markdown渲染组件
 import {hasCodeBlocks, hasMarkdown} from './markdown-utils';  // 导入Markdown检测工具
 
 import styles from './chat-wrapper.css';
@@ -84,6 +86,18 @@ const SearchIcon = () => (
         fill="currentColor"
     >
         <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+    </svg>
+);
+
+// 设置图标组件
+const SettingsIcon = () => (
+    <svg 
+        width="16" 
+        height="16" 
+        viewBox="0 0 24 24" 
+        fill="currentColor"
+    >
+        <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" />
     </svg>
 );
 
@@ -180,9 +194,153 @@ const ChatWrapperComponent = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [toolExecuting, setToolExecuting] = useState(false);  // 工具执行状态
     const [searchExecuting, setSearchExecuting] = useState(false);  // 搜索执行状态
+    const [showSettingsModal, setShowSettingsModal] = useState(false); // 控制设置模态框显示
+    const [abortController, setAbortController] = useState(null); // 用于中断请求的控制器
+    
+    // 输入历史相关状态
+    const [inputHistory, setInputHistory] = useState([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
+    const [temporaryInput, setTemporaryInput] = useState(''); // 存储用户当前编辑但未提交的内容
+    
+    // 设置相关状态
+    const [apiKey, setApiKey] = useState('');
+    const [apiUrl, setApiUrl] = useState('https://api.deepseek.com/v1/chat/completions');
+    const [modelName, setModelName] = useState('deepseek-chat');
+    const [temperature, setTemperature] = useState(0.7);
+    
+    // 测试连接相关状态
+    const [isTestingConnection, setIsTestingConnection] = useState(false);
+    const [testConnectionResult, setTestConnectionResult] = useState(null);
+    
+    // 清空历史记录相关状态
+    const [clearHistoryResult, setClearHistoryResult] = useState(null);
+    
     const chatRef = React.useRef(null);
     const messagesEndRef = useRef(null);
     const textareaRef = useRef(null);
+    
+    // 从存储加载设置和历史记录
+    useEffect(() => {
+        // 加载模型设置
+        const loadSettings = async () => {
+            try {
+                // 优先从 IndexedDB 加载设置
+                const settings = await indexedDBHelper.getModelSettings();
+                
+                if (settings) {
+                    if (settings.apiKey) setApiKey(settings.apiKey);
+                    if (settings.apiUrl) setApiUrl(settings.apiUrl);
+                    if (settings.modelName) setModelName(settings.modelName);
+                    if (settings.temperature !== undefined) setTemperature(settings.temperature);
+                } else {
+                    // 如果 IndexedDB 中没有，尝试从 localStorage 加载
+                    const savedSettings = localStorage.getItem('deepseekSettings');
+                    if (savedSettings) {
+                        const settings = JSON.parse(savedSettings);
+                        if (settings.apiKey) setApiKey(settings.apiKey);
+                        if (settings.apiUrl) setApiUrl(settings.apiUrl);
+                        if (settings.modelName) setModelName(settings.modelName);
+                        if (settings.temperature !== undefined) setTemperature(settings.temperature);
+                    }
+                }
+            } catch (e) {
+                console.error('加载设置失败:', e);
+            }
+        };
+        
+        // 加载输入历史记录
+        const loadInputHistory = async () => {
+            try {
+                const history = await indexedDBHelper.getInputHistory();
+                if (history && history.length > 0) {
+                    setInputHistory(history);
+                }
+            } catch (e) {
+                console.error('加载输入历史失败:', e);
+            }
+        };
+        
+        loadSettings();
+        loadInputHistory();
+    }, []);
+    
+    // 保存设置
+    const saveSettings = () => {
+        const settings = {
+            apiKey,
+            apiUrl,
+            modelName,
+            temperature
+        };
+        
+        // 更新 DeepSeek API 的设置
+        // updateSettings 函数会自动保存到 localStorage
+        deepseekAPI.updateSettings(settings);
+        
+        // 关闭模态框
+        setShowSettingsModal(false);
+        
+        // 清除测试结果
+        setTestConnectionResult(null);
+    };
+    
+    // 测试 API 连接
+    const testApiConnection = async () => {
+        setIsTestingConnection(true);
+        setTestConnectionResult(null);
+        
+        try {
+            const testSettings = {
+                apiKey,
+                apiUrl,
+                modelName,
+                temperature
+            };
+            
+            const result = await deepseekAPI.testConnection(testSettings);
+            setTestConnectionResult(result);
+        } catch (error) {
+            setTestConnectionResult({
+                success: false,
+                message: `测试失败: ${error.message}`
+            });
+        } finally {
+            setIsTestingConnection(false);
+        }
+    };
+    
+    // 清空输入历史记录
+    const handleClearInputHistory = async () => {
+        try {
+            const success = await indexedDBHelper.clearInputHistory();
+            
+            if (success) {
+                // 清空本地状态中的历史记录
+                setInputHistory([]);
+                setHistoryIndex(-1);
+                setTemporaryInput('');
+                
+                // 显示成功消息
+                setClearHistoryResult('历史记录已清空');
+                
+                // 3秒后清除消息
+                setTimeout(() => {
+                    setClearHistoryResult(null);
+                }, 3000);
+            } else {
+                setClearHistoryResult('清空历史记录失败');
+                setTimeout(() => {
+                    setClearHistoryResult(null);
+                }, 3000);
+            }
+        } catch (error) {
+            console.error('清空输入历史记录失败:', error);
+            setClearHistoryResult(`清空失败: ${error.message}`);
+            setTimeout(() => {
+                setClearHistoryResult(null);
+            }, 3000);
+        }
+    };
     
     // 窗口大小改变时，根据屏幕宽度调整聊天区域宽度
     useEffect(() => {
@@ -241,11 +399,54 @@ const ChatWrapperComponent = props => {
         e.target.style.height = `${Math.min(120, e.target.scrollHeight)}px`;
     };
     
-    // 处理按键事件 (按下回车键发送消息)
-    const handleKeyPress = (e) => {
+    // 处理按键事件 (按下回车键发送消息，上下键浏览历史)
+    const handleKeyDown = (e) => {
+        // 回车键发送消息
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage();
+            return;
+        }
+        
+        // 上下箭头键浏览历史记录
+        if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && inputHistory.length > 0) {
+            e.preventDefault();
+            
+            // 第一次按上箭头键，保存当前输入作为临时输入
+            if (historyIndex === -1 && e.key === 'ArrowUp') {
+                setTemporaryInput(inputValue);
+            }
+            
+            // 计算新的历史索引
+            let newIndex = historyIndex;
+            
+            if (e.key === 'ArrowUp') {
+                // 向上浏览历史（更早的消息）
+                newIndex = historyIndex >= inputHistory.length - 1 ? inputHistory.length - 1 : historyIndex + 1;
+            } else {
+                // 向下浏览历史（更新的消息）
+                newIndex = historyIndex <= 0 ? -1 : historyIndex - 1;
+            }
+            
+            // 更新历史索引
+            setHistoryIndex(newIndex);
+            
+            // 更新输入框内容
+            if (newIndex === -1) {
+                // 恢复临时输入
+                setInputValue(temporaryInput);
+            } else {
+                // 使用历史记录
+                setInputValue(inputHistory[inputHistory.length - 1 - newIndex]);
+                
+                // 自动调整输入框高度（延迟执行以确保DOM已更新）
+                setTimeout(() => {
+                    if (textareaRef.current) {
+                        textareaRef.current.style.height = 'auto';
+                        textareaRef.current.style.height = `${Math.min(120, textareaRef.current.scrollHeight)}px`;
+                    }
+                }, 0);
+            }
         }
     };
     
@@ -253,14 +454,62 @@ const ChatWrapperComponent = props => {
      * 处理发送消息
      * @param {string} [content] - 可选，如果传入则使用该内容而不是输入框的内容
      */
+    // 取消当前请求
+    const cancelCurrentRequest = () => {
+        if (abortController) {
+            abortController.abort();
+            setAbortController(null);
+            setIsLoading(false);
+            setToolExecuting(false);
+            setSearchExecuting(false);
+            
+            // 添加一个通知消息，表示请求已被中断
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: '消息发送已被中断。',
+                isSystemNotice: true
+            }]);
+        }
+    };
+    
     const handleSendMessage = async (content) => {
+        // 如果正在加载，点击按钮表示取消当前请求
+        if (isLoading) {
+            cancelCurrentRequest();
+            return;
+        }
+        
         const messageToSend = content || inputValue;
-        if (messageToSend.trim() === '' || isLoading) return;
+        if (messageToSend.trim() === '') return;
         
         const userMessage = {
             role: 'user',
             content: messageToSend
         };
+        
+        // 创建新的AbortController用于本次请求
+        const controller = new AbortController();
+        setAbortController(controller);
+        
+        // 检查是否与最近的历史记录重复
+        const isDuplicate = inputHistory.length > 0 && 
+            inputHistory[inputHistory.length - 1] === messageToSend;
+        
+        // 只在非重复的情况下保存历史记录
+        if (!isDuplicate) {
+            // 保存输入历史到IndexedDB (最多保存100条)
+            indexedDBHelper.saveInputHistory(messageToSend, 100);
+            
+            // 更新本地输入历史状态
+            setInputHistory(prev => {
+                const newHistory = [...prev, messageToSend];
+                return newHistory.slice(-100); // 只保留最近100条
+            });
+        }
+        
+        // 重置历史导航索引
+        setHistoryIndex(-1);
+        setTemporaryInput('');
         
         // 更新消息列表，添加用户消息
         setMessages(prev => [...prev, userMessage]);
@@ -280,9 +529,16 @@ const ChatWrapperComponent = props => {
             // 将系统提示放在消息历史的开头
             const messageHistory = [systemPrompt, ...visibleMessages];
             
-            // 调用 DeepSeek API
-            const response = await deepseekAPI.sendMessage(messageHistory);
+            // 调用 DeepSeek API，传入 AbortController 的 signal
+            const response = await deepseekAPI.sendMessage(messageHistory, {
+                signal: abortController ? abortController.signal : undefined
+            });
             
+            // 如果请求已被取消，不继续处理
+            if (abortController && abortController.signal.aborted) {
+                return;
+            }
+
             // 检查是否有工具调用
             if (response.choices && 
                 response.choices[0] && 
@@ -521,6 +777,16 @@ const ChatWrapperComponent = props => {
                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
                                     </svg>
                                 </button>
+                                
+                                {/* 添加设置按钮 */}
+                                <button 
+                                    className={styles.settingsButton}
+                                    onClick={() => setShowSettingsModal(true)}
+                                    title="设置"
+                                    aria-label="设置"
+                                >
+                                    <SettingsIcon />
+                                </button>
                             </div>
                         </div>
                     </Box>
@@ -634,34 +900,51 @@ const ChatWrapperComponent = props => {
                     </Box>
                     <Box className={styles.chatInputWrapper}>
                         <div className={styles.chatInput}>
+                            {historyIndex !== -1 && (
+                                <div className={styles.historyIndicator}>
+                                    {`历史 ${historyIndex + 1}/${inputHistory.length}`}
+                                </div>
+                            )}
                             <textarea 
                                 placeholder="输入消息..." 
-                                className={styles.chatInputField}
+                                className={`${styles.chatInputField} ${historyIndex !== -1 ? styles.historyNavActive : ''}`}
                                 rows="1"
                                 value={inputValue}
                                 onChange={handleInputChange}
-                                onKeyPress={handleKeyPress}
+                                onKeyDown={handleKeyDown}
                                 ref={textareaRef}
                                 disabled={isLoading}
                             />
                             <button 
-                                className={styles.sendButton} 
-                                title="发送消息"
-                                aria-label="发送消息"
+                                className={`${styles.sendButton} ${isLoading ? styles.cancelButton : ''}`}
+                                title={isLoading ? "中断发送" : "发送消息"}
+                                aria-label={isLoading ? "中断发送" : "发送消息"}
                                 onClick={handleSendMessage}
-                                disabled={inputValue.trim() === '' || isLoading}
+                                disabled={!isLoading && inputValue.trim() === ''}
                             >
-                                <svg 
-                                    className={styles.sendIcon} 
-                                    width="16" 
-                                    height="16" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" 
+                                {isLoading ? (
+                                    <svg 
+                                        className={styles.cancelIcon} 
+                                        width="16" 
+                                        height="16" 
+                                        viewBox="0 0 24 24" 
                                         fill="white"
-                                    />
-                                </svg>
+                                    >
+                                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                                    </svg>
+                                ) : (
+                                    <svg 
+                                        className={styles.sendIcon} 
+                                        width="16" 
+                                        height="16" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path 
+                                            d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" 
+                                            fill="white"
+                                        />
+                                    </svg>
+                                )}
                             </button>
                         </div>
                     </Box>
@@ -677,6 +960,128 @@ const ChatWrapperComponent = props => {
                         />
                     </div>
                 </div>
+            )}
+            
+            {/* 设置模态框 */}
+            {showSettingsModal && (
+                <Modal 
+                    contentLabel="大模型设置"
+                    onRequestClose={() => setShowSettingsModal(false)}
+                >
+                    <Box className={styles.settingsModalContent}>
+                        <h2>大模型设置</h2>
+                        <p>在此处可以调整大模型的相关设置，设置将被保存在本地。</p>
+                        
+                        <div className={styles.settingItem}>
+                            <label htmlFor="apiKey" className={styles.settingLabel}>
+                                API Key
+                            </label>
+                            <input 
+                                type="text" 
+                                id="apiKey" 
+                                value={apiKey}
+                                onChange={e => setApiKey(e.target.value)} 
+                                className={styles.settingInput}
+                                placeholder="输入您的 API Key"
+                            />
+                        </div>
+
+                        <div className={styles.settingItem}>
+                            <label htmlFor="apiUrl" className={styles.settingLabel}>
+                                API URL
+                            </label>
+                            <input 
+                                type="text" 
+                                id="apiUrl" 
+                                value={apiUrl}
+                                onChange={e => setApiUrl(e.target.value)}
+                                className={styles.settingInput}
+                                placeholder="https://api.deepseek.com/v1/chat/completions"
+                            />
+                        </div>
+                        
+                        <div className={styles.settingItem}>
+                            <label htmlFor="modelName" className={styles.settingLabel}>
+                                模型名称
+                            </label>
+                            <input 
+                                type="text" 
+                                id="modelName" 
+                                value={modelName}
+                                onChange={e => setModelName(e.target.value)}
+                                className={styles.settingInput}
+                                placeholder="deepseek-chat"
+                            />
+                        </div>
+                        
+                        <div className={styles.settingItem}>
+                            <label htmlFor="temperature" className={styles.settingLabel}>
+                                温度: {temperature}
+                            </label>
+                            <input 
+                                type="range" 
+                                id="temperature" 
+                                min="0" 
+                                max="1" 
+                                step="0.01" 
+                                value={temperature}
+                                onChange={e => setTemperature(parseFloat(e.target.value))}
+                                className={styles.settingSlider}
+                            />
+                            <div className={styles.rangeLabels}>
+                                <span>精确</span>
+                                <span>创造力</span>
+                            </div>
+                        </div>
+                        
+                        <div className={styles.settingItem}>
+                            <label className={styles.settingLabel}>
+                                输入历史记录
+                            </label>
+                            <button 
+                                onClick={handleClearInputHistory} 
+                                className={styles.clearHistoryButton}
+                                title="清空所有输入历史记录"
+                            >
+                                清空历史记录
+                            </button>
+                            {clearHistoryResult && (
+                                <div className={`${styles.clearHistoryResult} ${styles.testSuccess}`}>
+                                    {clearHistoryResult}
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* 连接测试结果显示区域 */}
+                        {testConnectionResult && (
+                            <div className={`${styles.testResult} ${testConnectionResult.success ? styles.testSuccess : styles.testError}`}>
+                                {testConnectionResult.message}
+                            </div>
+                        )}
+                        
+                        <div className={styles.modalButtons}>
+                            <button 
+                                onClick={() => setShowSettingsModal(false)}
+                                className={styles.cancelButton}
+                            >
+                                取消
+                            </button>
+                            <button
+                                onClick={testApiConnection}
+                                className={styles.testButton}
+                                disabled={isTestingConnection}
+                            >
+                                {isTestingConnection ? '测试中...' : '测试连接'}
+                            </button>
+                            <button 
+                                onClick={saveSettings}
+                                className={styles.saveButton}
+                            >
+                                保存设置
+                            </button>
+                        </div>
+                    </Box>
+                </Modal>
             )}
         </Box>
     );
