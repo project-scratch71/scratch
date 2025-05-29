@@ -27,8 +27,6 @@ const initDB = () => {
             return resolve(null);
         }
         
-        console.log(`正在初始化数据库: ${DB_NAME}, 版本: ${DB_VERSION}`);
-        
         // 打开数据库
         const request = indexedDB.open(DB_NAME, DB_VERSION);
         
@@ -36,38 +34,26 @@ const initDB = () => {
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
             const oldVersion = event.oldVersion;
-            console.log(`数据库正在升级: 从版本 ${oldVersion} 到版本 ${DB_VERSION}`);
             
             // 创建聊天历史对象存储
             if (!db.objectStoreNames.contains(STORES.CHAT_HISTORY)) {
                 const chatHistoryStore = db.createObjectStore(STORES.CHAT_HISTORY, { keyPath: 'timestamp' });
                 chatHistoryStore.createIndex('timestamp', 'timestamp', { unique: false });
-                console.log('创建聊天历史存储成功');
-            } else {
-                console.log('聊天历史存储已存在');
             }
             
             // 创建设置对象存储
             if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
                 db.createObjectStore(STORES.SETTINGS, { keyPath: 'key' });
-                console.log('创建设置存储成功');
-            } else {
-                console.log('设置存储已存在');
             }
             
             // 确保创建会话和消息存储（无论版本如何）
-            console.log('检查并确保聊天会话和消息存储存在');
             
             // 创建聊天会话存储
             try {
                 if (!db.objectStoreNames.contains(STORES.CHAT_SESSIONS)) {
-                    console.log('准备创建聊天会话存储');
                     const sessionStore = db.createObjectStore(STORES.CHAT_SESSIONS, { keyPath: 'id' });
                     sessionStore.createIndex('timestamp', 'timestamp', { unique: false });
                     sessionStore.createIndex('title', 'title', { unique: false });
-                    console.log('创建聊天会话存储成功');
-                } else {
-                    console.log('聊天会话存储已存在');
                 }
             } catch (e) {
                 console.error('创建会话存储失败:', e);
@@ -76,19 +62,13 @@ const initDB = () => {
             // 创建聊天消息存储
             try {
                 if (!db.objectStoreNames.contains(STORES.CHAT_MESSAGES)) {
-                    console.log('准备创建聊天消息存储');
                     const messageStore = db.createObjectStore(STORES.CHAT_MESSAGES, { keyPath: 'id', autoIncrement: true });
                     messageStore.createIndex('sessionId', 'sessionId', { unique: false });
                     messageStore.createIndex('timestamp', 'timestamp', { unique: false });
-                    console.log('创建聊天消息存储成功');
-                } else {
-                    console.log('聊天消息存储已存在');
                 }
             } catch (e) {
                 console.error('创建消息存储失败:', e);
             }
-            
-            console.log('数据库版本升级完成');
         };
         
         // 处理版本被阻塞的情况
@@ -99,11 +79,9 @@ const initDB = () => {
         // 处理成功和错误
         request.onsuccess = (event) => {
             const db = event.target.result;
-            console.log('数据库初始化成功，当前版本:', db.version);
             
             // 验证存储是否存在
             const storeNames = Array.from(db.objectStoreNames);
-            console.log('当前存在的存储:', storeNames);
             
             // 确认所有需要的存储都已创建
             const requiredStores = Object.values(STORES);
@@ -112,15 +90,11 @@ const initDB = () => {
             if (missingStores.length > 0) {
                 console.warn('缺少必要的存储:', missingStores);
                 
-                // 当存在缺失的必要存储时，强制升级数据库版本
-                console.log('检测到缺少必要的存储，需要重置数据库...');
-                
                 // 关闭当前数据库连接
                 db.close();
                 
                 // 强制升级数据库版本以触发 onupgradeneeded 事件
                 const newVersion = db.version + 1;
-                console.log(`尝试升级数据库到新版本: ${newVersion}`);
                 
                 const reopenRequest = indexedDB.open(DB_NAME, newVersion);
                 
@@ -131,22 +105,17 @@ const initDB = () => {
                     missingStores.forEach(storeName => {
                         try {
                             if (!upgradedDb.objectStoreNames.contains(storeName)) {
-                                console.log(`正在创建缺失的存储: ${storeName}`);
-                                
                                 if (storeName === STORES.CHAT_SESSIONS) {
                                     const sessionStore = upgradedDb.createObjectStore(STORES.CHAT_SESSIONS, { keyPath: 'id' });
                                     sessionStore.createIndex('timestamp', 'timestamp', { unique: false });
                                     sessionStore.createIndex('title', 'title', { unique: false });
-                                    console.log('创建聊天会话存储成功');
                                 } else if (storeName === STORES.CHAT_MESSAGES) {
                                     const messageStore = upgradedDb.createObjectStore(STORES.CHAT_MESSAGES, { keyPath: 'id', autoIncrement: true });
                                     messageStore.createIndex('sessionId', 'sessionId', { unique: false });
                                     messageStore.createIndex('timestamp', 'timestamp', { unique: false });
-                                    console.log('创建聊天消息存储成功');
                                 } else {
                                     // 处理其他缺失的存储
                                     upgradedDb.createObjectStore(storeName);
-                                    console.log(`创建存储 ${storeName} 成功`);
                                 }
                             }
                         } catch (error) {
@@ -156,7 +125,6 @@ const initDB = () => {
                 };
                 
                 reopenRequest.onsuccess = (reopenEvent) => {
-                    console.log('数据库重新打开成功，存储已修复');
                     resolve(reopenEvent.target.result);
                 };
                 
@@ -211,7 +179,6 @@ const saveInputHistory = async (input, maxItems = 100) => {
                         const mostRecent = allHistory[allHistory.length - 1];
                         if (mostRecent && mostRecent.text === input) {
                             // 如果与最近记录相同，不保存
-                            console.log('跳过保存重复的输入历史');
                             resolve();
                             return;
                         }
@@ -383,7 +350,6 @@ const clearInputHistory = async () => {
             const clearRequest = store.clear();
             
             clearRequest.onsuccess = () => {
-                console.log('聊天输入历史已清空');
                 resolve(true);
             };
             
@@ -405,7 +371,6 @@ const clearInputHistory = async () => {
  */
 const createSession = async (title = '新会话') => {
     try {
-        console.log('开始创建新会话:', title);
         const db = await initDB();
         if (!db) {
             console.error('创建会话失败: 无法获取数据库实例');
@@ -423,19 +388,10 @@ const createSession = async (title = '新会话') => {
             messageCount: 0
         };
         
-        console.log('准备添加会话到存储:', session);
-        
         return new Promise((resolve, reject) => {
             const request = store.add(session);
             
             request.onsuccess = () => {
-                console.log('创建会话成功，完成添加操作:', sessionId);
-                
-                // 确认事务完成
-                transaction.oncomplete = () => {
-                    console.log('创建会话事务完成');
-                };
-                
                 resolve(sessionId);
             };
             
@@ -495,7 +451,6 @@ const getSessionMessages = async (sessionId) => {
     }
     
     try {
-        console.log('开始获取会话消息:', sessionId);
         const db = await initDB();
         if (!db) {
             console.error('获取会话消息失败: 无法获取数据库实例');
@@ -519,15 +474,6 @@ const getSessionMessages = async (sessionId) => {
             request.onsuccess = () => {
                 // 按时间排序
                 const messages = request.result;
-                console.log(`获取会话消息成功, 共${messages.length}条消息:`);
-                
-                if (messages.length > 0) {
-                    console.log('第一条消息:', messages[0]);
-                    console.log('最后一条消息:', messages[messages.length - 1]);
-                } else {
-                    console.log('会话中没有消息');
-                }
-                
                 messages.sort((a, b) => a.timestamp - b.timestamp);
                 resolve(messages);
             };
@@ -556,7 +502,6 @@ const saveMessageToSession = async (sessionId, message) => {
     }
     
     try {
-        console.log('开始保存消息到会话:', { sessionId, message });
         const db = await initDB();
         if (!db) {
             console.error('保存消息失败: 无法获取数据库实例');
@@ -573,7 +518,6 @@ const saveMessageToSession = async (sessionId, message) => {
             
             checkRequest.onsuccess = () => {
                 if (checkRequest.result) {
-                    console.log('会话验证成功:', sessionId);
                     resolve(true);
                 } else {
                     console.error('会话不存在，尝试自动创建:', sessionId);
@@ -590,7 +534,6 @@ const saveMessageToSession = async (sessionId, message) => {
         // 如果会话不存在，先创建会话
         if (!sessionExists) {
             try {
-                console.log('尝试自动创建会话:', sessionId);
                 const createSessionTx = db.transaction([STORES.CHAT_SESSIONS], 'readwrite');
                 const createSessionStore = createSessionTx.objectStore(STORES.CHAT_SESSIONS);
                 
@@ -605,7 +548,6 @@ const saveMessageToSession = async (sessionId, message) => {
                     const createRequest = createSessionStore.add(newSession);
                     
                     createRequest.onsuccess = () => {
-                        console.log('自动创建会话成功:', sessionId);
                         resolve();
                     };
                     
@@ -621,15 +563,10 @@ const saveMessageToSession = async (sessionId, message) => {
         }
         
         // 更新会话的消息数量
-        console.log('准备更新会话消息数量');
         const sessionTx = db.transaction([STORES.CHAT_SESSIONS], 'readwrite');
         const sessionStore = sessionTx.objectStore(STORES.CHAT_SESSIONS);
         
         // 添加事务监听
-        sessionTx.oncomplete = () => {
-            console.log('会话更新事务已完成');
-        };
-        
         sessionTx.onerror = (event) => {
             console.error('会话更新事务出错:', event.target.error);
         };
@@ -638,7 +575,6 @@ const saveMessageToSession = async (sessionId, message) => {
         sessionRequest.onsuccess = () => {
             if (sessionRequest.result) {
                 const session = sessionRequest.result;
-                console.log('找到会话，当前消息数量:', session.messageCount);
                 
                 session.messageCount = (session.messageCount || 0) + 1;
                 session.timestamp = Date.now(); // 更新会话时间戳
@@ -646,13 +582,9 @@ const saveMessageToSession = async (sessionId, message) => {
                 // 如果是第一条用户消息且还是默认标题，则使用消息内容的前20个字符作为标题
                 if (session.messageCount === 1 && message.role === 'user' && session.title === '新会话') {
                     session.title = message.content.substring(0, 20) + (message.content.length > 20 ? '...' : '');
-                    console.log('更新会话标题为:', session.title);
                 }
                 
                 const putRequest = sessionStore.put(session);
-                putRequest.onsuccess = () => {
-                    console.log('会话更新成功');
-                };
                 putRequest.onerror = (event) => {
                     console.error('会话更新失败:', event.target.error);
                 };
@@ -666,15 +598,10 @@ const saveMessageToSession = async (sessionId, message) => {
         };
         
         // 保存消息
-        console.log('准备保存消息内容到消息存储');
         const messageTx = db.transaction([STORES.CHAT_MESSAGES], 'readwrite');
         const messageStore = messageTx.objectStore(STORES.CHAT_MESSAGES);
         
         // 添加消息事务监听
-        messageTx.oncomplete = () => {
-            console.log('消息保存事务已完成');
-        };
-        
         messageTx.onerror = (event) => {
             console.error('消息保存事务出错:', event.target.error);
         };
@@ -690,7 +617,6 @@ const saveMessageToSession = async (sessionId, message) => {
             
             request.onsuccess = (event) => {
                 const messageId = event.target.result;
-                console.log('保存消息成功, ID:', messageId);
                 resolve(messageId); // 返回消息ID
             };
             
@@ -739,7 +665,6 @@ const deleteSession = async (sessionId) => {
                 );
                 
                 Promise.all(deletePromises).then(() => {
-                    console.log('删除会话及消息成功:', sessionId);
                     resolve(true);
                 });
             };
@@ -781,7 +706,6 @@ const updateSessionTitle = async (sessionId, title) => {
                     
                     const updateRequest = store.put(session);
                     updateRequest.onsuccess = () => {
-                        console.log('更新会话标题成功');
                         resolve(true);
                     };
                     
@@ -825,12 +749,7 @@ const clearAllSessions = async () => {
             const clearSessionsRequest = sessionStore.clear();
             const clearMessagesRequest = messageStore.clear();
             
-            clearSessionsRequest.onsuccess = () => {
-                console.log('清空会话成功');
-            };
-            
             clearMessagesRequest.onsuccess = () => {
-                console.log('清空消息成功');
                 resolve(true);
             };
             
@@ -853,8 +772,6 @@ const clearAllSessions = async () => {
 const resetDatabase = async () => {
     return new Promise((resolve, reject) => {
         try {
-            console.log('开始重置数据库...');
-            
             // 首先尝试关闭所有可能的数据库连接
             const closeConnections = () => {
                 return new Promise(resolveClose => {
@@ -863,12 +780,10 @@ const resetDatabase = async () => {
                             indexedDB.databases().then(databases => {
                                 const dbFound = databases.find(db => db.name === DB_NAME);
                                 if (dbFound) {
-                                    console.log('尝试关闭已有的数据库连接');
                                     const closeRequest = indexedDB.open(DB_NAME);
                                     closeRequest.onsuccess = event => {
                                         const db = event.target.result;
                                         db.close();
-                                        console.log('已关闭数据库连接');
                                         resolveClose();
                                     };
                                     closeRequest.onerror = () => resolveClose();
@@ -893,20 +808,15 @@ const resetDatabase = async () => {
                     const deleteRequest = indexedDB.deleteDatabase(DB_NAME);
                     
                     deleteRequest.onsuccess = () => {
-                        console.log('数据库删除成功');
-                        
                         // 2. 重新初始化数据库
                         initDB().then(db => {
                             if (db) {
-                                console.log('数据库重新初始化成功');
-                                
                                 // 验证所有需要的存储是否都已创建
                                 const storeNames = Array.from(db.objectStoreNames);
                                 const requiredStores = Object.values(STORES);
                                 const missingStores = requiredStores.filter(store => !storeNames.includes(store));
                                 
                                 if (missingStores.length === 0) {
-                                    console.log('所有必要的存储都已创建成功');
                                     resolveDelete(true);
                                 } else {
                                     console.warn('重建后仍缺少存储:', missingStores);
@@ -930,7 +840,6 @@ const resetDatabase = async () => {
                                                 } else {
                                                     upgradedDb.createObjectStore(storeName);
                                                 }
-                                                console.log(`创建存储 ${storeName} 成功`);
                                             } catch (e) {
                                                 console.error(`创建存储 ${storeName} 失败:`, e);
                                             }
@@ -938,7 +847,6 @@ const resetDatabase = async () => {
                                     };
                                     
                                     upgradeRequest.onsuccess = () => {
-                                        console.log('强制升级并创建缺失存储成功');
                                         resolveDelete(true);
                                     };
                                     
@@ -968,11 +876,9 @@ const resetDatabase = async () => {
                         setTimeout(() => {
                             const retryRequest = indexedDB.deleteDatabase(DB_NAME);
                             retryRequest.onsuccess = () => {
-                                console.log('重试删除数据库成功');
                                 // 继续初始化
                                 initDB().then(db => {
                                     if (db) {
-                                        console.log('数据库重新初始化成功');
                                         resolveDelete(true);
                                     } else {
                                         console.error('数据库重新初始化失败');
@@ -1006,8 +912,6 @@ const resetDatabase = async () => {
  */
 const checkAndRepairDatabase = async () => {
     try {
-        console.log('开始检查数据库结构...');
-        
         // 打开并检查数据库
         const db = await initDB();
         if (!db) {
@@ -1020,12 +924,7 @@ const checkAndRepairDatabase = async () => {
         const requiredStores = Object.values(STORES);
         const missingStores = requiredStores.filter(store => !storeNames.includes(store));
         
-        console.log('当前数据库版本:', db.version);
-        console.log('现有存储:', storeNames);
-        console.log('缺失的存储:', missingStores);
-        
         if (missingStores.length === 0) {
-            console.log('数据库结构检查完成: 所有存储都已正确创建');
             return { 
                 success: true, 
                 message: '数据库结构正常',
@@ -1035,7 +934,6 @@ const checkAndRepairDatabase = async () => {
         }
         
         console.warn(`检测到缺失的存储: ${missingStores.join(', ')}`);
-        console.log('尝试修复数据库...');
         
         // 关闭当前连接以便重置
         db.close();
@@ -1043,8 +941,6 @@ const checkAndRepairDatabase = async () => {
         // 尝试重置数据库以修复问题
         const resetSuccess = await resetDatabase();
         if (resetSuccess) {
-            console.log('数据库修复完成');
-            
             // 再次检查修复后的数据库状态
             const repairedDb = await initDB();
             if (!repairedDb) return { success: false, message: '修复后无法打开数据库' };

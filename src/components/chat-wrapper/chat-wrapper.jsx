@@ -322,7 +322,8 @@ const ChatWrapperComponent = props => {
     const [clearHistoryResult, setClearHistoryResult] = useState(null);
     const [clearSessionsResult, setClearSessionsResult] = useState(null);
     
-    const chatRef = React.useRef(null);
+    const chatRefObject = React.useRef(null);
+    const chatRef = element => { chatRefObject.current = element; };
     const messagesEndRef = useRef(null);
     const textareaRef = useRef(null);
     
@@ -1252,7 +1253,7 @@ const ChatWrapperComponent = props => {
         <Box 
             className={`${styles.chatWrapper} ${collapsed ? styles.collapsed : ''} ${className || ''}`}
             style={!collapsed ? { width: `${width}px` } : {}}
-            ref={chatRef}
+            componentRef={chatRef}
         >
             <button 
                 className={styles.toggleButton} 
@@ -1775,7 +1776,7 @@ const ChatWrapperComponent = props => {
 };
 
 ChatWrapperComponent.propTypes = {
-    vm: PropTypes.instanceOf(PropTypes.object).isRequired,
+    vm: PropTypes.object.isRequired, // 修改为正确的PropTypes.object
     mcpServer: PropTypes.shape({}), // MCP server is optional as it's initialized after component mount
     className: PropTypes.string
 };
