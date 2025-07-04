@@ -154,7 +154,7 @@ class SeleniumHelper {
             .build()
             .then(driver => {
                 if(testName) {
-                    const __dirname = path.dirname(fileURLToPath(import.meta.url))
+                    // const __dirname = path.dirname(fileURLToPath(import.meta.url))
                     injectDriver(driver, testName, {
                         outputDir: path.join(__dirname, '../../output'),
                         answerDataDir: path.join(__dirname, '../../answer-data'),
