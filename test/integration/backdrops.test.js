@@ -18,7 +18,7 @@ let driver;
 
 describe('Working with backdrops', () => {
     beforeAll(() => {
-        driver = getDriver();
+        driver = getDriver('Working with backdrops');
     });
 
     afterAll(async () => {

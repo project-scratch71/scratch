@@ -2,8 +2,13 @@
 // allow time for that so we get a more specific error message
 jest.setTimeout(95000); // eslint-disable-line no-undef
 
+import path from 'path';
+import {fileURLToPath} from 'url';
+
 import bindAll from 'lodash.bindall';
 import webdriver from 'selenium-webdriver';
+
+import {injectDriver} from '@rozelin-dc/js-uitestfix';
 
 const {Button, By, until} = webdriver;
 
@@ -122,9 +127,10 @@ class SeleniumHelper {
 
     /**
      * Instantiate a new Selenium driver.
+     * @param {string} [testName]
      * @returns {webdriver.ThenableWebDriver} The new driver.
      */
-    getDriver () {
+    getDriver (testName) {
         const chromeCapabilities = webdriver.Capabilities.chrome();
         const args = [];
         if (USE_HEADLESS) {
@@ -145,7 +151,18 @@ class SeleniumHelper {
         this.driver = new webdriver.Builder()
             .forBrowser('chrome')
             .withCapabilities(chromeCapabilities)
-            .build();
+            .build()
+            .then(driver => {
+                if(testName) {
+                    const __dirname = path.dirname(fileURLToPath(import.meta.url))
+                    injectDriver(driver, testName, {
+                        outputDir: path.join(__dirname, '../../output'),
+                        answerDataDir: path.join(__dirname, '../../answer-data'),
+                        configPath: path.join(__dirname, '../../config.properties'),
+                        resultSavePath: path.join(__dirname, '../../result'),
+                    })
+                }
+            });
         return this.driver;
     }
 
