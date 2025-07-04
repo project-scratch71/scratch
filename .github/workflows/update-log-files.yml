@@ -40,6 +40,9 @@ jobs:
       - name: Set test config
         run: sed -i 's/version=new/version=old/g' config.properties
 
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
       - name: Build
         run: npm run build
 
