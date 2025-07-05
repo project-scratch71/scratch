@@ -150,7 +150,8 @@
   "jest": {
     "setupFiles": [
       "raf/polyfill",
-      "<rootDir>/test/helpers/enzyme-setup.js"
+      "<rootDir>/test/helpers/enzyme-setup.js",
+      "<rootDir>/test/helpers/textencoder-polyfill.js"
     ],
     "testPathIgnorePatterns": [
       "src/test.js"
