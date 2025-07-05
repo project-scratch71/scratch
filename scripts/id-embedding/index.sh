@@ -17,6 +17,7 @@ for file in $files; do
 
   if [[ $file =~ $target_file_pattern ]]; then
     # If $file is TSX, JSX, or SVG file, do ID embedding.
+    echo "Start ID-embedding: $file"
     node ./scripts/id-embedding/main.mjs --file $file --projectRootDir $project_root_dir --mapFileDir $map_file_dir &
     ((job_count++))
 
