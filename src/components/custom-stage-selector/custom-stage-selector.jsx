@@ -5,7 +5,7 @@ import {defineMessages, intlShape, injectIntl, FormattedMessage} from 'react-int
 
 import Box from '../box/box.jsx';
 import ActionMenu from '../action-menu/action-menu.jsx';
-import styles from './stage-selector.css';
+import styles from './custom-stage-selector.css';
 import {isRtl} from 'scratch-l10n';
 
 import backdropIcon from '../action-menu/icon--backdrop.svg';
@@ -37,7 +37,7 @@ const messages = defineMessages({
     }
 });
 
-const StageSelector = props => {
+const CustomStageSelector = props => {
     const {
         backdropCount,
         containerRef,
@@ -60,15 +60,7 @@ const StageSelector = props => {
     } = props;
     return (
         <Box
-            className={classNames(styles.stageSelector, {
-                [styles.isSelected]: selected,
-                [styles.raised]: raised || dragOver,
-                [styles.receivedBlocks]: receivedBlocks
-            })}
-            componentRef={containerRef}
-            onClick={onClick}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
+            className={styles.stageSelector}
             {...componentProps}
         >
             <div className={styles.header}>
@@ -80,56 +72,47 @@ const StageSelector = props => {
                     />
                 </div>
             </div>
-            {url ? (
-                <img
-                    className={styles.costumeCanvas}
-                    src={url}
-                />
-            ) : null}
+            <Box className={styles.itemsWrapper}>
+                <div className={styles.stageWrapper}>
+                    <div
+                        className={classNames(styles.stage, {
+                            [styles.isSelected]: selected,
+                            [styles.raised]: raised || dragOver,
+                            [styles.receivedBlocks]: receivedBlocks
+                        })}
+                        onClick={onClick}
+                        onMouseEnter={onMouseEnter}
+                        onMouseLeave={onMouseLeave}
+                        ref={containerRef}
+                    >
+                        {url ? (
+                            <div className={styles.stageImageOuter}>
+                                <div className={styles.stageImageInner}>
+                                    <img
+                                        className={styles.stageImage}
+                                        draggable={false}
+                                        src={url}
+                                    />
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
+                </div>
+            </Box>
             <div className={styles.label}>
+                {backdropCount}
+                {" "}
                 <FormattedMessage
                     defaultMessage="Backdrops"
                     description="Label for the backdrops in the stage selector"
                     id="gui.stageSelector.backdrops"
                 />
             </div>
-            <div className={styles.count}>{backdropCount}</div>
-            <ActionMenu
-                className={styles.addButton}
-                img={backdropIcon}
-                moreButtons={[
-                    {
-                        title: intl.formatMessage(messages.addBackdropFromFile),
-                        img: fileUploadIcon,
-                        onClick: onBackdropFileUploadClick,
-                        fileAccept: '.svg, .png, .bmp, .jpg, .jpeg, .gif',
-                        fileChange: onBackdropFileUpload,
-                        fileInput: fileInputRef,
-                        fileMultiple: true
-                    }, /* Surprise button commented out for iframe embedding - not needed
-                    {
-                        title: intl.formatMessage(messages.addBackdropFromSurprise),
-                        img: surpriseIcon,
-                        onClick: onSurpriseBackdropClick
-                    }, */ {
-                        title: intl.formatMessage(messages.addBackdropFromPaint),
-                        img: paintIcon,
-                        onClick: onEmptyBackdropClick
-                    }, {
-                        title: intl.formatMessage(messages.addBackdropFromLibrary),
-                        img: searchIcon,
-                        onClick: onNewBackdropClick
-                    }
-                ]}
-                title={intl.formatMessage(messages.addBackdropFromLibrary)}
-                tooltipPlace={isRtl(intl.locale) ? 'right' : 'left'}
-                onClick={onNewBackdropClick}
-            />
         </Box>
     );
 };
 
-StageSelector.propTypes = {
+CustomStageSelector.propTypes = {
     backdropCount: PropTypes.number.isRequired,
     containerRef: PropTypes.func,
     dragOver: PropTypes.bool,
@@ -149,4 +132,4 @@ StageSelector.propTypes = {
     url: PropTypes.string
 };
 
-export default injectIntl(StageSelector);
+export default injectIntl(CustomStageSelector);

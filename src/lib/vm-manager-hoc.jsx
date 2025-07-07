@@ -32,6 +32,12 @@ const vmManagerHOC = function (WrappedComponent) {
                 this.audioEngine = new AudioEngine();
                 this.props.vm.attachAudioEngine(this.audioEngine);
                 this.props.vm.setCompatibilityMode(true);
+                
+                // Initialize storage web stores for asset loading
+                if (this.props.vm.runtime.storage && !this.props.vm.runtime.storage.webStores) {
+                    this.props.vm.runtime.storage.addOfficialScratchWebStores();
+                }
+                
                 this.props.vm.initialized = true;
                 this.props.vm.setLocale(this.props.locale, this.props.messages);
             }

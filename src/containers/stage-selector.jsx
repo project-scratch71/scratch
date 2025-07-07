@@ -17,7 +17,7 @@ import sharedMessages from '../lib/shared-messages';
 import {fetchCode} from '../lib/backpack-api';
 import {getEventXY} from '../lib/touch-utils';
 
-import StageSelectorComponent from '../components/stage-selector/stage-selector.jsx';
+import CustomStageSelectorComponent from '../components/custom-stage-selector/custom-stage-selector.jsx';
 
 import backdropLibraryContent from '../lib/libraries/backdrops.json';
 import {handleFileUpload, costumeUpload} from '../lib/file-uploader.js';
@@ -31,7 +31,7 @@ const dragTypes = [
 ];
 
 const DroppableThrottledStage = DropAreaHOC(dragTypes)(
-    ThrottledPropertyHOC('url', 500)(StageSelectorComponent)
+    ThrottledPropertyHOC('url', 500)(CustomStageSelectorComponent)
 );
 
 class StageSelector extends React.Component {
@@ -178,7 +178,7 @@ class StageSelector extends React.Component {
     }
 }
 StageSelector.propTypes = {
-    ...StageSelectorComponent.propTypes,
+    ...CustomStageSelectorComponent.propTypes,
     id: PropTypes.string,
     intl: intlShape.isRequired,
     onCloseImporting: PropTypes.func,

@@ -13,7 +13,7 @@ import {setReceivedBlocks} from '../reducers/hovered-target';
 import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 import {setRestore} from '../reducers/restore-deletion';
 import DragConstants from '../lib/drag-constants';
-import TargetPaneComponent from '../components/target-pane/target-pane.jsx';
+import CustomTargetPaneComponent from '../components/custom-target-pane/custom-target-pane.jsx';
 import {BLOCKS_DEFAULT_SCALE} from '../lib/layout-constants';
 import spriteLibraryContent from '../lib/libraries/sprites.json';
 import {handleFileUpload, spriteUpload} from '../lib/file-uploader.js';
@@ -248,7 +248,7 @@ class TargetPane extends React.Component {
         } = this.props;
         /* eslint-enable no-unused-vars */
         return (
-            <TargetPaneComponent
+            <CustomTargetPaneComponent
                 {...componentProps}
                 fileInputRef={this.setFileInput}
                 onActivateBlocksTab={this.handleActivateBlocksTab}
@@ -277,7 +277,7 @@ const {
     onSelectSprite, // eslint-disable-line no-unused-vars
     onActivateBlocksTab, // eslint-disable-line no-unused-vars
     ...targetPaneProps
-} = TargetPaneComponent.propTypes;
+} = CustomTargetPaneComponent.propTypes;
 
 TargetPane.propTypes = {
     intl: intlShape.isRequired,

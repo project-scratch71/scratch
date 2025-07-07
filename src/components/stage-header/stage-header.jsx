@@ -50,14 +50,14 @@ const messages = defineMessages({
 const StageHeaderComponent = function (props) {
     const {
         isFullScreen,
-        isPlayerOnly,
-        onKeyPress,
-        onSetStageLarge,
-        onSetStageSmall,
-        onSetStageFull,
-        onSetStageUnFull,
-        showBranding,
-        stageSizeMode,
+        // isPlayerOnly,
+        // onKeyPress,
+        // onSetStageLarge,
+        // onSetStageSmall,
+        // onSetStageFull,
+        // onSetStageUnFull,
+        // showBranding,
+        // stageSizeMode,
         vm
     } = props;
 
@@ -65,36 +65,36 @@ const StageHeaderComponent = function (props) {
 
     if (isFullScreen) {
         const stageDimensions = getStageDimensions(null, true);
-        const stageButton = showBranding ? (
-            <div className={styles.embedScratchLogo}>
-                <a
-                    href="https://scratch.mit.edu"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                >
-                    <img
-                        alt="Scratch"
-                        src={scratchLogo}
-                    />
-                </a>
-            </div>
-        ) : (
-            <div className={styles.unselectWrapper}>
-                <Button
-                    className={styles.stageButton}
-                    onClick={onSetStageUnFull}
-                    onKeyPress={onKeyPress}
-                >
-                    <img
-                        alt={props.intl.formatMessage(messages.unFullStageSizeMessage)}
-                        className={styles.stageButtonIcon}
-                        draggable={false}
-                        src={unFullScreenIcon}
-                        title={props.intl.formatMessage(messages.fullscreenControl)}
-                    />
-                </Button>
-            </div>
-        );
+        // const stageButton = showBranding ? (
+        //     <div className={styles.embedScratchLogo}>
+        //         <a
+        //             href="https://scratch.mit.edu"
+        //             rel="noopener noreferrer"
+        //             target="_blank"
+        //         >
+        //             <img
+        //                 alt="Scratch"
+        //                 src={scratchLogo}
+        //             />
+        //         </a>
+        //     </div>
+        // ) : (
+        //     <div className={styles.unselectWrapper}>
+        //         <Button
+        //             className={styles.stageButton}
+        //             onClick={onSetStageUnFull}
+        //             onKeyPress={onKeyPress}
+        //         >
+        //             <img
+        //                 alt={props.intl.formatMessage(messages.unFullStageSizeMessage)}
+        //                 className={styles.stageButtonIcon}
+        //                 draggable={false}
+        //                 src={unFullScreenIcon}
+        //                 title={props.intl.formatMessage(messages.fullscreenControl)}
+        //             />
+        //         </Button>
+        //     </div>
+        // );
         header = (
             <Box className={styles.stageHeaderWrapperOverlay}>
                 <Box
@@ -102,41 +102,41 @@ const StageHeaderComponent = function (props) {
                     style={{width: stageDimensions.width}}
                 >
                     <Controls vm={vm} />
-                    {stageButton}
+                    {/* {stageButton} */}
                 </Box>
             </Box>
         );
     } else {
-        const stageControls =
-            isPlayerOnly ? (
-                []
-            ) : (
-                <div className={styles.stageSizeToggleGroup}>
-                    <ToggleButtons
-                        buttons={[
-                            {
-                                handleClick: onSetStageSmall,
-                                icon: smallStageIcon,
-                                iconClassName: styles.stageButtonIcon,
-                                isSelected: stageSizeMode === STAGE_SIZE_MODES.small,
-                                title: props.intl.formatMessage(messages.smallStageSizeMessage)
-                            },
-                            {
-                                handleClick: onSetStageLarge,
-                                icon: largeStageIcon,
-                                iconClassName: styles.stageButtonIcon,
-                                isSelected: stageSizeMode === STAGE_SIZE_MODES.large,
-                                title: props.intl.formatMessage(messages.largeStageSizeMessage)
-                            }
-                        ]}
-                    />
-                </div>
-            );
+        // const stageControls =
+        //     isPlayerOnly ? (
+        //         []
+        //     ) : (
+        //         <div className={styles.stageSizeToggleGroup}>
+        //             <ToggleButtons
+        //                 buttons={[
+        //                     {
+        //                         handleClick: onSetStageSmall,
+        //                         icon: smallStageIcon,
+        //                         iconClassName: styles.stageButtonIcon,
+        //                         isSelected: stageSizeMode === STAGE_SIZE_MODES.small,
+        //                         title: props.intl.formatMessage(messages.smallStageSizeMessage)
+        //                     },
+        //                     {
+        //                         handleClick: onSetStageLarge,
+        //                         icon: largeStageIcon,
+        //                         iconClassName: styles.stageButtonIcon,
+        //                         isSelected: stageSizeMode === STAGE_SIZE_MODES.large,
+        //                         title: props.intl.formatMessage(messages.largeStageSizeMessage)
+        //                     }
+        //                 ]}
+        //             />
+        //         </div>
+        //     );
         header = (
             <Box className={styles.stageHeaderWrapper}>
                 <Box className={styles.stageMenuWrapper}>
                     <Controls vm={vm} />
-                    <div className={styles.stageSizeRow}>
+                    {/* <div className={styles.stageSizeRow}>
                         {stageControls}
                         <div>
                             <Button
@@ -152,7 +152,7 @@ const StageHeaderComponent = function (props) {
                                 />
                             </Button>
                         </div>
-                    </div>
+                    </div> */}
                 </Box>
             </Box>
         );

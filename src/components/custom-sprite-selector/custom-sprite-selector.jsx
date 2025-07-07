@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {defineMessages, injectIntl, intlShape} from 'react-intl';
+import {defineMessages, injectIntl, intlShape, FormattedMessage} from 'react-intl';
 
 import Box from '../box/box.jsx';
 import SpriteInfo from '../../containers/sprite-info.jsx';
 import SpriteList from './sprite-list.jsx';
 import ActionMenu from '../action-menu/action-menu.jsx';
-import {STAGE_DISPLAY_SIZES} from '../../lib/layout-constants';
+import {STAGE_DISPLAY_SIZES} from '../../lib/layout-constants.js';
 import {isRtl} from 'scratch-l10n';
 
-import styles from './sprite-selector.css';
+import styles from './custom-sprite-selector.css';
 
 import fileUploadIcon from '../action-menu/icon--file-upload.svg';
 import paintIcon from '../action-menu/icon--paint.svg';
@@ -40,7 +40,7 @@ const messages = defineMessages({
     }
 });
 
-const SpriteSelectorComponent = function (props) {
+const CustomSpriteSelectorComponent = function (props) {
     const {
         editingTarget,
         hoveredTarget,
@@ -80,8 +80,16 @@ const SpriteSelectorComponent = function (props) {
             className={styles.spriteSelector}
             {...componentProps}
         >
-
-            <SpriteInfo
+            <div className={styles.header}>
+                <div className={styles.headerTitle}>
+                    <FormattedMessage
+                        defaultMessage="Sprite"
+                        description="Sprite info label"
+                        id="gui.SpriteInfo.sprite"
+                    />
+                </div>
+            </div>
+            {/* <SpriteInfo
                 direction={selectedSprite.direction}
                 disabled={spriteInfoDisabled}
                 name={selectedSprite.name}
@@ -98,7 +106,7 @@ const SpriteSelectorComponent = function (props) {
                 onChangeVisibility={onChangeSpriteVisibility}
                 onChangeX={onChangeSpriteX}
                 onChangeY={onChangeSpriteY}
-            />
+            /> */}
 
             <SpriteList
                 editingTarget={editingTarget}
@@ -112,7 +120,8 @@ const SpriteSelectorComponent = function (props) {
                 onExportSprite={onExportSprite}
                 onSelectSprite={onSelectSprite}
             />
-            <ActionMenu
+
+                        <ActionMenu
                 className={styles.addButton}
                 img={spriteIcon}
                 moreButtons={[
@@ -147,7 +156,7 @@ const SpriteSelectorComponent = function (props) {
     );
 };
 
-SpriteSelectorComponent.propTypes = {
+CustomSpriteSelectorComponent.propTypes = {
     editingTarget: PropTypes.string,
     hoveredTarget: PropTypes.shape({
         hoveredSprite: PropTypes.string,
@@ -190,4 +199,4 @@ SpriteSelectorComponent.propTypes = {
     stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)).isRequired
 };
 
-export default injectIntl(SpriteSelectorComponent);
+export default injectIntl(CustomSpriteSelectorComponent);

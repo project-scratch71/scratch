@@ -168,6 +168,7 @@ const GUIComponent = props => {
                 dir={isRtl ? 'rtl' : 'ltr'}
                 {...componentProps}
             >
+                {/* Telemetry Modal commented out for iframe embedding - privacy popup not needed
                 {telemetryModalVisible ? (
                     <TelemetryModal
                         isRtl={isRtl}
@@ -179,6 +180,7 @@ const GUIComponent = props => {
                         onShowPrivacyPolicy={onShowPrivacyPolicy}
                     />
                 ) : null}
+                */}
                 {loading ? (
                     <Loader />
                 ) : null}
@@ -188,12 +190,14 @@ const GUIComponent = props => {
                 {isRendererSupported ? null : (
                     <WebGlModal isRtl={isRtl} />
                 )}
+                {/* Tips Library and Cards commented out for iframe embedding - tutorials not needed
                 {tipsLibraryVisible ? (
                     <TipsLibrary />
                 ) : null}
                 {cardsVisible ? (
                     <Cards />
                 ) : null}
+                */}
                 {alertsVisible ? (
                     <Alerts className={styles.alertsContainer} />
                 ) : null}
@@ -208,16 +212,19 @@ const GUIComponent = props => {
                         onRequestClose={onRequestCloseCostumeLibrary}
                     />
                 ) : null}
+                {/* Debug Modal commented out for iframe embedding - debug help not needed
                 {<DebugModal
                     isOpen={debugModalVisible}
                     onClose={onRequestCloseDebugModal}
                 />}
+                */}
                 {backdropLibraryVisible ? (
                     <BackdropLibrary
                         vm={vm}
                         onRequestClose={onRequestCloseBackdropLibrary}
                     />
                 ) : null}
+                {/* MenuBar commented out for iframe embedding - header not needed
                 <MenuBar
                     accountNavOpen={accountNavOpen}
                     authorId={authorId}
@@ -251,8 +258,17 @@ const GUIComponent = props => {
                     onStartSelectingFileUpload={onStartSelectingFileUpload}
                     onToggleLoginOpen={onToggleLoginOpen}
                 />
+                */}
                 <Box className={styles.bodyWrapper}>
                     <Box className={styles.flexWrapper}>
+
+                        <Box className={styles.targetWrapper}>
+                            <TargetPane
+                                stageSize={stageSize}
+                                vm={vm}
+                            />
+                        </Box>
+
                         <Box className={styles.editorWrapper}>
                             <Tabs
                                 forceRenderTabPanel
@@ -326,7 +342,7 @@ const GUIComponent = props => {
                                             vm={vm}
                                         />
                                     </Box>
-                                    <Box className={styles.extensionButtonContainer}>
+                                    {/* <Box className={styles.extensionButtonContainer}>
                                         <button
                                             className={styles.extensionButton}
                                             title={intl.formatMessage(messages.addExtension)}
@@ -338,10 +354,12 @@ const GUIComponent = props => {
                                                 src={addExtensionIcon}
                                             />
                                         </button>
-                                    </Box>
+                                    </Box> */}
+                                    {/* Watermark/Footer commented out
                                     <Box className={styles.watermark}>
                                         <Watermark />
                                     </Box>
+                                    */}
                                 </TabPanel>
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     {costumesTabVisible ? <CostumeTab vm={vm} /> : null}
@@ -350,9 +368,11 @@ const GUIComponent = props => {
                                     {soundsTabVisible ? <SoundTab vm={vm} /> : null}
                                 </TabPanel>
                             </Tabs>
+                            {/* Backpack commented out for iframe embedding - not needed
                             {backpackVisible ? (
                                 <Backpack host={backpackHost} />
                             ) : null}
+                            */}
                         </Box>
 
                         <Box className={classNames(styles.stageAndTargetWrapper, styles[stageSize])}>
@@ -363,12 +383,6 @@ const GUIComponent = props => {
                                 stageSize={stageSize}
                                 vm={vm}
                             />
-                            <Box className={styles.targetWrapper}>
-                                <TargetPane
-                                    stageSize={stageSize}
-                                    vm={vm}
-                                />
-                            </Box>
                         </Box>
                     </Box>
                 </Box>

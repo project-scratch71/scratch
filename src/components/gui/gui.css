@@ -13,6 +13,7 @@
 
 .body-wrapper * {
     box-sizing: border-box;
+    
 }
 
 .flex-wrapper {
@@ -36,15 +37,17 @@
 .editor-wrapper {
     /*
         This is carefully balanced--  the minimum width at which the GUI will be displayed is 1024px.
-        At that size, the stage pane is 408px wide, with $space of padding to each side.
-        However, we must also add the border width to the stage pane. All-in-all, the stage pane's final width is
-        408px + ($space + $stage-standard-border-width * 2) (one border & padding per left/right side).
+        The stage pane now includes stage + custom target pane (sprite/stage selectors) which is:
+        - Stage: flexible width
+        - Target pane: calc(6rem + $space) for custom selectors
+        - Padding: $space on each side
+        - Border widths for stage
 
         @todo This is in place to prevent "doubling up" of horizontal scrollbars in narrow windows, but there are likely
         much better ways to solve that (e.g. undo #2124, remove this flex-basis entirely). However, they run their own
         risks of breaking things, so let's just leave this as-is for the time being.
     */
-    flex-basis: calc(1024px - 408px - (($space + $stage-standard-border-width) * 2));
+    flex-basis: calc(500px - calc(6rem + $space) - (($space + $stage-standard-border-width) * 2));
     flex-grow: 1;
     flex-shrink: 0;
     position: relative;
@@ -74,7 +77,7 @@
     height: 80%;
     margin-bottom: 0;
 
-    border-radius: 1rem 1rem 0 0;
+    border-radius: $space $space 0 0;
     border: 1px solid $ui-black-transparent;
 
     padding: 0.125rem 1.25rem 0;
@@ -92,11 +95,11 @@
 }
 
 [dir="ltr"] .tab {
-    margin-left: -0.5rem;
+    margin-left: -0rem;
 }
 
 [dir="rtl"] .tab {
-    margin-right: -0.5rem;
+    margin-right: -0rem;
 }
 
 [dir="ltr"] .tab:nth-of-type(1) {
@@ -176,6 +179,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+  /* align-items: flex-end; */
 }
 
 .tab-panel {
@@ -214,10 +218,11 @@
 
 .target-wrapper {
     display: flex;
-    flex-grow: 1;
+    flex-grow: 0;
     flex-basis: 0;
 
     padding-top: $space;
+    padding-right: $space;
     min-height: 0; /* this makes it work in Firefox */
 
     /*
@@ -229,17 +234,7 @@
 }
 
 .extension-button-container {
-    width: 3.75rem;
-    height: 3.25rem;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: $z-index-extension-button;
-    background: $looks-secondary;
-
-    border: 1px solid $looks-secondary;
-    box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
+    display: none;
 }
 
 $fade-out-distance: 15px;
