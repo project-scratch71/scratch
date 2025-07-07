@@ -1,0 +1,38 @@
+diff --git a/node_modules/scratch-storage/src/ProxyTool.ts b/node_modules/scratch-storage/src/ProxyTool.ts
+index e6626f4..895430c 100644
+--- a/node_modules/scratch-storage/src/ProxyTool.ts
++++ b/node_modules/scratch-storage/src/ProxyTool.ts
+@@ -36,11 +36,14 @@ export default class ProxyTool implements Tool {
+ 
+     constructor (filter: ToolFilter = ProxyTool.TOOL_FILTER.ALL) {
+         let tools: Tool[];
+-        if (filter === ProxyTool.TOOL_FILTER.READY) {
+-            tools = [new FetchTool()];
+-        } else {
+-            tools = [new FetchWorkerTool(), new FetchTool()];
+-        }
++
++        tools = [new FetchTool()];
++
++        // if (filter === ProxyTool.TOOL_FILTER.READY) {
++        //     tools = [new FetchTool()];
++        // } else {
++        //     tools = [new FetchWorkerTool(), new FetchTool()];
++        // }
+ 
+         /**
+          * Sequence of tools to proxy.
+diff --git a/node_modules/scratch-storage/src/WebHelper.ts b/node_modules/scratch-storage/src/WebHelper.ts
+index 685e607..9199076 100644
+--- a/node_modules/scratch-storage/src/WebHelper.ts
++++ b/node_modules/scratch-storage/src/WebHelper.ts
+@@ -136,6 +136,9 @@ export default class WebHelper extends Helper {
+                     return tryNextSource();
+                 }
+                 
++                console.log("RAW REQ");
++                console.log(reqConfig);
++
+                 return tool.get(reqConfig)
+                     .then(body => {
+                         if (body) {
