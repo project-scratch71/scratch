@@ -1,8 +1,8 @@
 diff --git a/node_modules/scratch-storage/dist/node/scratch-storage.js b/node_modules/scratch-storage/dist/node/scratch-storage.js
-index ff3ac05..3a2a396 100644
+index ff3ac05..a04bd98 100644
 --- a/node_modules/scratch-storage/dist/node/scratch-storage.js
 +++ b/node_modules/scratch-storage/dist/node/scratch-storage.js
-@@ -4414,11 +4414,14 @@ class ProxyTool {
+@@ -4414,11 +4414,16 @@ class ProxyTool {
      let filter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ProxyTool.TOOL_FILTER.ALL;
      ProxyTool_defineProperty(this, "tools", void 0);
      let tools;
@@ -12,21 +12,23 @@ index ff3ac05..3a2a396 100644
 -      tools = [new PublicFetchWorkerTool(), new FetchTool()];
 -    }
 +
++    // Always use FetchTool to avoid worker-based fetch failures:
 +    tools = [new FetchTool()];
++    // Legacy:
 +    // if (filter === ProxyTool.TOOL_FILTER.READY) {
 +    //   tools = [new FetchTool()];
 +    // } else {
-+    //   tools = [new PublicFetchWorkerTool(), new FetchTool()];
++    //     tools = [new FetchWorkerTool(), new FetchTool()];
 +    // }
 +
      /**
       * Sequence of tools to proxy.
       * @type {Array.<Tool>}
 diff --git a/node_modules/scratch-storage/dist/web/scratch-storage.js b/node_modules/scratch-storage/dist/web/scratch-storage.js
-index 1e2aa25..b331317 100644
+index 1e2aa25..f77f134 100644
 --- a/node_modules/scratch-storage/dist/web/scratch-storage.js
 +++ b/node_modules/scratch-storage/dist/web/scratch-storage.js
-@@ -5294,11 +5294,14 @@ class ProxyTool {
+@@ -5294,11 +5294,16 @@ class ProxyTool {
      let filter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ProxyTool.TOOL_FILTER.ALL;
      ProxyTool_defineProperty(this, "tools", void 0);
      let tools;
@@ -36,21 +38,27 @@ index 1e2aa25..b331317 100644
 -      tools = [new PublicFetchWorkerTool(), new FetchTool()];
 -    }
 +
++    // Always use FetchTool to avoid worker-based fetch failures:
 +    tools = [new FetchTool()];
++    // Legacy:
 +    // if (filter === ProxyTool.TOOL_FILTER.READY) {
 +    //   tools = [new FetchTool()];
 +    // } else {
-+    //   tools = [new PublicFetchWorkerTool(), new FetchTool()];
++    //     tools = [new FetchWorkerTool(), new FetchTool()];
 +    // }
 +    
      /**
       * Sequence of tools to proxy.
       * @type {Array.<Tool>}
+diff --git a/node_modules/scratch-storage/dist/web/scratch-storage.min.js b/node_modules/scratch-storage/dist/web/scratch-storage.min.js.backup
+similarity index 100%
+rename from node_modules/scratch-storage/dist/web/scratch-storage.min.js
+rename to node_modules/scratch-storage/dist/web/scratch-storage.min.js.backup
 diff --git a/node_modules/scratch-storage/src/ProxyTool.ts b/node_modules/scratch-storage/src/ProxyTool.ts
-index e6626f4..895430c 100644
+index e6626f4..08432bd 100644
 --- a/node_modules/scratch-storage/src/ProxyTool.ts
 +++ b/node_modules/scratch-storage/src/ProxyTool.ts
-@@ -36,11 +36,14 @@ export default class ProxyTool implements Tool {
+@@ -36,11 +36,15 @@ export default class ProxyTool implements Tool {
  
      constructor (filter: ToolFilter = ProxyTool.TOOL_FILTER.ALL) {
          let tools: Tool[];
@@ -60,10 +68,11 @@ index e6626f4..895430c 100644
 -            tools = [new FetchWorkerTool(), new FetchTool()];
 -        }
 +
++        // Always use FetchTool to avoid worker-based fetch failures:
 +        tools = [new FetchTool()];
-+
++        // Legacy:
 +        // if (filter === ProxyTool.TOOL_FILTER.READY) {
-+        //     tools = [new FetchTool()];
++        //   tools = [new FetchTool()];
 +        // } else {
 +        //     tools = [new FetchWorkerTool(), new FetchTool()];
 +        // }

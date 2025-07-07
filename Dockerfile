@@ -6,7 +6,10 @@ WORKDIR /app
 
 # 依存関係のみ先にコピーしてインストール（キャッシュを効かせるため）
 COPY package.json package-lock.json ./
-RUN npm install --ignore-scripts
+# パッチファイルとスクリプトを先にコピー（postinstallとprepublishスクリプトのため）
+COPY patches ./patches
+COPY scripts ./scripts
+RUN npm install
 
 # ソースコード全体をコピー
 COPY . .
