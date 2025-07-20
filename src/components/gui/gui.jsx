@@ -21,6 +21,7 @@ import MenuBar from '../menu-bar/menu-bar.jsx';
 import CostumeLibrary from '../../containers/costume-library.jsx';
 import BackdropLibrary from '../../containers/backdrop-library.jsx';
 import Watermark from '../../containers/watermark.jsx';
+import SpriteInfo from '../../containers/sprite-info.jsx';
 
 import Backpack from '../../containers/backpack.jsx';
 import WebGlModal from '../../containers/webgl-modal.jsx';
@@ -56,6 +57,11 @@ let isRendererSupported = null;
 
 const GUIComponent = props => {
     const {
+        editingTarget,
+        selectedId,
+        sprites,
+        stage,
+        vm,
         accountNavOpen,
         activeTabIndex,
         alertsVisible,
@@ -126,11 +132,51 @@ const GUIComponent = props => {
         telemetryModalVisible,
         theme,
         tipsLibraryVisible,
-        vm,
         ...componentProps
     } = omit(props, 'dispatch');
     if (children) {
         return <Box {...componentProps}>{children}</Box>;
+    }
+
+    // Handler functions for SpriteInfo
+    const handleChangeSpriteDirection = (direction) => {
+        vm.postSpriteInfo({direction});
+    };
+
+    const handleChangeSpriteName = (name) => {
+        vm.renameSprite(editingTarget, name);
+    };
+
+    const handleChangeSpriteRotationStyle = (rotationStyle) => {
+        vm.postSpriteInfo({rotationStyle});
+    };
+
+    const handleChangeSpriteSize = (size) => {
+        vm.postSpriteInfo({size});
+    };
+
+    const handleChangeSpriteVisibility = (visible) => {
+        vm.postSpriteInfo({visible});
+    };
+
+    const handleChangeSpriteX = (x) => {
+        vm.postSpriteInfo({x});
+    };
+
+    const handleChangeSpriteY = (y) => {
+        vm.postSpriteInfo({y});
+    };
+
+    // Check if stage is selected
+    const isStageSelected = stage && stage.id === editingTarget;
+    
+    // Get selected sprite data
+    let selectedSprite = sprites && selectedId ? sprites[selectedId] : null;
+    let spriteInfoDisabled = false;
+    
+    if (!selectedSprite || isStageSelected) {
+        selectedSprite = {};
+        spriteInfoDisabled = true;
     }
 
     const tabClassNames = {
@@ -342,7 +388,7 @@ const GUIComponent = props => {
                                             vm={vm}
                                         />
                                     </Box>
-                                    {/* <Box className={styles.extensionButtonContainer}>
+                                    <Box className={styles.extensionButtonContainer}>
                                         <button
                                             className={styles.extensionButton}
                                             title={intl.formatMessage(messages.addExtension)}
@@ -354,12 +400,10 @@ const GUIComponent = props => {
                                                 src={addExtensionIcon}
                                             />
                                         </button>
-                                    </Box> */}
-                                    {/* Watermark/Footer commented out
+                                    </Box>
                                     <Box className={styles.watermark}>
                                         <Watermark />
                                     </Box>
-                                    */}
                                 </TabPanel>
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     {costumesTabVisible ? <CostumeTab vm={vm} /> : null}
@@ -419,6 +463,7 @@ GUIComponent.propTypes = {
     costumeLibraryVisible: PropTypes.bool,
     costumesTabVisible: PropTypes.bool,
     debugModalVisible: PropTypes.bool,
+    editingTarget: PropTypes.object,
     enableCommunity: PropTypes.bool,
     intl: intlShape.isRequired,
     isCreating: PropTypes.bool,
@@ -452,8 +497,11 @@ GUIComponent.propTypes = {
     onTelemetryModalOptOut: PropTypes.func,
     onToggleLoginOpen: PropTypes.func,
     renderLogin: PropTypes.func,
+    selectedId: PropTypes.string,
     showComingSoon: PropTypes.bool,
     soundsTabVisible: PropTypes.bool,
+    sprites: PropTypes.object,
+    stage: PropTypes.object,
     stageSizeMode: PropTypes.oneOf(Object.keys(STAGE_SIZE_MODES)),
     targetIsStage: PropTypes.bool,
     telemetryModalVisible: PropTypes.bool,
@@ -488,6 +536,10 @@ GUIComponent.defaultProps = {
 const mapStateToProps = state => ({
     // This is the button's mode, as opposed to the actual current state
     blocksId: state.scratchGui.timeTravel.year.toString(),
+    editingTarget: state.scratchGui.targets.editingTarget,
+    selectedId: state.scratchGui.targets.editingTarget,
+    sprites: state.scratchGui.targets.sprites,
+    stage: state.scratchGui.targets.stage,
     stageSizeMode: state.scratchGui.stageSize.stageSize,
     theme: state.scratchGui.theme.theme
 });

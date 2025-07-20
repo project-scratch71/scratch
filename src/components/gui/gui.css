@@ -3,12 +3,23 @@
 @import "../../css/z-index.css";
 
 .page-wrapper {
-    height: 100%;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    width: 100vw;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .body-wrapper {
-    height: calc(100% - $menu-bar-height);
+    height: 100vh;
     background-color: $ui-primary;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .body-wrapper * {
@@ -26,12 +37,14 @@
     */
     flex-direction: row;
     height: 100%;
+    width: 100%;
+    max-width: 100%;
 
     /*
         Stop scrollbar popping in and out from scratch-blocks border issue
         https://github.com/LLK/scratch-gui/issues/318
     */
-    overflow-y: hidden;
+    overflow: hidden;
 }
 
 .editor-wrapper {
@@ -47,10 +60,12 @@
         much better ways to solve that (e.g. undo #2124, remove this flex-basis entirely). However, they run their own
         risks of breaking things, so let's just leave this as-is for the time being.
     */
-    flex-basis: calc(500px - calc(6rem + $space) - (($space + $stage-standard-border-width) * 2));
     flex-grow: 1;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    flex-basis: 0;
     position: relative;
+    min-width: 380px;
+    max-width: 100%;
 
     display: flex;
     flex-direction: column;
@@ -195,6 +210,83 @@
 .blocks-wrapper {
     flex-grow: 1;
     position: relative;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.sprite-info-container {
+    position: absolute;
+    bottom: 1rem;
+    right: 4rem;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+[dir="rtl"] .sprite-info-container {
+    left: 4rem;
+    right: auto;
+}
+
+/* タブレット対応 */
+@media (max-width: 1024px) {
+    .sprite-info-container {
+        right: 2rem;
+        bottom: 0.75rem;
+        transform: scale(0.9);
+        transform-origin: bottom right;
+    }
+    
+    [dir="rtl"] .sprite-info-container {
+        left: 2rem;
+        right: auto;
+        transform-origin: bottom left;
+    }
+}
+
+/* 小さなタブレット・大きなスマートフォン対応 */
+@media (max-width: 768px) {
+    .editor-wrapper {
+        min-width: 320px;
+    }
+    
+    .stage-and-target-wrapper {
+        min-width: 240px;
+    }
+    
+    .sprite-info-container {
+        right: 1rem;
+        bottom: 0.5rem;
+        transform: scale(0.8);
+    }
+    
+    [dir="rtl"] .sprite-info-container {
+        left: 1rem;
+        right: auto;
+    }
+}
+
+/* モバイル対応 */
+@media (max-width: 480px) {
+    .flex-wrapper {
+        flex-direction: column;
+    }
+    
+    .editor-wrapper {
+        min-width: 280px;
+        order: 2;
+        flex-basis: 60%;
+    }
+    
+    .stage-and-target-wrapper {
+        min-width: 240px;
+        order: 1;
+        flex-basis: 40%;
+    }
+    
+    .sprite-info-container {
+        display: none; /* モバイルでは非表示 */
+    }
 }
 
 .stage-and-target-wrapper {
@@ -213,7 +305,11 @@
     padding-right: $space;
 
     /* this will only ever be as wide as the stage */
-    flex-basis: 0;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    min-width: 280px;
+    max-width: 100%;
 }
 
 .target-wrapper {
@@ -223,6 +319,7 @@
 
     padding-top: $space;
     padding-right: $space;
+    padding-bottom: 0;
     min-height: 0; /* this makes it work in Firefox */
 
     /*
@@ -234,7 +331,17 @@
 }
 
 .extension-button-container {
-    display: none;
+    width: 3.75rem;
+    height: 3.25rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: $z-index-extension-button;
+    background: $looks-secondary;
+
+    border: 1px solid $looks-secondary;
+    box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
 }
 
 $fade-out-distance: 15px;

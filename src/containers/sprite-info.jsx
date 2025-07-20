@@ -2,7 +2,7 @@ import bindAll from 'lodash.bindall';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import SpriteInfoComponent from '../components/sprite-info/sprite-info.jsx';
+import CustomSpriteInfoComponent from '../components/custom-sprite-info/custom-sprite-info.jsx';
 
 class SpriteInfo extends React.Component {
     constructor (props) {
@@ -22,7 +22,7 @@ class SpriteInfo extends React.Component {
     }
     render () {
         return (
-            <SpriteInfoComponent
+            <CustomSpriteInfoComponent
                 {...this.props}
                 onClickNotVisible={this.handleClickNotVisible}
                 onClickVisible={this.handleClickVisible}
@@ -32,7 +32,7 @@ class SpriteInfo extends React.Component {
 }
 
 SpriteInfo.propTypes = {
-    ...SpriteInfoComponent.propTypes,
+    ...CustomSpriteInfoComponent.propTypes,
     onChangeDirection: PropTypes.func,
     onChangeName: PropTypes.func,
     onChangeSize: PropTypes.func,

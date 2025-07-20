@@ -76,7 +76,7 @@ $header-height: calc($stage-menu-height - 0.5rem);
     padding-top: calc($space / 2);
     padding-left: calc($space / 2);
     padding-right: calc($space / 2);
-    padding-bottom: calc($space / 2);
+    padding-bottom: 0;
 }
 
 .header {

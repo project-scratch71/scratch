@@ -121,7 +121,7 @@ const CustomSpriteSelectorComponent = function (props) {
                 onSelectSprite={onSelectSprite}
             />
 
-                        <ActionMenu
+            <ActionMenu
                 className={styles.addButton}
                 img={spriteIcon}
                 moreButtons={[

@@ -4,7 +4,7 @@ import bindAll from 'lodash.bindall';
 import {defineMessages, intlShape, injectIntl} from 'react-intl';
 import VM from 'scratch-vm';
 
-import AssetPanel from '../components/asset-panel/asset-panel.jsx';
+import AssetPanel from '../components/custom-asset-panel/custom-asset-panel.jsx';
 import PaintEditorWrapper from './paint-editor-wrapper.jsx';
 import {connect} from 'react-redux';
 import {handleFileUpload, costumeUpload} from '../lib/file-uploader.js';

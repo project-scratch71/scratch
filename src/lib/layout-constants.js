@@ -41,14 +41,16 @@ const STAGE_DISPLAY_SIZES = keyMirror({
 const BLOCKS_DEFAULT_SCALE = 0.675;
 
 const STAGE_DISPLAY_SCALES = {};
-STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.large] = 1; // large mode, wide browser (standard)
-STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.largeConstrained] = 0.85; // large mode but narrow browser
-STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.small] = 0.5; // small mode, regardless of browser size
+STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.large] = 0.85; // large mode, wide browser (reduced from 1.0)
+STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.largeConstrained] = 0.7; // large mode but narrow browser (reduced from 0.85)
+STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.small] = 0.45; // small mode, regardless of browser size (reduced from 0.5)
 
 export default {
     standardStageWidth: 480,
     standardStageHeight: 360,
-    fullSizeMinWidth: 1096,
+    fullSizeMinWidth: 1024,
+    tabletBreakpoint: 768,
+    mobileBreakpoint: 480,
     fullSizePaintMinWidth: 1250
 };
 

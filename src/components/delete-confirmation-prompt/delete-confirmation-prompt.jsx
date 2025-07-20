@@ -51,16 +51,26 @@ const calculateModalPosition = (relativeElemRef, modalPosition) => {
     const refPosition = relativeElemRef.getBoundingClientRect();
 
     if (modalPosition === 'left') {
+        let left = refPosition.left - modalWidth - 25;
+        // 画面外に出る場合は右側に表示
+        if (left < 0) {
+            left = refPosition.right + 25;
+        }
         return {
             top: refPosition.top - refPosition.height,
-            left: refPosition.left - modalWidth - 25
+            left: left
         };
     }
 
     if (modalPosition === 'right') {
+        let left = refPosition.right + 25;
+        // 画面外に出る場合は左側に表示
+        if (left + modalWidth > window.innerWidth) {
+            left = refPosition.left - modalWidth - 25;
+        }
         return {
             top: refPosition.top - refPosition.height,
-            left: refPosition.right + 25
+            left: left
         };
     }
 
@@ -120,7 +130,7 @@ const DeleteConfirmationPrompt = ({
         onRequestClose={onCancel}
     >
         <Box className={styles.modalContainer}>
-            { modalPosition === 'right' ?
+            { modalPosition === 'left' ?
                 <Box className={classNames(styles.arrowContainer, styles.arrowContainerLeft)}>
                     <img
                         className={styles.deleteIcon}
@@ -160,7 +170,7 @@ const DeleteConfirmationPrompt = ({
                     </button>
                 </Box>
             </Box>
-            {modalPosition === 'left' ?
+            {modalPosition === 'right' ?
                 <Box className={classNames(styles.arrowContainer, styles.arrowContainerRight)}>
                     <img
                         className={styles.deleteIcon}

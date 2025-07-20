@@ -2,17 +2,25 @@ import {addLocaleData} from 'react-intl';
 
 import {localeData, isRtl} from 'scratch-l10n';
 import editorMessages from 'scratch-l10n/locales/editor-msgs';
+import {getAllCustomMessages} from '../lib/custom-messages';
 
 addLocaleData(localeData);
 
 const UPDATE_LOCALES = 'scratch-gui/locales/UPDATE_LOCALES';
 const SELECT_LOCALE = 'scratch-gui/locales/SELECT_LOCALE';
 
+// カスタムメッセージで公式メッセージを上書き
+const customMessages = getAllCustomMessages();
+const mergedMessages = {
+    ...editorMessages,
+    ...customMessages
+};
+
 const initialState = {
     isRtl: false,
-    locale: 'en',
-    messagesByLocale: editorMessages,
-    messages: editorMessages.en
+    locale: 'ja', // デフォルトを日本語に変更
+    messagesByLocale: mergedMessages,
+    messages: mergedMessages.ja
 };
 
 const reducer = function (state, action) {
