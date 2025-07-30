@@ -194,11 +194,21 @@
 }
 
 .stage-and-target-wrapper {
-    display: flex;
-    flex-direction: column;
+    position: relative;
     flex: 0 1 auto;
     min-width: 280px;
     margin: 0.5rem;
+    height: calc(100vh - 1rem);
+}
+
+.custom-instruction-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: $ui-primary;
+    display: flex;
+    flex-direction: column;
 }
 
 .extension-button-container {

@@ -5,8 +5,7 @@ import classNames from 'classnames';
 import Box from '../box/box.jsx';
 import styles from './custom-instruction-viewer.css';
 
-const CustomInstructionViewerComponent = function (props) {
-    const {width} = props;
+const CustomInstructionViewerComponent =  () => {
     const [instructionUrl, setInstructionUrl] = useState('');
 
     const handleUrlChange = (url) => {
@@ -49,7 +48,6 @@ const CustomInstructionViewerComponent = function (props) {
     return (
         <Box 
             className={styles.instructionViewer}
-            style={{width: `${width}px`}}
         >
             <Box className={styles.content}>
                 {instructionUrl && isValidUrl(instructionUrl) ? (
@@ -84,10 +82,6 @@ const CustomInstructionViewerComponent = function (props) {
             </Box>
         </Box>
     );
-};
-
-CustomInstructionViewerComponent.propTypes = {
-    width: PropTypes.number.isRequired
 };
 
 export default CustomInstructionViewerComponent;

@@ -46,16 +46,13 @@ const StageComponent = props => {
                     styles.stage,
                     {[styles.fullScreen]: isFullScreen}
                 )}
-                style={{
-                    height: stageDimensions.height,
-                    width: stageDimensions.width
-                }}
             >
                 <DOMElementRenderer
                     domElement={canvas}
                     style={{
-                        height: stageDimensions.height,
-                        width: stageDimensions.width
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: "1rem",
                     }}
                     {...boxProps}
                 />

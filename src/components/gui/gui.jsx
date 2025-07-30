@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import omit from 'lodash.omit';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-intl';
 import {connect} from 'react-redux';
 import MediaQuery from 'react-responsive';
@@ -16,6 +16,8 @@ import TargetPane from '../../containers/target-pane.jsx';
 import SoundTab from '../../containers/sound-tab.jsx';
 import StageWrapper from '../../containers/stage-wrapper.jsx';
 import CustomInstructionViewerComponent from '../custom-instruction-viewer/custom-instruction-viewer.jsx';
+import ResizeHandle from '../resize-handle/resize-handle.jsx';
+import VerticalResizeHandle from '../vertical-resize-handle/vertical-resize-handle.jsx';
 import Loader from '../loader/loader.jsx';
 import Box from '../box/box.jsx';
 import MenuBar from '../menu-bar/menu-bar.jsx';
@@ -54,6 +56,40 @@ const messages = defineMessages({
 let isRendererSupported = null;
 
 const GUIComponent = props => {
+    const [bodyWidth, setBodyWidth] = useState(600);
+    const [viewerTopPosition, setViewerTopPosition] = useState(400);
+    const [isDragging, setIsDragging] = useState(false);
+    const bodyWrapperRef = useRef(null);
+    const stageAndTargetWrapperRef = useRef(null);
+
+    const handleResize = (newWidth) => {
+        setBodyWidth(newWidth);
+        // Scratch Blocksワークスペースにリサイズを通知
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 0);
+    };
+
+    const handleVerticalResize = (newTopPosition) => {
+        setViewerTopPosition(newTopPosition);
+    };
+
+
+    useEffect(() => {
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const width = entry.contentRect.width;
+                setBodyWidth(width);
+            }
+        });
+
+        if (bodyWrapperRef.current) {
+            resizeObserver.observe(bodyWrapperRef.current);
+        }
+
+        return () => resizeObserver.disconnect();
+    }, []);
+
     const {
         editingTarget,
         selectedId,
@@ -228,7 +264,11 @@ const GUIComponent = props => {
                     />
                 ) : null}
                 <Box className={styles.chunkWrapper}>
-                    <Box className={styles.bodyWrapper} style={{width: `calc(100vw - ${dims.width}px - 1rem)`}}>
+                    <Box 
+                        className={styles.bodyWrapper} 
+                        ref={bodyWrapperRef}
+                        style={{ width: `${bodyWidth}px` }}
+                    >
                         <Box className={styles.targetWrapper}>
                             <TargetPane
                                 stageSize={stageSize}
@@ -246,6 +286,7 @@ const GUIComponent = props => {
                             >
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     <Blocks
+                                        style={{width: '100%'}}
                                         key={`${blocksId}/${theme}`}
                                         canUseCloud={canUseCloud}
                                         grow={1}
@@ -324,18 +365,54 @@ const GUIComponent = props => {
                             */}
                         </Box>
                     </Box>
-                    <Box className={styles.stageAndTargetWrapper}>
+                    <ResizeHandle 
+                        onResize={handleResize} 
+                        currentWidth={bodyWidth}
+                        onDragStart={() => setIsDragging(true)}
+                        onDragEnd={() => setIsDragging(false)}
+                    />
+                    <Box 
+                        className={styles.stageAndTargetWrapper}
+                        ref={stageAndTargetWrapperRef}
+                        style={{ width: `calc(100vw - ${bodyWidth}px - 1rem)` }}
+                    >
                         <StageWrapper
                             isFullScreen={isFullScreen}
                             isRendererSupported={isRendererSupported}
                             stageSize={stageSize}
                             vm={vm}
                         />
-                        <CustomInstructionViewerComponent
-                            width={dims.width}
-                        />
+                        <Box 
+                            className={styles.customInstructionSection}
+                            style={{ top: `${viewerTopPosition}px` }}
+                        >
+                            <VerticalResizeHandle 
+                                onResize={handleVerticalResize} 
+                                currentHeight={viewerTopPosition}
+                                onDragStart={() => setIsDragging(true)}
+                                onDragEnd={() => setIsDragging(false)}
+                            />
+
+                            <CustomInstructionViewerComponent/>
+                        </Box>
                     </Box>
                 </Box>
+                {isDragging && (
+                    <Box 
+                        className={styles.dragOverlay}
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            zIndex: 2147483647,
+                            pointerEvents: 'auto',
+                            background: 'transparent'
+                        }}
+                        onMouseUp={() => setIsDragging(false)}
+                    />
+                )}
                 <DragLayer />
             </Box>
         );

@@ -6,10 +6,8 @@
     flex-direction: column;
     background-color: $ui-white;
     border: $stage-standard-border-width solid $ui-black-transparent;
-    border-top: none;
-    border-radius: 0 0 1rem 1rem;
+    border-radius: 1rem;
     overflow: hidden;
-    min-height: 300px;
     flex: 1;
     box-sizing: content-box;
 }
@@ -18,7 +16,6 @@
     background-color: $motion-primary;
     padding: calc($space / 2);
     border-bottom: 1px solid $ui-black-transparent;
-    min-height: 32px;
 }
 
 .url-form {
@@ -73,7 +70,6 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    min-height: 250px;
 }
 
 .iframe {
@@ -81,7 +77,6 @@
     height: 100%;
     flex: 1;
     border: none;
-    min-height: 250px;
 }
 
 .placeholder {
