@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
+import { FaTrash } from 'react-icons/fa';
 
 import styles from './delete-button.css';
-import deleteIcon from './icon--delete.svg';
 
 const DeleteButton = props => (
     <div
@@ -21,9 +21,9 @@ const DeleteButton = props => (
                 [styles.deleteButtonClicked]: props.isConfirmationModalOpened
             })}
         >
-            <img
+            <FaTrash
                 className={styles.deleteIcon}
-                src={deleteIcon}
+                size={14}
             />
         </div>
     </div>

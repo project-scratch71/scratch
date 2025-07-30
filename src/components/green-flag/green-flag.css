@@ -8,6 +8,10 @@
     user-select: none;
     user-drag: none;
     cursor: pointer;
+    color: $looks-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .green-flag:hover {

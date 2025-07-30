@@ -48,7 +48,7 @@ STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.small] = 0.45; // small mode, regardles
 export default {
     standardStageWidth: 480,
     standardStageHeight: 360,
-    fullSizeMinWidth: 1024,
+    fullSizeMinWidth: 0,
     tabletBreakpoint: 768,
     mobileBreakpoint: 480,
     fullSizePaintMinWidth: 1250

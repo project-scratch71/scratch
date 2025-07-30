@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { FaPlay } from 'react-icons/fa';
 
-import greenFlagIcon from './icon--green-flag.svg';
 import styles from './green-flag.css';
 
 const GreenFlagComponent = function (props) {
@@ -14,7 +14,7 @@ const GreenFlagComponent = function (props) {
         ...componentProps
     } = props;
     return (
-        <img
+        <FaPlay
             className={classNames(
                 className,
                 styles.greenFlag,
@@ -22,10 +22,9 @@ const GreenFlagComponent = function (props) {
                     [styles.isActive]: active
                 }
             )}
-            draggable={false}
-            src={greenFlagIcon}
             title={title}
             onClick={onClick}
+            size={20}
             {...componentProps}
         />
     );

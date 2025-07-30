@@ -12,25 +12,23 @@ import AudioSelector from '../../containers/audio-selector.jsx';
 import IconButton from '../icon-button/icon-button.jsx';
 
 import styles from './custom-sound-editor.css';
-
-import playIcon from './icon--play.svg';
-import stopIcon from './icon--stop.svg';
-import redoIcon from './icon--redo.svg';
-import undoIcon from './icon--undo.svg';
-import fasterIcon from './icon--faster.svg';
-import slowerIcon from './icon--slower.svg';
-import louderIcon from './icon--louder.svg';
-import softerIcon from './icon--softer.svg';
-import robotIcon from './icon--robot.svg';
-import reverseIcon from './icon--reverse.svg';
-import fadeOutIcon from './icon--fade-out.svg';
-import fadeInIcon from './icon--fade-in.svg';
-import muteIcon from './icon--mute.svg';
-
-import deleteIcon from './icon--delete.svg';
-import copyIcon from './icon--copy.svg';
-import pasteIcon from './icon--paste.svg';
-import copyToNewIcon from './icon--copy-to-new.svg';
+import { 
+    FaPlay, 
+    FaStop, 
+    FaRedo, 
+    FaUndo, 
+    FaForward, 
+    FaBackward, 
+    FaVolumeUp, 
+    FaVolumeDown, 
+    FaRobot, 
+    FaExchangeAlt, 
+    FaVolumeMute,
+    FaTrash,
+    FaCopy,
+    FaPaste,
+    FaPlusSquare
+} from 'react-icons/fa';
 
 const BufferedInput = BufferedInputHOC(Input);
 
@@ -160,10 +158,9 @@ const CustomSoundEditor = props => (
                         title={props.intl.formatMessage(messages.undo)}
                         onClick={props.onUndo}
                     >
-                        <img
+                        <FaUndo
                             className={styles.undoIcon}
-                            draggable={false}
-                            src={undoIcon}
+                            size={16}
                         />
                     </button>
                     <button
@@ -172,10 +169,9 @@ const CustomSoundEditor = props => (
                         title={props.intl.formatMessage(messages.redo)}
                         onClick={props.onRedo}
                     >
-                        <img
+                        <FaRedo
                             className={styles.redoIcon}
-                            draggable={false}
-                            src={redoIcon}
+                            size={16}
                         />
                     </button>
                 </div>
@@ -183,20 +179,20 @@ const CustomSoundEditor = props => (
             <div className={styles.inputGroup}>
                 <IconButton
                     className={styles.toolButton}
-                    img={copyIcon}
+                    icon={<FaCopy size={16} />}
                     title={props.intl.formatMessage(messages.copy)}
                     onClick={props.onCopy}
                 />
                 <IconButton
                     className={styles.toolButton}
                     disabled={props.canPaste === false}
-                    img={pasteIcon}
+                    icon={<FaPaste size={16} />}
                     title={props.intl.formatMessage(messages.paste)}
                     onClick={props.onPaste}
                 />
                 <IconButton
                     className={classNames(styles.toolButton, styles.flipInRtl)}
-                    img={copyToNewIcon}
+                    icon={<FaPlusSquare size={16} />}
                     title={props.intl.formatMessage(messages.copyToNew)}
                     onClick={props.onCopyToNew}
                 />
@@ -204,7 +200,7 @@ const CustomSoundEditor = props => (
             <IconButton
                 className={styles.toolButton}
                 disabled={props.trimStart === null}
-                img={deleteIcon}
+                icon={<FaTrash size={16} />}
                 title={props.intl.formatMessage(messages.delete)}
                 onClick={props.onDelete}
             />
@@ -234,10 +230,7 @@ const CustomSoundEditor = props => (
                         title={props.intl.formatMessage(messages.stop)}
                         onClick={props.onStop}
                     >
-                        <img
-                            draggable={false}
-                            src={stopIcon}
-                        />
+                        <FaStop size={20} />
                     </button>
                 ) : (
                     <button
@@ -245,65 +238,62 @@ const CustomSoundEditor = props => (
                         title={props.intl.formatMessage(messages.play)}
                         onClick={props.onPlay}
                     >
-                        <img
-                            draggable={false}
-                            src={playIcon}
-                        />
+                        <FaPlay size={20} />
                     </button>
                 )}
             </div>
             <IconButton
                 className={styles.effectButton}
-                img={fasterIcon}
+                icon={<FaForward size={16} />}
                 title={<FormattedMessage {...messages.faster} />}
                 onClick={props.onFaster}
             />
             <IconButton
                 className={styles.effectButton}
-                img={slowerIcon}
+                icon={<FaBackward size={16} />}
                 title={<FormattedMessage {...messages.slower} />}
                 onClick={props.onSlower}
             />
             <IconButton
                 disabled={props.tooLoud}
                 className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={louderIcon}
+                icon={<FaVolumeUp size={16} />}
                 title={<FormattedMessage {...messages.louder} />}
                 onClick={props.onLouder}
             />
             <IconButton
                 className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={softerIcon}
+                icon={<FaVolumeDown size={16} />}
                 title={<FormattedMessage {...messages.softer} />}
                 onClick={props.onSofter}
             />
             <IconButton
                 className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={muteIcon}
+                icon={<FaVolumeMute size={16} />}
                 title={<FormattedMessage {...messages.mute} />}
                 onClick={props.onMute}
             />
             <IconButton
                 className={styles.effectButton}
-                img={fadeInIcon}
+                icon={<FaVolumeDown size={16} />}
                 title={<FormattedMessage {...messages.fadeIn} />}
                 onClick={props.onFadeIn}
             />
             <IconButton
                 className={styles.effectButton}
-                img={fadeOutIcon}
+                icon={<FaVolumeDown size={16} />}
                 title={<FormattedMessage {...messages.fadeOut} />}
                 onClick={props.onFadeOut}
             />
             <IconButton
                 className={styles.effectButton}
-                img={reverseIcon}
+                icon={<FaExchangeAlt size={16} />}
                 title={<FormattedMessage {...messages.reverse} />}
                 onClick={props.onReverse}
             />
             <IconButton
                 className={styles.effectButton}
-                img={robotIcon}
+                icon={<FaRobot size={16} />}
                 title={<FormattedMessage {...messages.robot} />}
                 onClick={props.onRobot}
             />

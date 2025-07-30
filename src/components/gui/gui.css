@@ -12,91 +12,81 @@
     padding: 0;
 }
 
-.body-wrapper {
-    height: 100vh;
+.chunk-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     background-color: $ui-primary;
     overflow: hidden;
-    width: 100%;
-    max-width: 100%;
+}
+
+.body-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-width: 600px;
+    background-color: $ui-primary;
+    overflow: hidden;
     margin: 0;
     padding: 0;
 }
 
 .body-wrapper * {
     box-sizing: border-box;
-    
-}
-
-.flex-wrapper {
-    display: flex;
-
-    /*
-        Make 2 columns:
-        a) for the blocks + workspace panes, and
-        b) for combined stage menu + stage + sprite/stage selectors
-    */
-    flex-direction: row;
-    height: 100%;
-    width: 100%;
-    max-width: 100%;
-
-    /*
-        Stop scrollbar popping in and out from scratch-blocks border issue
-        https://github.com/LLK/scratch-gui/issues/318
-    */
-    overflow: hidden;
 }
 
 .editor-wrapper {
-    /*
-        This is carefully balanced--  the minimum width at which the GUI will be displayed is 1024px.
-        The stage pane now includes stage + custom target pane (sprite/stage selectors) which is:
-        - Stage: flexible width
-        - Target pane: calc(6rem + $space) for custom selectors
-        - Padding: $space on each side
-        - Border widths for stage
-
-        @todo This is in place to prevent "doubling up" of horizontal scrollbars in narrow windows, but there are likely
-        much better ways to solve that (e.g. undo #2124, remove this flex-basis entirely). However, they run their own
-        risks of breaking things, so let's just leave this as-is for the time being.
-    */
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
     position: relative;
-    min-width: 380px;
+    width: 100%;
     max-width: 100%;
+    min-width: 600px;
 
     display: flex;
     flex-direction: column;
+
+    padding: 0.5rem;
+}
+
+.target-wrapper {
+    height: 8.5rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 600px;
+
+    padding: 0.5rem;
 }
 
 .tab-list {
     height: $stage-menu-height;
-    width: 250px; /* Match width of the toolbox */
+    width: 100%; /* Match width of the toolbox */
     display: flex;
     align-items: flex-end;
     flex-shrink: 0;
 
+    border: none;
+    margin: 0; /* 上部のスキマを除去 */
+    padding: 0; /* 上部のスキマを除去 */
+
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 500;
     font-size: 0.80rem;
-
-    /* Overrides for react-tabs styling */
-    margin: 0 !important;
-    border-bottom: 0 !important;
 }
 
 .tab {
     flex-grow: 1;
-    height: 80%;
-    margin-bottom: 0;
+    height: 100%;
+    padding: 0;
 
-    border-radius: $space $space 0 0;
+    border-radius: 0;
     border: 1px solid $ui-black-transparent;
 
-    padding: 0.125rem 1.25rem 0;
-    font-size: 0.75rem;
+   
+    font-size: 1.0rem;
 
     background-color: $ui-tertiary;
     color: $text-primary-transparent;
@@ -109,31 +99,19 @@
     white-space: nowrap;
 }
 
-[dir="ltr"] .tab {
-    margin-left: -0rem;
-}
 
-[dir="rtl"] .tab {
-    margin-right: -0rem;
-}
-
-[dir="ltr"] .tab:nth-of-type(1) {
-    margin-left: 0;
-}
-
-[dir="rtl"] .tab:nth-of-type(1) {
-    margin-right: 0;
-}
 
 /* Use z-indices to force left-on-top for tabs */
 .tab:nth-of-type(1) {
     z-index: 3;
+    border-bottom-left-radius: 1rem;
 }
 .tab:nth-of-type(2) {
     z-index: 2;
 }
 .tab:nth-of-type(3) {
     z-index: 1;
+    border-bottom-right-radius: 1rem;
 }
 
 .tab:hover {
@@ -141,7 +119,7 @@
 }
 
 .tab.is-selected {
-    height: 90%;
+    height: 100%;
     color: $looks-secondary;
     background-color: $ui-white;
     z-index: 4; /* Make sure selected is always above */
@@ -150,23 +128,6 @@
 .tab img {
     width: 1.375rem;
     filter: grayscale(100%);
-}
-
-[dir="ltr"] .tab img {
-    margin-right: 0.125rem;
-}
-
-[dir="rtl"] .tab img {
-    margin-left: 0.125rem;
-}
-
-/* mirror blocks and sound tab icons */
-[dir="rtl"] .tab:nth-of-type(1) img {
-    transform: scaleX(-1);
-}
-
-[dir="rtl"] .tab:nth-of-type(3) img {
-    transform: scaleX(-1);
 }
 
 .tab.is-selected img {
@@ -190,6 +151,7 @@
 
 /* Body of the tabs */
 .tabs {
+    width: 100%;
     position: relative;
     flex-grow: 1;
     display: flex;
@@ -201,19 +163,27 @@
     position: relative;
     flex-grow: 1;
     display: none;
+    width: 100%;
+
+    border: 1px solid $ui-black-transparent;
+    border-bottom: none;
+    /* 完全に囲む境界線 */
+
+    /* 上端だけ角丸に */
+    border-top-left-radius:  1rem;
+    border-top-right-radius: 1rem;
+    /* 下端は角丸なし */
+    border-bottom-left-radius:  0;
+    border-bottom-right-radius: 0;
+    
+    /* 子要素の背景はみ出しを防ぐ */
+    overflow: hidden;
 }
 
 .tab-panel.is-selected {
     display: flex;
 }
 
-.blocks-wrapper {
-    flex-grow: 1;
-    position: relative;
-    min-width: 0;
-    max-width: 100%;
-    overflow: hidden;
-}
 
 .sprite-info-container {
     position: absolute;
@@ -223,111 +193,12 @@
     pointer-events: auto;
 }
 
-[dir="rtl"] .sprite-info-container {
-    left: 4rem;
-    right: auto;
-}
-
-/* タブレット対応 */
-@media (max-width: 1024px) {
-    .sprite-info-container {
-        right: 2rem;
-        bottom: 0.75rem;
-        transform: scale(0.9);
-        transform-origin: bottom right;
-    }
-    
-    [dir="rtl"] .sprite-info-container {
-        left: 2rem;
-        right: auto;
-        transform-origin: bottom left;
-    }
-}
-
-/* 小さなタブレット・大きなスマートフォン対応 */
-@media (max-width: 768px) {
-    .editor-wrapper {
-        min-width: 320px;
-    }
-    
-    .stage-and-target-wrapper {
-        min-width: 240px;
-    }
-    
-    .sprite-info-container {
-        right: 1rem;
-        bottom: 0.5rem;
-        transform: scale(0.8);
-    }
-    
-    [dir="rtl"] .sprite-info-container {
-        left: 1rem;
-        right: auto;
-    }
-}
-
-/* モバイル対応 */
-@media (max-width: 480px) {
-    .flex-wrapper {
-        flex-direction: column;
-    }
-    
-    .editor-wrapper {
-        min-width: 280px;
-        order: 2;
-        flex-basis: 60%;
-    }
-    
-    .stage-and-target-wrapper {
-        min-width: 240px;
-        order: 1;
-        flex-basis: 40%;
-    }
-    
-    .sprite-info-container {
-        display: none; /* モバイルでは非表示 */
-    }
-}
-
 .stage-and-target-wrapper {
-    /*
-        Makes rows for children:
-          1) stage menu
-          2) stage
-          3) sprite/stage selectors
-        Only reason we need this, is so .targetWrapper, which holds the selectors,
-        goes to full vertical height of the window
-    */
     display: flex;
     flex-direction: column;
-    /* pad entire wrapper to the left and right; allow children to fill width */
-    padding-left: $space;
-    padding-right: $space;
-
-    /* this will only ever be as wide as the stage */
-    flex-grow: 0;
-    flex-shrink: 1;
-    flex-basis: auto;
+    flex: 0 1 auto;
     min-width: 280px;
-    max-width: 100%;
-}
-
-.target-wrapper {
-    display: flex;
-    flex-grow: 0;
-    flex-basis: 0;
-
-    padding-top: $space;
-    padding-right: $space;
-    padding-bottom: 0;
-    min-height: 0; /* this makes it work in Firefox */
-
-    /*
-        For making the sprite-selector a scrollable pane
-        @todo: Not working in Safari
-    */
-    /* TODO this also breaks the thermometer menu */
-    /* overflow: hidden; */
+    margin: 0.5rem;
 }
 
 .extension-button-container {
@@ -364,15 +235,16 @@ $fade-out-distance: 15px;
     width: 100%;
     height: 100%;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $ui-white;
 }
 
 .extension-button-icon {
     width: 1.75rem;
     height: 1.75rem;
-}
-
-[dir="rtl"] .extension-button-icon {
-    transform: scaleX(-1);
+    color: inherit;
 }
 
 .extension-button > div {
@@ -384,14 +256,6 @@ $fade-out-distance: 15px;
     position: absolute;
     top: 1.25rem;
     pointer-events: none;
-}
-
-[dir="ltr"] .watermark {
-    right: 1.25rem;
-}
-
-[dir="rtl"] .watermark {
-    left: 1.25rem;
 }
 
 /* Menu */

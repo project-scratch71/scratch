@@ -15,10 +15,7 @@ import {isWideLocale} from '../../lib/locale-utils.js';
 
 import styles from './custom-sprite-info.css';
 
-import xIcon from './icon--x.svg';
-import yIcon from './icon--y.svg';
-import showIcon from './icon--show.svg';
-import hideIcon from './icon--hide.svg';
+import { FaArrowsAltH, FaArrowsAltV, FaEye, FaEyeSlash } from 'react-icons/fa';
 import ToggleButtons from '../toggle-buttons/toggle-buttons.jsx';
 
 const BufferedInput = BufferedInputHOC(Input);
@@ -107,10 +104,10 @@ class CustomSpriteInfo extends React.Component {
                 {
                     (stageSize === STAGE_DISPLAY_SIZES.large) ?
                         <div className={styles.iconWrapper}>
-                            <img
+                            <FaArrowsAltH
                                 aria-hidden="true"
                                 className={classNames(styles.xIcon, styles.icon)}
-                                src={xIcon}
+                                size={16}
                             />
                         </div> :
                         null
@@ -134,10 +131,10 @@ class CustomSpriteInfo extends React.Component {
                 {
                     (stageSize === STAGE_DISPLAY_SIZES.large) ?
                         <div className={styles.iconWrapper}>
-                            <img
+                            <FaArrowsAltV
                                 aria-hidden="true"
                                 className={classNames(styles.yIcon, styles.icon)}
-                                src={yIcon}
+                                size={16}
                             />
                         </div> :
                         null
@@ -188,13 +185,13 @@ class CustomSpriteInfo extends React.Component {
                         buttons={[
                             {
                                 handleClick: this.props.onClickVisible,
-                                icon: showIcon,
+                                iconComponent: <FaEye size={16} />,
                                 isSelected: this.props.visible && !this.props.disabled,
                                 title: this.props.intl.formatMessage(messages.showSpriteAction)
                             },
                             {
                                 handleClick: this.props.onClickNotVisible,
-                                icon: hideIcon,
+                                iconComponent: <FaEyeSlash size={16} />,
                                 isSelected: !this.props.visible && !this.props.disabled,
                                 title: this.props.intl.formatMessage(messages.hideSpriteAction)
                             }

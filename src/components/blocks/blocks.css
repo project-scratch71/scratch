@@ -24,7 +24,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    border: 1px solid $ui-black-transparent;
+    border: none; /* 親のtab-panelが境界線を管理するため削除 */
     border-top-right-radius: $space;
     border-bottom-right-radius: $space;
 }

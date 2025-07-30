@@ -31,61 +31,52 @@ const Selector = props => {
 
     const isRelevantDrag = draggingType === dragType;
 
-    let newButtonSection = null;
-
-    if (buttons.length > 0) {
-        const {img, title, onClick} = buttons[0];
-        const moreButtons = buttons.slice(1);
-        newButtonSection = (
-            <Box className={styles.newButtons}>
-                <ActionMenu
-                    img={img}
-                    moreButtons={moreButtons}
-                    title={title}
-                    tooltipPlace={isRtl ? 'left' : 'right'}
-                    onClick={onClick}
-                />
-            </Box>
-        );
-    }
-
     return (
         <Box
             className={styles.wrapper}
             componentRef={containerRef}
         >
-            <Box className={styles.listArea}>
-                {items.map((item, index) => (
-                    <SortableAsset
-                        id={item.name}
-                        index={isRelevantDrag ? ordering.indexOf(index) : index}
-                        key={item.name}
-                        onAddSortable={onAddSortable}
-                        onRemoveSortable={onRemoveSortable}
-                    >
-                        <SpriteSelectorItem
-                            asset={item.asset}
-                            className={classNames(styles.listItem, {
-                                [styles.placeholder]: isRelevantDrag && index === draggingIndex
-                            })}
-                            costumeURL={item.url}
-                            details={item.details}
-                            dragPayload={item.dragPayload}
-                            dragType={dragType}
-                            id={index}
-                            index={index}
-                            name={item.name}
-                            number={index + 1 /* 1-indexed */}
-                            selected={index === selectedItemIndex}
-                            onClick={onItemClick}
-                            onDeleteButtonClick={onDeleteClick}
-                            onDuplicateButtonClick={onDuplicateClick}
-                            onExportButtonClick={onExportClick}
-                        />
-                    </SortableAsset>
-                ))}
+            <Box className={styles.scrollWrapper}>
+                <Box className={styles.listArea}>
+                    {items.map((item, index) => (
+                        <SortableAsset
+                            id={item.name}
+                            index={isRelevantDrag ? ordering.indexOf(index) : index}
+                            key={item.name}
+                            onAddSortable={onAddSortable}
+                            onRemoveSortable={onRemoveSortable}
+                        >
+                            <SpriteSelectorItem
+                                asset={item.asset}
+                                className={classNames(styles.listItem, {
+                                    [styles.placeholder]: isRelevantDrag && index === draggingIndex
+                                })}
+                                costumeURL={item.url}
+                                details={item.details}
+                                dragPayload={item.dragPayload}
+                                dragType={dragType}
+                                id={index}
+                                index={index}
+                                name={item.name}
+                                number={index + 1 /* 1-indexed */}
+                                selected={index === selectedItemIndex}
+                                onClick={onItemClick}
+                                onDeleteButtonClick={onDeleteClick}
+                                onDuplicateButtonClick={onDuplicateClick}
+                                onExportButtonClick={onExportClick}
+                            />
+                        </SortableAsset>
+                    ))}
+                </Box>
             </Box>
-            {newButtonSection}
+            <ActionMenu
+                className={styles['action-menu']}
+                img={buttons[0].img}
+                moreButtons={buttons.slice(1)}
+                title={buttons[0].title}
+                tooltipPlace={isRtl ? 'left' : 'right'}
+                onClick={buttons[0].onClick}
+            />
         </Box>
     );
 };

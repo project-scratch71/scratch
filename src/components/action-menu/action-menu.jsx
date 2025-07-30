@@ -127,18 +127,8 @@ class ActionMenu extends React.Component {
                     ref={this.setButtonRef}
                     onClick={this.clickDelayer(onClick)}
                 >
-                    <img
-                        className={styles.mainIcon}
-                        draggable={false}
-                        src={mainImg}
-                    />
+                    {mainImg}
                 </button>
-                <ReactTooltip
-                    className={styles.tooltip}
-                    effect="solid"
-                    id={this.mainTooltipId}
-                    place={tooltipPlace || 'left'}
-                />
                 <div className={styles.moreButtonsOuter}>
                     <div className={styles.moreButtons}>
                         {(moreButtons || []).map(({img, title, onClick: handleClick,
@@ -172,14 +162,6 @@ class ActionMenu extends React.Component {
                                                 onChange={fileChange}
                                             />) : null}
                                     </button>
-                                    <ReactTooltip
-                                        className={classNames(styles.tooltip, {
-                                            [styles.comingSoonTooltip]: isComingSoon
-                                        })}
-                                        effect="solid"
-                                        id={tooltipId}
-                                        place={tooltipPlace || 'left'}
-                                    />
                                 </div>
                             );
                         })}

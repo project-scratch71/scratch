@@ -46,12 +46,8 @@
     border-radius: $form-radius;
 }
 
-[dir="ltr"] .stage-size-toggle-group {
+.stage-size-toggle-group {
     margin-right: .2rem;
-}
-
-[dir="rtl"] .stage-size-toggle-group {
-    margin-left: .2rem;
 }
 
 .stage-button {
@@ -75,6 +71,3 @@
     height: 100%;
 }
 
-[dir="rtl"] .stage-button-icon {
-    transform: scaleX(-1);
-}

@@ -22,6 +22,7 @@ import {handleFileUpload, soundUpload} from '../lib/file-uploader.js';
 import errorBoundaryHOC from '../lib/error-boundary-hoc.jsx';
 import DragConstants from '../lib/drag-constants';
 import downloadBlob from '../lib/download-blob';
+import { FaPlus } from 'react-icons/fa';
 
 import {connect} from 'react-redux';
 
@@ -178,7 +179,8 @@ class SoundTab extends React.Component {
             isRtl,
             vm,
             onNewSoundFromLibraryClick,
-            onNewSoundFromRecordingClick
+            onNewSoundFromRecordingClick,
+            style
         } = this.props;
 
         if (!vm.editingTarget) {
@@ -221,35 +223,19 @@ class SoundTab extends React.Component {
 
         return (
             <AssetPanel
-                buttons={[{
-                    title: intl.formatMessage(messages.addSound),
-                    img: addSoundFromLibraryIcon,
-                    onClick: onNewSoundFromLibraryClick
-                }, {
-                    title: intl.formatMessage(messages.fileUploadSound),
-                    img: fileUploadIcon,
-                    onClick: this.handleFileUploadClick,
-                    fileAccept: '.wav, .mp3',
-                    fileChange: this.handleSoundUpload,
-                    fileInput: this.setFileInput,
-                    fileMultiple: true
-                }, {
-                    title: intl.formatMessage(messages.surpriseSound),
-                    img: surpriseIcon,
-                    onClick: this.handleSurpriseSound
-                }, {
-                    title: intl.formatMessage(messages.recordSound),
-                    img: addSoundFromRecordingIcon,
-                    onClick: onNewSoundFromRecordingClick
-                }, {
-                    title: intl.formatMessage(messages.addSound),
-                    img: searchIcon,
-                    onClick: onNewSoundFromLibraryClick
-                }]}
+                buttons={[                    
+                    {
+                        title: intl.formatMessage(messages.addSound),
+                        img: <FaPlus color="white" size={20} />,
+                        onClick: onNewSoundFromLibraryClick
+                                    
+                    },
+                ]}
                 dragType={DragConstants.SOUND}
                 isRtl={isRtl}
                 items={sounds}
                 selectedItemIndex={this.state.selectedSoundIndex}
+                style={style}
                 onDeleteClick={this.handleDeleteSound}
                 onDrop={this.handleDrop}
                 onDuplicateClick={this.handleDuplicateSound}

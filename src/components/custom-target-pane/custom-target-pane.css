@@ -1,14 +1,8 @@
 @import "../../css/units.css";
 
 .target-pane {
-    /* Makes columns for the sprite library selector + and the stage selector */
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.stage-selector-wrapper {
-    display: flex;
-    flex-shrink: 0;
-    margin-bottom: $space;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
 }

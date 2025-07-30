@@ -8,6 +8,7 @@ import VMScratchBlocks from '../lib/blocks';
 import VM from 'scratch-vm';
 
 import log from '../lib/log.js';
+import codeChangeMonitor from '../lib/code-change-monitor';
 import Prompt from './prompt.jsx';
 import BlocksComponent from '../components/blocks/blocks.jsx';
 import ExtensionLibrary from './extension-library.jsx';
@@ -276,6 +277,9 @@ class Blocks extends React.Component {
         this.props.vm.addListener('BLOCKSINFO_UPDATE', this.handleBlocksInfoUpdate);
         this.props.vm.addListener('PERIPHERAL_CONNECTED', this.handleStatusButtonUpdate);
         this.props.vm.addListener('PERIPHERAL_DISCONNECTED', this.handleStatusButtonUpdate);
+        
+        // Initialize code change monitor
+        codeChangeMonitor.initialize(this.props.vm, this.workspace);
     }
     detachVM () {
         this.props.vm.removeListener('SCRIPT_GLOW_ON', this.onScriptGlowOn);
@@ -290,6 +294,9 @@ class Blocks extends React.Component {
         this.props.vm.removeListener('BLOCKSINFO_UPDATE', this.handleBlocksInfoUpdate);
         this.props.vm.removeListener('PERIPHERAL_CONNECTED', this.handleStatusButtonUpdate);
         this.props.vm.removeListener('PERIPHERAL_DISCONNECTED', this.handleStatusButtonUpdate);
+        
+        // Cleanup code change monitor
+        codeChangeMonitor.cleanup();
     }
 
     updateToolboxBlockValue (id, value) {

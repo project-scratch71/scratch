@@ -13,9 +13,9 @@ import styles from './custom-sprite-selector.css';
 
 import fileUploadIcon from '../action-menu/icon--file-upload.svg';
 import paintIcon from '../action-menu/icon--paint.svg';
-import spriteIcon from '../action-menu/icon--sprite.svg';
 import surpriseIcon from '../action-menu/icon--surprise.svg';
 import searchIcon from '../action-menu/icon--search.svg';
+import { FaPlus } from 'react-icons/fa';
 
 const messages = defineMessages({
     addSpriteFromLibrary: {
@@ -80,33 +80,7 @@ const CustomSpriteSelectorComponent = function (props) {
             className={styles.spriteSelector}
             {...componentProps}
         >
-            <div className={styles.header}>
-                <div className={styles.headerTitle}>
-                    <FormattedMessage
-                        defaultMessage="Sprite"
-                        description="Sprite info label"
-                        id="gui.SpriteInfo.sprite"
-                    />
-                </div>
-            </div>
-            {/* <SpriteInfo
-                direction={selectedSprite.direction}
-                disabled={spriteInfoDisabled}
-                name={selectedSprite.name}
-                rotationStyle={selectedSprite.rotationStyle}
-                size={selectedSprite.size}
-                stageSize={stageSize}
-                visible={selectedSprite.visible}
-                x={selectedSprite.x}
-                y={selectedSprite.y}
-                onChangeDirection={onChangeSpriteDirection}
-                onChangeName={onChangeSpriteName}
-                onChangeRotationStyle={onChangeSpriteRotationStyle}
-                onChangeSize={onChangeSpriteSize}
-                onChangeVisibility={onChangeSpriteVisibility}
-                onChangeX={onChangeSpriteX}
-                onChangeY={onChangeSpriteY}
-            /> */}
+
 
             <SpriteList
                 editingTarget={editingTarget}
@@ -121,35 +95,9 @@ const CustomSpriteSelectorComponent = function (props) {
                 onSelectSprite={onSelectSprite}
             />
 
+
             <ActionMenu
-                className={styles.addButton}
-                img={spriteIcon}
-                moreButtons={[
-                    {
-                        title: intl.formatMessage(messages.addSpriteFromFile),
-                        img: fileUploadIcon,
-                        onClick: onFileUploadClick,
-                        fileAccept: '.svg, .png, .bmp, .jpg, .jpeg, .sprite2, .sprite3, .gif',
-                        fileChange: onSpriteUpload,
-                        fileInput: spriteFileInput,
-                        fileMultiple: true
-                    }, /* Surprise button commented out for iframe embedding - not needed
-                    {
-                        title: intl.formatMessage(messages.addSpriteFromSurprise),
-                        img: surpriseIcon,
-                        onClick: onSurpriseSpriteClick // TODO need real function for this
-                    }, */ {
-                        title: intl.formatMessage(messages.addSpriteFromPaint),
-                        img: paintIcon,
-                        onClick: onPaintSpriteClick // TODO need real function for this
-                    }, {
-                        title: intl.formatMessage(messages.addSpriteFromLibrary),
-                        img: searchIcon,
-                        onClick: onNewSpriteClick
-                    }
-                ]}
-                title={intl.formatMessage(messages.addSpriteFromLibrary)}
-                tooltipPlace={isRtl(intl.locale) ? 'right' : 'left'}
+                img={<FaPlus color={"white"} size={20} />}
                 onClick={onNewSpriteClick}
             />
         </Box>

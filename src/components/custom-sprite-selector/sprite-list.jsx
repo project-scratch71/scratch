@@ -43,7 +43,7 @@ const SpriteList = function (props) {
             componentRef={containerRef}
         >
             <Box
-                className={styles.itemsWrapper}
+                className={styles.scrollX}
             >
                 {items.map((sprite, index) => {
 

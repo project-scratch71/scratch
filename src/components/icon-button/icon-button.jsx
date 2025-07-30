@@ -5,6 +5,7 @@ import styles from './icon-button.css';
 
 const IconButton = ({
     img,
+    icon,
     disabled,
     className,
     title,
@@ -19,11 +20,17 @@ const IconButton = ({
         role="button"
         onClick={disabled ? null : onClick}
     >
-        <img
-            className={styles.icon}
-            draggable={false}
-            src={img}
-        />
+        {icon ? (
+            <div className={styles.icon}>
+                {icon}
+            </div>
+        ) : (
+            <img
+                className={styles.icon}
+                draggable={false}
+                src={img}
+            />
+        )}
         <div className={styles.title}>
             {title}
         </div>
@@ -34,6 +41,7 @@ IconButton.propTypes = {
     className: PropTypes.string,
     disabled: PropTypes.bool,
     img: PropTypes.string,
+    icon: PropTypes.node,
     onClick: PropTypes.func.isRequired,
     title: PropTypes.node.isRequired
 };

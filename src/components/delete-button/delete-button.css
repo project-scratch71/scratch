@@ -34,7 +34,7 @@
 
 .delete-icon {
     position: relative;
-    margin: 0.25rem;
     user-select: none;
     transform-origin: 50%;
+    color: inherit;
 }

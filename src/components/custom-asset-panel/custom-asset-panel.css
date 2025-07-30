@@ -3,34 +3,28 @@
 
 .wrapper {
     display: flex;
-    flex-grow: 1;
-    border: 1px solid $ui-black-transparent;
+    flex-direction: column;
+    /* 親の中で伸び縮みさせたいなら flex:1 を使うほうが安全です */
+    flex: 1 1 auto;
+    min-height: 0;  /* 子の overflow を効かせるのに必須 */
+    background: white;
+
     background: white;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 0.85rem;
 }
 
-[dir="ltr"] .wrapper {
-    border-top-right-radius: $space;
-    border-bottom-right-radius: $space;
+
+/* selector は子要素に合わせて自動高さ */
+.selector {
+  flex: 0 0 auto;    /* 中身の高さだけ */
+  width: 100%;
 }
 
-[dir="rtl"] .wrapper {
-    border-top-left-radius: $space;
-    border-bottom-left-radius: $space;
-}
-
+/* detail-area が残り高さを全部埋める */
 .detail-area {
-    display: flex;
-    flex-grow: 1;
-    flex-shrink: 1;
-    overflow: visible;
-}
-
-[dir="ltr"] .detail-area {
-    border-left: 1px solid $ui-black-transparent;
-}
-
-[dir="rtl"] .detail-area {
-    border-right: 1px solid $ui-black-transparent;
+  flex: 1 1 auto;    /* ここが大事：grow=1 で残りを取得 */
+  min-height: 0;     /* overflow を効かせるに必須 */
+  width: 100%;
+  overflow: auto;    /* はみ出したらスクロール */
 }

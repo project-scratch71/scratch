@@ -34,104 +34,110 @@ const StageComponent = props => {
 
     const stageDimensions = getStageDimensions(stageSize, isFullScreen);
 
-    return (
-        <React.Fragment>
+    const mainStage = (
+        <Box
+            className={classNames(
+                styles.stageWrapper,
+                {[styles.withColorPicker]: !isFullScreen && isColorPicking})}
+            onDoubleClick={onDoubleClick}
+        >
             <Box
                 className={classNames(
-                    styles.stageWrapper,
-                    {[styles.withColorPicker]: !isFullScreen && isColorPicking})}
-                onDoubleClick={onDoubleClick}
+                    styles.stage,
+                    {[styles.fullScreen]: isFullScreen}
+                )}
+                style={{
+                    height: stageDimensions.height,
+                    width: stageDimensions.width
+                }}
             >
-                <Box
-                    className={classNames(
-                        styles.stage,
-                        {[styles.fullScreen]: isFullScreen}
-                    )}
+                <DOMElementRenderer
+                    domElement={canvas}
                     style={{
                         height: stageDimensions.height,
                         width: stageDimensions.width
                     }}
-                >
-                    <DOMElementRenderer
-                        domElement={canvas}
-                        style={{
-                            height: stageDimensions.height,
-                            width: stageDimensions.width
-                        }}
-                        {...boxProps}
+                    {...boxProps}
+                />
+                <Box className={styles.monitorWrapper}>
+                    <MonitorList
+                        draggable={useEditorDragStyle}
+                        stageSize={stageDimensions}
                     />
-                    <Box className={styles.monitorWrapper}>
-                        <MonitorList
-                            draggable={useEditorDragStyle}
+                </Box>
+                <Box className={styles.frameWrapper}>
+                    <TargetHighlight
+                        className={styles.frame}
+                        stageHeight={stageDimensions.height}
+                        stageWidth={stageDimensions.width}
+                    />
+                </Box>
+                {isColorPicking && colorInfo ? (
+                    <Loupe colorInfo={colorInfo} />
+                ) : null}
+            </Box>
+
+            {/* `stageOverlays` is for items that should *not* have their overflow contained within the stage */}
+            <Box
+                className={classNames(
+                    styles.stageOverlays,
+                    {[styles.fullScreen]: isFullScreen}
+                )}
+            >
+                <div
+                    className={styles.stageBottomWrapper}
+                    style={{
+                        width: stageDimensions.width,
+                        height: stageDimensions.height
+                    }}
+                >
+                    {micIndicator ? (
+                        <MicIndicator
+                            className={styles.micIndicator}
                             stageSize={stageDimensions}
                         />
-                    </Box>
-                    <Box className={styles.frameWrapper}>
-                        <TargetHighlight
-                            className={styles.frame}
-                            stageHeight={stageDimensions.height}
-                            stageWidth={stageDimensions.width}
-                        />
-                    </Box>
-                    {isColorPicking && colorInfo ? (
-                        <Loupe colorInfo={colorInfo} />
                     ) : null}
-                </Box>
-
-                {/* `stageOverlays` is for items that should *not* have their overflow contained within the stage */}
-                <Box
-                    className={classNames(
-                        styles.stageOverlays,
-                        {[styles.fullScreen]: isFullScreen}
-                    )}
-                >
-                    <div
-                        className={styles.stageBottomWrapper}
-                        style={{
-                            width: stageDimensions.width,
-                            height: stageDimensions.height
-                        }}
-                    >
-                        {micIndicator ? (
-                            <MicIndicator
-                                className={styles.micIndicator}
-                                stageSize={stageDimensions}
+                    {question === null ? null : (
+                        <div
+                            className={styles.questionWrapper}
+                            style={{width: stageDimensions.width}}
+                        >
+                            <Question
+                                question={question}
+                                onQuestionAnswered={onQuestionAnswered}
                             />
-                        ) : null}
-                        {question === null ? null : (
-                            <div
-                                className={styles.questionWrapper}
-                                style={{width: stageDimensions.width}}
-                            >
-                                <Question
-                                    question={question}
-                                    onQuestionAnswered={onQuestionAnswered}
-                                />
-                            </div>
-                        )}
-                    </div>
-                    <canvas
-                        className={styles.draggingSprite}
-                        height={0}
-                        ref={dragRef}
-                        width={0}
-                    />
-                </Box>
-                {isStarted ? null : (
-                    <GreenFlagOverlay
-                        className={styles.greenFlagOverlay}
-                        wrapperClass={styles.greenFlagOverlayWrapper}
-                    />
-                )}
+                        </div>
+                    )}
+                </div>
+                <canvas
+                    className={styles.draggingSprite}
+                    height={0}
+                    ref={dragRef}
+                    width={0}
+                />
             </Box>
-            {isColorPicking ? (
+            {isStarted ? null : (
+                <GreenFlagOverlay
+                    className={styles.greenFlagOverlay}
+                    wrapperClass={styles.greenFlagOverlayWrapper}
+                />
+            )}
+        </Box>
+    );
+
+    if (isColorPicking) {
+        return (
+            <React.Fragment>
+                {mainStage}
                 <Box
                     className={styles.colorPickerBackground}
                     onClick={onDeactivateColorPicker}
                 />
-            ) : null}
-        </React.Fragment>
-    );
+            </React.Fragment>
+        );
+    }
+
+    return mainStage;
 };
 StageComponent.propTypes = {
     canvas: PropTypes.instanceOf(Element).isRequired,

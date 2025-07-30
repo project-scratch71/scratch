@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { FaStop } from 'react-icons/fa';
 
-import stopAllIcon from './icon--stop-all.svg';
 import styles from './stop-all.css';
 
 const StopAllComponent = function (props) {
@@ -14,7 +14,7 @@ const StopAllComponent = function (props) {
         ...componentProps
     } = props;
     return (
-        <img
+        <FaStop
             className={classNames(
                 className,
                 styles.stopAll,
@@ -22,10 +22,9 @@ const StopAllComponent = function (props) {
                     [styles.isActive]: active
                 }
             )}
-            draggable={false}
-            src={stopAllIcon}
             title={title}
             onClick={onClick}
+            size={20}
             {...componentProps}
         />
     );

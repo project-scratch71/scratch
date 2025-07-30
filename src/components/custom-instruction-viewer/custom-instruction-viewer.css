@@ -1,0 +1,107 @@
+@import "../../css/colors.css";
+@import "../../css/units.css";
+
+.instruction-viewer {
+    display: flex;
+    flex-direction: column;
+    background-color: $ui-white;
+    border: $stage-standard-border-width solid $ui-black-transparent;
+    border-top: none;
+    border-radius: 0 0 1rem 1rem;
+    overflow: hidden;
+    min-height: 300px;
+    flex: 1;
+    box-sizing: content-box;
+}
+
+.header {
+    background-color: $motion-primary;
+    padding: calc($space / 2);
+    border-bottom: 1px solid $ui-black-transparent;
+    min-height: 32px;
+}
+
+.url-form {
+    display: flex;
+    gap: calc($space / 2);
+    width: 100%;
+    align-items: center;
+}
+
+.url-input {
+    flex: 1;
+    padding: calc($space / 2);
+    border: 1px solid $ui-black-transparent;
+    border-radius: $form-radius;
+    font-size: 12px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    height: 24px;
+}
+
+.url-input:focus {
+    outline: none;
+    border-color: $motion-tertiary;
+    box-shadow: 0 0 0 2px rgba(77, 151, 255, 0.2);
+}
+
+.load-button {
+    padding: calc($space / 2) $space;
+    background-color: $ui-white;
+    border: 1px solid $ui-black-transparent;
+    border-radius: $form-radius;
+    font-size: 12px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.load-button:hover {
+    background-color: $ui-black-transparent;
+}
+
+.load-button:active {
+    background-color: $motion-tertiary;
+    color: $ui-white;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 250px;
+}
+
+.iframe {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    border: none;
+    min-height: 250px;
+}
+
+.placeholder {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: calc($space * 4);
+    color: $text-primary-transparent;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.placeholder p {
+    margin: 0 0 $space 0;
+}
+
+.placeholder p:last-child {
+    margin-bottom: 0;
+}

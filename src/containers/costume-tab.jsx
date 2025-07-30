@@ -13,6 +13,7 @@ import DragConstants from '../lib/drag-constants';
 import {emptyCostume} from '../lib/empty-assets';
 import sharedMessages from '../lib/shared-messages';
 import downloadBlob from '../lib/download-blob';
+import { FaPlus } from 'react-icons/fa';
 
 import {
     openCostumeLibrary,
@@ -248,7 +249,8 @@ class CostumeTab extends React.Component {
             isRtl,
             onNewLibraryBackdropClick,
             onNewLibraryCostumeClick,
-            vm
+            vm,
+            style
         } = this.props;
 
         if (!vm.editingTarget) {
@@ -275,38 +277,15 @@ class CostumeTab extends React.Component {
                 buttons={[
                     {
                         title: intl.formatMessage(addLibraryMessage),
-                        img: addLibraryIcon,
+                        img: <FaPlus color="white" size={20} />,
                         onClick: addLibraryFunc
                     },
-                    {
-                        title: intl.formatMessage(addFileMessage),
-                        img: fileUploadIcon,
-                        onClick: this.handleFileUploadClick,
-                        fileAccept: '.svg, .png, .bmp, .jpg, .jpeg, .gif',
-                        fileChange: this.handleCostumeUpload,
-                        fileInput: this.setFileInput,
-                        fileMultiple: true
-                    },
-                    {
-                        title: intl.formatMessage(messages.addSurpriseCostumeMsg),
-                        img: surpriseIcon,
-                        onClick: addSurpriseFunc
-                    },
-                    {
-                        title: intl.formatMessage(messages.addBlankCostumeMsg),
-                        img: paintIcon,
-                        onClick: this.handleNewBlankCostume
-                    },
-                    {
-                        title: intl.formatMessage(addLibraryMessage),
-                        img: searchIcon,
-                        onClick: addLibraryFunc
-                    }
                 ]}
                 dragType={DragConstants.COSTUME}
                 isRtl={isRtl}
                 items={costumeData}
                 selectedItemIndex={this.state.selectedCostumeIndex}
+                style={style}
                 onDeleteClick={target && target.costumes && target.costumes.length > 1 ?
                     this.handleDeleteCostume : null}
                 onDrop={this.handleDrop}
@@ -335,6 +314,7 @@ CostumeTab.propTypes = {
     onNewLibraryBackdropClick: PropTypes.func.isRequired,
     onNewLibraryCostumeClick: PropTypes.func.isRequired,
     onShowImporting: PropTypes.func.isRequired,
+    style: PropTypes.object,
     sprites: PropTypes.shape({
         id: PropTypes.shape({
             costumes: PropTypes.arrayOf(PropTypes.shape({

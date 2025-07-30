@@ -19,13 +19,15 @@ class IframeCommunication {
         // Try to detect parent origin
         this.detectParentOrigin();
         
+        // Set initialized flag first
+        this.isInitialized = true;
+        
         // Send ready signal to parent
         this.sendToParent({
             type: 'SCRATCH_READY',
             timestamp: Date.now()
         });
         
-        this.isInitialized = true;
         console.log('IframeCommunication initialized');
     }
     
@@ -56,6 +58,11 @@ class IframeCommunication {
     }
 
     handleMessage(event) {
+        // Skip messages from this same window (self-sent messages)
+        if (event.source === window) {
+            return;
+        }
+
         // Store parent origin for secure communication
         if (!this.parentOrigin) {
             this.parentOrigin = event.origin;
@@ -75,6 +82,11 @@ class IframeCommunication {
 
         // Skip webpack hot reload messages
         if (type === 'webpackOk' || type.startsWith('webpack')) {
+            return;
+        }
+
+        // Skip outgoing message types (messages we send TO parent, not FROM parent)
+        if (type === 'CODE_UPDATE' || type === 'SCRATCH_READY') {
             return;
         }
         
@@ -120,24 +132,8 @@ class IframeCommunication {
         }
 
         try {
-            // Try with specific origin first, then fallback to '*'
-            let targetOrigin = this.parentOrigin;
-            if (!targetOrigin && document.referrer) {
-                try {
-                    const referrerUrl = new URL(document.referrer);
-                    targetOrigin = referrerUrl.origin;
-                } catch (e) {
-                    // Ignore
-                }
-            }
-            
-            // Final fallback to '*' (less secure but works)
-            if (!targetOrigin) {
-                targetOrigin = '*';
-            }
-            
-            // Log basic messages being sent to parent
-            console.log(`[SEND_TO_PARENT]:`, message.type);
+            // Use '*' for development to avoid origin mismatch issues
+            const targetOrigin = '*';
             
             window.parent.postMessage(message, targetOrigin);
         } catch (error) {
@@ -157,7 +153,7 @@ class IframeCommunication {
 
     
 
-    // Basic message sending to parent
+    // Send code updates to parent window
     sendMessage(type, data) {
         this.sendToParent({
             type,

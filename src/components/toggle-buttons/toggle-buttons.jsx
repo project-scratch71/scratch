@@ -24,11 +24,20 @@ const ToggleButtons = ({buttons, className, disabled}) => (
                 onClick={button.handleClick}
                 disabled={disabled}
             >
-                <img
-                    src={button.icon}
-                    aria-hidden="true"
-                    className={button.iconClassName}
-                />
+                {button.iconComponent ? (
+                    <div
+                        aria-hidden="true"
+                        className={button.iconClassName}
+                    >
+                        {button.iconComponent}
+                    </div>
+                ) : (
+                    <img
+                        src={button.icon}
+                        aria-hidden="true"
+                        className={button.iconClassName}
+                    />
+                )}
             </button>
         ))}
     </div>
@@ -38,7 +47,8 @@ ToggleButtons.propTypes = {
     buttons: PropTypes.arrayOf(PropTypes.shape({
         title: PropTypes.string.isRequired,
         handleClick: PropTypes.func.isRequired,
-        icon: PropTypes.string.isRequired,
+        icon: PropTypes.string,
+        iconComponent: PropTypes.node,
         iconClassName: PropTypes.string,
         isSelected: PropTypes.bool
     })),
