@@ -7,7 +7,7 @@
     border-radius: 0.25rem;
     user-select: none;
     cursor: pointer;
-    color: $looks-secondary;
+    color: #F44336;
     display: flex;
     align-items: center;
     justify-content: center;

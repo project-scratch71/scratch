@@ -11,11 +11,8 @@ $header-height: calc($stage-menu-height - 0.5rem);
     gap: 1rem;
     padding-right: 1rem;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: $ui-secondary;
+    background-color: $ui-primary;
     border-radius: 1rem;
-    border-color: $ui-black-transparent;
-    border-width: 1px;
-    border-style: solid;
     height: 100%;
     width: 100%;
 }
@@ -47,7 +44,7 @@ $header-height: calc($stage-menu-height - 0.5rem);
   overflow-y: hidden;
   padding: 0.7rem;
  
-  border-right: 1px solid $ui-black-transparent;
+  border-right: 5px solid white;
   -webkit-overflow-scrolling: touch;
 }
 

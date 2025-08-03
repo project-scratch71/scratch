@@ -1,75 +1,14 @@
 @import "../../css/colors.css";
 @import "../../css/units.css";
 
-.instruction-viewer {
-    display: flex;
-    flex-direction: column;
-    background-color: $ui-white;
-    border: $stage-standard-border-width solid $ui-black-transparent;
-    border-radius: 1rem;
-    overflow: hidden;
-    flex: 1;
-    box-sizing: content-box;
-}
-
-.header {
-    background-color: $motion-primary;
-    padding: calc($space / 2);
-    border-bottom: 1px solid $ui-black-transparent;
-}
-
-.url-form {
-    display: flex;
-    gap: calc($space / 2);
-    width: 100%;
-    align-items: center;
-}
-
-.url-input {
-    flex: 1;
-    padding: calc($space / 2);
-    border: 1px solid $ui-black-transparent;
-    border-radius: $form-radius;
-    font-size: 12px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    height: 24px;
-}
-
-.url-input:focus {
-    outline: none;
-    border-color: $motion-tertiary;
-    box-shadow: 0 0 0 2px rgba(77, 151, 255, 0.2);
-}
-
-.load-button {
-    padding: calc($space / 2) $space;
-    background-color: $ui-white;
-    border: 1px solid $ui-black-transparent;
-    border-radius: $form-radius;
-    font-size: 12px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    height: 24px;
-    display: flex;
-    align-items: center;
-}
-
-.load-button:hover {
-    background-color: $ui-black-transparent;
-}
-
-.load-button:active {
-    background-color: $motion-tertiary;
-    color: $ui-white;
-}
-
 .content {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid $ui-black-transparent;
 }
 
 .iframe {

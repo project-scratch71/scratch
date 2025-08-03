@@ -7,7 +7,6 @@ const VerticalResizeHandle = ({ onResize, currentHeight, onDragStart, onDragEnd 
     const dragDataRef = useRef({ startY: 0, initialHeight: 0 });
     const onResizeRef = useRef(onResize);
 
-    // 最新のonResizeを常に参照
     onResizeRef.current = onResize;
 
     const handleMouseDown = useCallback((e) => {
@@ -23,10 +22,8 @@ const VerticalResizeHandle = ({ onResize, currentHeight, onDragStart, onDragEnd 
     const handleMouseMove = useCallback((e) => {
         const { startY, initialHeight } = dragDataRef.current;
         const deltaY = e.clientY - startY;
-        const minPosition = 200; // StageWrapperの最小高さ
-        const maxPosition = window.innerHeight - 100; // Viewerの最小高さ
-        const newPosition = Math.max(minPosition, Math.min(maxPosition, initialHeight + deltaY));
-        onResizeRef.current(newPosition);
+        const newHeight = initialHeight - deltaY;
+        onResizeRef.current(newHeight);
     }, []);
 
     const handleMouseUp = useCallback(() => {
@@ -35,14 +32,15 @@ const VerticalResizeHandle = ({ onResize, currentHeight, onDragStart, onDragEnd 
     }, [onDragEnd]);
 
     useEffect(() => {
-        if (isDragging) {
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-            return () => {
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-            };
-        }
+        if (!isDragging) return;
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
     }, [isDragging, handleMouseMove, handleMouseUp]);
 
     return (

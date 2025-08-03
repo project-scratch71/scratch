@@ -7,7 +7,6 @@ const ResizeHandle = ({ onResize, currentWidth, onDragStart, onDragEnd }) => {
     const dragDataRef = useRef({ startX: 0, initialWidth: 0 });
     const onResizeRef = useRef(onResize);
 
-    // 最新のonResizeを常に参照
     onResizeRef.current = onResize;
 
     const handleMouseDown = useCallback((e) => {
@@ -35,14 +34,15 @@ const ResizeHandle = ({ onResize, currentWidth, onDragStart, onDragEnd }) => {
     }, [onDragEnd]);
 
     useEffect(() => {
-        if (isDragging) {
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-            return () => {
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-            };
-        }
+        if (!isDragging) return;
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
     }, [isDragging, handleMouseMove, handleMouseUp]);
 
     return (

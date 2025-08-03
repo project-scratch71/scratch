@@ -2,24 +2,34 @@
 @import "../../css/colors.css";
 @import "../../css/z-index.css";
 
-.stage-wrapper * {
-    box-sizing: border-box;
+.stage-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: $space;
+    padding-left: $space;
+    padding-right: $space;
+}
+
+.stage-canvas-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto; 
 }
 
 .stage-wrapper.full-screen {
     position: fixed;
-    top: $stage-menu-height;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: $z-index-stage-wrapper-overlay;
-    background-color: $ui-white;
-    /* spacing between stage and control bar (on the top), or between
-    stage and window edges (on left/right/bottom) */
-    padding: $stage-full-screen-stage-padding;
-
-    /* this centers the stage */
+    z-index: 500;
+    background-color: #4d97ff;
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    padding-top: 2.875rem;
+    box-sizing: border-box;
 }

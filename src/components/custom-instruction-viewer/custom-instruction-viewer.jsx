@@ -5,8 +5,8 @@ import classNames from 'classnames';
 import Box from '../box/box.jsx';
 import styles from './custom-instruction-viewer.css';
 
-const CustomInstructionViewerComponent =  () => {
-    const [instructionUrl, setInstructionUrl] = useState('');
+const CustomInstructionViewerComponent = ({ isDragging }) => {
+    const [instructionUrl, setInstructionUrl] = useState('http://localhost:3000/pdf-viewer?file=sample1.pdf');
 
     const handleUrlChange = (url) => {
         setInstructionUrl(url);
@@ -25,7 +25,7 @@ const CustomInstructionViewerComponent =  () => {
         try {
             new URL(string);
             return true;
-        } catch (_) {
+        } catch {
             return false;
         }
     };
@@ -36,7 +36,6 @@ const CustomInstructionViewerComponent =  () => {
 
     const getEmbedUrl = (url) => {
         if (isYouTubeUrl(url)) {
-            // Convert YouTube URL to embed URL
             const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
             if (videoId) {
                 return `https://www.youtube.com/embed/${videoId[1]}`;
@@ -46,40 +45,22 @@ const CustomInstructionViewerComponent =  () => {
     };
 
     return (
-        <Box 
-            className={styles.instructionViewer}
-        >
-            <Box className={styles.content}>
-                {instructionUrl && isValidUrl(instructionUrl) ? (
-                    <iframe
-                        src={getEmbedUrl(instructionUrl)}
-                        className={styles.iframe}
-                        title="Programming Instruction"
-                        frameBorder="0"
-                        allowFullScreen
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    />
-                ) : (
-                    <Box className={styles.placeholder}>
-                        <p>Enter a URL above to load programming tutorials, documentation, or educational videos.</p>
-                        <p>Supported: YouTube videos, coding tutorials, documentation sites, and more.</p>
-                    </Box>
-                )}
-            </Box>
-            <Box className={styles.header}>
-                <form onSubmit={handleUrlSubmit} className={styles.urlForm}>
-                    <input
-                        type="url"
-                        name="url"
-                        placeholder="Enter URL for programming tutorial or video..."
-                        className={styles.urlInput}
-                        required
-                    />
-                    <button type="submit" className={styles.loadButton}>
-                        Load
-                    </button>
-                </form>
-            </Box>
+        <Box className={styles.content}>
+            {instructionUrl && isValidUrl(instructionUrl) ? (
+                <iframe
+                    src={getEmbedUrl(instructionUrl)}
+                    className={styles.iframe}
+                    title="Programming Instruction"
+                    style={{ pointerEvents: isDragging ? 'none' : 'auto' }}
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+            ) : (
+                <Box className={styles.placeholder}>
+                    <p>Enter a URL above to load programming tutorials, documentation, or educational videos.</p>
+                    <p>Supported: YouTube videos, coding tutorials, documentation sites, and more.</p>
+                </Box>
+            )}
         </Box>
     );
 };

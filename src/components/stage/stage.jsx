@@ -10,8 +10,7 @@ import TargetHighlight from '../../containers/target-highlight.jsx';
 import GreenFlagOverlay from '../../containers/green-flag-overlay.jsx';
 import Question from '../../containers/question.jsx';
 import MicIndicator from '../mic-indicator/mic-indicator.jsx';
-import {STAGE_DISPLAY_SIZES} from '../../lib/layout-constants.js';
-import {getStageDimensions} from '../../lib/screen-utils.js';
+import {getParentBasedStageDimensions} from '../../lib/screen-utils.js';
 import styles from './stage.css';
 
 const StageComponent = props => {
@@ -24,18 +23,56 @@ const StageComponent = props => {
         colorInfo,
         micIndicator,
         question,
-        stageSize,
         useEditorDragStyle,
         onDeactivateColorPicker,
         onDoubleClick,
         onQuestionAnswered,
+        onStageDimensionsChanged,
         ...boxProps
     } = props;
 
-    const stageDimensions = getStageDimensions(stageSize, isFullScreen);
+    const stageWrapperRef = React.useRef(null);
+    const [stageDimensions, setStageDimensions] = React.useState({
+        width: 480,
+        height: 360,
+        widthDefault: 480,
+        heightDefault: 360,
+        scale: 1
+    });
+
+    React.useEffect(() => {
+        const updateStageDimensions = () => {
+            if (stageWrapperRef.current) {
+                const rect = stageWrapperRef.current.getBoundingClientRect();
+                const newDimensions = getParentBasedStageDimensions(rect.width, rect.height, isFullScreen);
+                setStageDimensions(newDimensions);
+                // Notify parent component about dimensions change
+                if (onStageDimensionsChanged) {
+                    onStageDimensionsChanged(newDimensions);
+                }
+            }
+        };
+
+        const timeoutId = setTimeout(updateStageDimensions, 100);
+        
+        const resizeObserver = new ResizeObserver(updateStageDimensions);
+        
+        setTimeout(() => {
+            if (stageWrapperRef.current) {
+                resizeObserver.observe(stageWrapperRef.current);
+            }
+        }, 200);
+
+        return () => {
+            clearTimeout(timeoutId);
+            resizeObserver.disconnect();
+        };
+    }, [isFullScreen]);
+
 
     const mainStage = (
         <Box
+            componentRef={stageWrapperRef}
             className={classNames(
                 styles.stageWrapper,
                 {[styles.withColorPicker]: !isFullScreen && isColorPicking})}
@@ -46,29 +83,33 @@ const StageComponent = props => {
                     styles.stage,
                     {[styles.fullScreen]: isFullScreen}
                 )}
+                style={{
+                    width: `${stageDimensions.width}px`,
+                    height: `${stageDimensions.height}px`,
+                }}
             >
                 <DOMElementRenderer
                     domElement={canvas}
                     style={{
-                        height: "100%",
-                        width: "100%",
-                        borderRadius: "1rem",
+                        width: `${stageDimensions.width}px !important`,
+                        height: `${stageDimensions.height}px !important`,
+                        borderRadius: "0.5rem",
                     }}
                     {...boxProps}
                 />
-                <Box className={styles.monitorWrapper}>
+                <div className={styles.monitorWrapper}>
                     <MonitorList
                         draggable={useEditorDragStyle}
                         stageSize={stageDimensions}
                     />
-                </Box>
-                <Box className={styles.frameWrapper}>
+                </div>
+                <div className={styles.frameWrapper}>
                     <TargetHighlight
                         className={styles.frame}
                         stageHeight={stageDimensions.height}
                         stageWidth={stageDimensions.width}
                     />
-                </Box>
+                </div>
                 {isColorPicking && colorInfo ? (
                     <Loupe colorInfo={colorInfo} />
                 ) : null}
@@ -80,6 +121,10 @@ const StageComponent = props => {
                     styles.stageOverlays,
                     {[styles.fullScreen]: isFullScreen}
                 )}
+                style={{
+                    width: `${stageDimensions.width}px`,
+                    height: `${stageDimensions.height}px`,
+                }}
             >
                 <div
                     className={styles.stageBottomWrapper}
@@ -97,7 +142,6 @@ const StageComponent = props => {
                     {question === null ? null : (
                         <div
                             className={styles.questionWrapper}
-                            style={{width: stageDimensions.width}}
                         >
                             <Question
                                 question={question}
@@ -147,8 +191,8 @@ StageComponent.propTypes = {
     onDeactivateColorPicker: PropTypes.func,
     onDoubleClick: PropTypes.func,
     onQuestionAnswered: PropTypes.func,
+    onStageDimensionsChanged: PropTypes.func,
     question: PropTypes.string,
-    stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)).isRequired,
     useEditorDragStyle: PropTypes.bool
 };
 StageComponent.defaultProps = {

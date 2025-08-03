@@ -1,36 +1,31 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import classNames from 'classnames';
-import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-intl';
+import {defineMessages, injectIntl, intlShape} from 'react-intl';
+import {
+    MdPlayArrow,
+    MdStop,
+    MdRedo,
+    MdUndo,
+    MdFastForward,
+    MdFastRewind,
+    MdVolumeUp,
+    MdVolumeDown,
+    MdAndroid,
+    MdVolumeOff,
+    MdDelete,
+    MdContentCopy,
+    MdContentPaste,
+    MdLibraryAdd
+} from 'react-icons/md';
+import { FiTrendingUp, FiTrendingDown, FiRefreshCcw } from 'react-icons/fi';
 
 import Waveform from '../waveform/waveform.jsx';
-import Label from '../forms/label.jsx';
 import Input from '../forms/input.jsx';
 
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
 import AudioSelector from '../../containers/audio-selector.jsx';
-import IconButton from '../icon-button/icon-button.jsx';
 
 import styles from './sound-editor.css';
-
-import playIcon from './icon--play.svg';
-import stopIcon from './icon--stop.svg';
-import redoIcon from './icon--redo.svg';
-import undoIcon from './icon--undo.svg';
-import fasterIcon from './icon--faster.svg';
-import slowerIcon from './icon--slower.svg';
-import louderIcon from './icon--louder.svg';
-import softerIcon from './icon--softer.svg';
-import robotIcon from './icon--robot.svg';
-import reverseIcon from './icon--reverse.svg';
-import fadeOutIcon from './icon--fade-out.svg';
-import fadeInIcon from './icon--fade-in.svg';
-import muteIcon from './icon--mute.svg';
-
-import deleteIcon from './icon--delete.svg';
-import copyIcon from './icon--copy.svg';
-import pasteIcon from './icon--paste.svg';
-import copyToNewIcon from './icon--copy-to-new.svg';
 
 const BufferedInput = BufferedInputHOC(Input);
 
@@ -52,28 +47,23 @@ const messages = defineMessages({
     },
     copy: {
         id: 'gui.soundEditor.copy',
-        description: 'Title of the button to copy the sound',
+        description: 'Title of the button to copy the current selection',
         defaultMessage: 'Copy'
     },
     paste: {
         id: 'gui.soundEditor.paste',
-        description: 'Title of the button to paste the sound',
+        description: 'Title of the button to paste the current selection',
         defaultMessage: 'Paste'
     },
     copyToNew: {
         id: 'gui.soundEditor.copyToNew',
-        description: 'Title of the button to copy the selection into a new sound',
-        defaultMessage: 'Copy to New'
+        description: 'Title of the button to copy the current selection to a new sound',
+        defaultMessage: 'Copy to new'
     },
     delete: {
         id: 'gui.soundEditor.delete',
-        description: 'Title of the button to delete the sound',
+        description: 'Title of the button to delete the current selection',
         defaultMessage: 'Delete'
-    },
-    save: {
-        id: 'gui.soundEditor.save',
-        description: 'Title of the button to save trimmed sound',
-        defaultMessage: 'Save'
     },
     undo: {
         id: 'gui.soundEditor.undo',
@@ -95,16 +85,6 @@ const messages = defineMessages({
         description: 'Title of the button to apply the slower effect',
         defaultMessage: 'Slower'
     },
-    echo: {
-        id: 'gui.soundEditor.echo',
-        description: 'Title of the button to apply the echo effect',
-        defaultMessage: 'Echo'
-    },
-    robot: {
-        id: 'gui.soundEditor.robot',
-        description: 'Title of the button to apply the robot effect',
-        defaultMessage: 'Robot'
-    },
     louder: {
         id: 'gui.soundEditor.louder',
         description: 'Title of the button to apply the louder effect',
@@ -112,8 +92,13 @@ const messages = defineMessages({
     },
     softer: {
         id: 'gui.soundEditor.softer',
-        description: 'Title of the button to apply thr.softer effect',
+        description: 'Title of the button to apply the softer effect',
         defaultMessage: 'Softer'
+    },
+    robot: {
+        id: 'gui.soundEditor.robot',
+        description: 'Title of the button to apply the robot effect',
+        defaultMessage: 'Robot'
     },
     reverse: {
         id: 'gui.soundEditor.reverse',
@@ -143,170 +128,174 @@ const SoundEditor = props => (
         ref={props.setRef}
         onMouseDown={props.onContainerClick}
     >
-        <div className={styles.row}>
-            <div className={styles.inputGroup}>
-                <Label text={props.intl.formatMessage(messages.sound)}>
-                    <BufferedInput
-                        tabIndex="1"
-                        type="text"
-                        value={props.name}
-                        onSubmit={props.onChangeName}
-                    />
-                </Label>
-                <div className={styles.buttonGroup}>
-                    <button
-                        className={styles.button}
-                        disabled={!props.canUndo}
-                        title={props.intl.formatMessage(messages.undo)}
-                        onClick={props.onUndo}
-                    >
-                        <img
-                            className={styles.undoIcon}
-                            draggable={false}
-                            src={undoIcon}
-                        />
-                    </button>
-                    <button
-                        className={styles.button}
-                        disabled={!props.canRedo}
-                        title={props.intl.formatMessage(messages.redo)}
-                        onClick={props.onRedo}
-                    >
-                        <img
-                            className={styles.redoIcon}
-                            draggable={false}
-                            src={redoIcon}
-                        />
-                    </button>
-                </div>
+        <div className={styles.headerSection}>
+            <BufferedInput
+                className={styles.nameInput}
+                placeholder="Sound name"
+                tabIndex="1"
+                type="text"
+                value={props.name}
+                onSubmit={props.onChangeName}
+            />
+            <div className={styles.historyButtons}>
+                <button
+                    className={styles.iconButton}
+                    disabled={!props.canUndo}
+                    title={props.intl.formatMessage(messages.undo)}
+                    onClick={props.onUndo}
+                >
+                    <MdUndo size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    disabled={!props.canRedo}
+                    title={props.intl.formatMessage(messages.redo)}
+                    onClick={props.onRedo}
+                >
+                    <MdRedo size="1rem" />
+                </button>
             </div>
-            <div className={styles.inputGroup}>
-                <IconButton
-                    className={styles.toolButton}
-                    img={copyIcon}
+        </div>
+
+        <div className={styles.waveformSection}>
+            <Waveform
+                data={props.chunkLevels}
+                height={120}
+                width={600}
+            />
+            <AudioSelector
+                playhead={props.playhead}
+                trimEnd={props.trimEnd}
+                trimStart={props.trimStart}
+                onPlay={props.onPlay}
+                onSetTrim={props.onSetTrim}
+                onStop={props.onStop}
+            />
+        </div>
+
+        {/* Play/Stop Button */}
+        <div className={styles.playSection}>
+            {props.playhead ? (
+                <button
+                    className={styles.playButton}
+                    title={props.intl.formatMessage(messages.stop)}
+                    onClick={props.onStop}
+                >
+                    <MdStop color="#C4553A" size="1.5rem" />
+                </button>
+            ) : (
+                <button
+                    className={styles.playButton}
+                    title={props.intl.formatMessage(messages.play)}
+                    onClick={props.onPlay}
+                >
+                    <MdPlayArrow color="#C4553A" size="1.5rem" />
+                </button>
+            )}
+        </div>
+
+        <div className={styles.buttonSection}>
+            <div className={styles.buttonRow}>
+                {/* Edit */}
+                <button
+                    className={styles.iconButton}
                     title={props.intl.formatMessage(messages.copy)}
                     onClick={props.onCopy}
-                />
-                <IconButton
-                    className={styles.toolButton}
+                >
+                    <MdContentCopy size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
                     disabled={props.canPaste === false}
-                    img={pasteIcon}
                     title={props.intl.formatMessage(messages.paste)}
                     onClick={props.onPaste}
-                />
-                <IconButton
-                    className={classNames(styles.toolButton, styles.flipInRtl)}
-                    img={copyToNewIcon}
+                >
+                    <MdContentPaste size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    disabled={props.trimStart === null}
+                    title={props.intl.formatMessage(messages.delete)}
+                    onClick={props.onDelete}
+                >
+                    <MdDelete size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
                     title={props.intl.formatMessage(messages.copyToNew)}
                     onClick={props.onCopyToNew}
-                />
+                >
+                    <MdLibraryAdd size="1rem" />
+                </button>
             </div>
-            <IconButton
-                className={styles.toolButton}
-                disabled={props.trimStart === null}
-                img={deleteIcon}
-                title={props.intl.formatMessage(messages.delete)}
-                onClick={props.onDelete}
-            />
-        </div>
-        <div className={styles.row}>
-            <div className={styles.waveformContainer}>
-                <Waveform
-                    data={props.chunkLevels}
-                    height={160}
-                    width={600}
-                />
-                <AudioSelector
-                    playhead={props.playhead}
-                    trimEnd={props.trimEnd}
-                    trimStart={props.trimStart}
-                    onPlay={props.onPlay}
-                    onSetTrim={props.onSetTrim}
-                    onStop={props.onStop}
-                />
+
+            <div className={styles.buttonRow}>
+                {/* Effects */}
+                <button
+                    className={styles.iconButton}
+                    title={props.intl.formatMessage(messages.faster)}
+                    onClick={props.onFaster}
+                >
+                    <MdFastForward size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    title={props.intl.formatMessage(messages.slower)}
+                    onClick={props.onSlower}
+                >
+                    <MdFastRewind size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    disabled={props.tooLoud}
+                    title={props.intl.formatMessage(messages.louder)}
+                    onClick={props.onLouder}
+                >
+                    <MdVolumeUp size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    title={props.intl.formatMessage(messages.softer)}
+                    onClick={props.onSofter}
+                >
+                    <MdVolumeDown size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    title={props.intl.formatMessage(messages.mute)}
+                    onClick={props.onMute}
+                >
+                    <MdVolumeOff size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    title={props.intl.formatMessage(messages.robot)}
+                    onClick={props.onRobot}
+                >
+                    <MdAndroid size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    title={props.intl.formatMessage(messages.fadeIn)}
+                    onClick={props.onFadeIn}
+                >
+                    <FiTrendingUp size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    title={props.intl.formatMessage(messages.fadeOut)}
+                    onClick={props.onFadeOut}
+                >
+                    <FiTrendingDown size="1rem" />
+                </button>
+                <button
+                    className={styles.iconButton}
+                    title={props.intl.formatMessage(messages.reverse)}
+                    onClick={props.onReverse}
+                >
+                    <FiRefreshCcw size="1rem" />
+                </button>
             </div>
-        </div>
-        <div className={classNames(styles.row, styles.rowReverse)}>
-            <div className={styles.inputGroup}>
-                {props.playhead ? (
-                    <button
-                        className={classNames(styles.roundButton, styles.stopButtonn)}
-                        title={props.intl.formatMessage(messages.stop)}
-                        onClick={props.onStop}
-                    >
-                        <img
-                            draggable={false}
-                            src={stopIcon}
-                        />
-                    </button>
-                ) : (
-                    <button
-                        className={classNames(styles.roundButton, styles.playButton)}
-                        title={props.intl.formatMessage(messages.play)}
-                        onClick={props.onPlay}
-                    >
-                        <img
-                            draggable={false}
-                            src={playIcon}
-                        />
-                    </button>
-                )}
-            </div>
-            <IconButton
-                className={styles.effectButton}
-                img={fasterIcon}
-                title={<FormattedMessage {...messages.faster} />}
-                onClick={props.onFaster}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={slowerIcon}
-                title={<FormattedMessage {...messages.slower} />}
-                onClick={props.onSlower}
-            />
-            <IconButton
-                disabled={props.tooLoud}
-                className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={louderIcon}
-                title={<FormattedMessage {...messages.louder} />}
-                onClick={props.onLouder}
-            />
-            <IconButton
-                className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={softerIcon}
-                title={<FormattedMessage {...messages.softer} />}
-                onClick={props.onSofter}
-            />
-            <IconButton
-                className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={muteIcon}
-                title={<FormattedMessage {...messages.mute} />}
-                onClick={props.onMute}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={fadeInIcon}
-                title={<FormattedMessage {...messages.fadeIn} />}
-                onClick={props.onFadeIn}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={fadeOutIcon}
-                title={<FormattedMessage {...messages.fadeOut} />}
-                onClick={props.onFadeOut}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={reverseIcon}
-                title={<FormattedMessage {...messages.reverse} />}
-                onClick={props.onReverse}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={robotIcon}
-                title={<FormattedMessage {...messages.robot} />}
-                onClick={props.onRobot}
-            />
         </div>
     </div>
 );
@@ -322,7 +311,7 @@ SoundEditor.propTypes = {
     onContainerClick: PropTypes.func.isRequired,
     onCopy: PropTypes.func.isRequired,
     onCopyToNew: PropTypes.func.isRequired,
-    onDelete: PropTypes.func,
+    onDelete: PropTypes.func.isRequired,
     onEcho: PropTypes.func.isRequired,
     onFadeIn: PropTypes.func.isRequired,
     onFadeOut: PropTypes.func.isRequired,
@@ -334,13 +323,13 @@ SoundEditor.propTypes = {
     onRedo: PropTypes.func.isRequired,
     onReverse: PropTypes.func.isRequired,
     onRobot: PropTypes.func.isRequired,
-    onSetTrim: PropTypes.func,
+    onSetTrim: PropTypes.func.isRequired,
     onSlower: PropTypes.func.isRequired,
     onSofter: PropTypes.func.isRequired,
     onStop: PropTypes.func.isRequired,
     onUndo: PropTypes.func.isRequired,
     playhead: PropTypes.number,
-    setRef: PropTypes.func,
+    setRef: PropTypes.func.isRequired,
     tooLoud: PropTypes.bool.isRequired,
     trimEnd: PropTypes.number,
     trimStart: PropTypes.number

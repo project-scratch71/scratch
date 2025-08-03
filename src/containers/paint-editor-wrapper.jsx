@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import bindAll from 'lodash.bindall';
 import VM from 'scratch-vm';
-import PaintEditor from 'scratch-paint';
+import PaintEditorContainer from './paint-editor-container.jsx';
 import {inlineSvgFonts} from 'scratch-svg-renderer';
 
 import {connect} from 'react-redux';
@@ -24,7 +24,16 @@ class PaintEditorWrapper extends React.Component {
         this.props.vm.renameCostume(this.props.selectedCostumeIndex, name);
     }
     handleUpdateImage (isVector, image, rotationCenterX, rotationCenterY) {
+        // imageがundefinedまたはnullの場合はスキップ
+        if (image === undefined || image === null) {
+            return;
+        }
+        
         if (isVector) {
+            // SVGの場合、imageが文字列であることを確認
+            if (typeof image !== 'string') {
+                return;
+            }
             this.props.vm.updateSvg(
                 this.props.selectedCostumeIndex,
                 image,
@@ -48,7 +57,7 @@ class PaintEditorWrapper extends React.Component {
         } = this.props;
 
         return (
-            <PaintEditor
+            <PaintEditorContainer
                 {...componentProps}
                 image={vm.getCostume(selectedCostumeIndex)}
                 onUpdateImage={this.handleUpdateImage}

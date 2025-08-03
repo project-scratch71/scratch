@@ -40,7 +40,8 @@ class Stage extends React.Component {
             'setDragCanvas',
             'clearDragCanvas',
             'drawDragCanvas',
-            'positionDragCanvas'
+            'positionDragCanvas',
+            'onStageDimensionsChanged'
         ]);
         this.state = {
             mouseDownTimeoutId: null,
@@ -51,6 +52,8 @@ class Stage extends React.Component {
             colorInfo: null,
             question: null
         };
+        // Store actual stage dimensions for accurate coordinate calculations
+        this.actualStageDimensions = null;
         if (this.props.vm.renderer) {
             this.renderer = this.props.vm.renderer;
             this.canvas = this.renderer.canvas;
@@ -91,8 +94,11 @@ class Stage extends React.Component {
         } else if (!this.props.isColorPicking && prevProps.isColorPicking) {
             this.stopColorPickingLoop();
         }
-        this.updateRect();
-        this.renderer.resize(this.rect.width, this.rect.height);
+        // Use requestAnimationFrame to ensure canvas has been resized before updating renderer
+        requestAnimationFrame(() => {
+            this.updateRect();
+            this.renderer.resize(this.rect.width, this.rect.height);
+        });
     }
     componentWillUnmount () {
         this.detachMouseEvents(this.canvas);
@@ -146,12 +152,18 @@ class Stage extends React.Component {
     }
     updateRect () {
         this.rect = this.canvas.getBoundingClientRect();
+        // Store the actual canvas position for more accurate coordinate calculations
+        this.canvasRect = this.canvas.getBoundingClientRect();
     }
     getScratchCoords (x, y) {
         const nativeSize = this.renderer.getNativeSize();
+        // x, y are already canvas-relative coordinates (mousePosition[0], mousePosition[1])
+        // So we need to use the canvas dimensions for the transformation
+        const canvasRect = this.canvas.getBoundingClientRect();
+        
         return [
-            (nativeSize[0] / this.rect.width) * (x - (this.rect.width / 2)),
-            (nativeSize[1] / this.rect.height) * (y - (this.rect.height / 2))
+            (nativeSize[0] / canvasRect.width) * (x - (canvasRect.width / 2)),
+            (nativeSize[1] / canvasRect.height) * (y - (canvasRect.height / 2))
         ];
     }
     getColorInfo (x, y) {
@@ -164,69 +176,87 @@ class Stage extends React.Component {
     handleDoubleClick (e) {
         const {x, y} = getEventXY(e);
         // Set editing target from cursor position, if clicking on a sprite.
-        const mousePosition = [x - this.rect.left, y - this.rect.top];
+        const canvasRect = this.canvas.getBoundingClientRect();
+        const mousePosition = [x - canvasRect.left, y - canvasRect.top];
         const drawableId = this.renderer.pick(mousePosition[0], mousePosition[1]);
         if (drawableId === null) return;
         const targetId = this.props.vm.getTargetIdForDrawableId(drawableId);
         if (targetId === null) return;
         this.props.vm.setEditingTarget(targetId);
     }
-    onMouseMove (e) {
-        const {x, y} = getEventXY(e);
-        const mousePosition = [x - this.rect.left, y - this.rect.top];
+    /**
+     * マウス／タッチムーブ時のハンドラ
+     * ドラッグ閾値判定後に onStartDrag を呼び直せるように、
+     * ページ座標→相対座標を常に最新のキャンバス位置で計算する。
+     */
+    onMouseMove(e) {
+        const { x: pageX, y: pageY } = getEventXY(e);
+        this.updateRect();
+        const canvasRect = this.canvas.getBoundingClientRect();
+        const relX = pageX - canvasRect.left;
+        const relY = pageY - canvasRect.top;
 
         if (this.props.isColorPicking) {
-            // Set the pickX/Y for the color picker loop to pick up
-            this.pickX = mousePosition[0];
-            this.pickY = mousePosition[1];
+            // カラーピッカー用位置更新
+            this.pickX = relX;
+            this.pickY = relY;
         }
 
+        // ドラッグ判定（まだ isDragging じゃない段階）
         if (this.state.mouseDown && !this.state.isDragging) {
-            const distanceFromMouseDown = Math.sqrt(
-                Math.pow(mousePosition[0] - this.state.mouseDownPosition[0], 2) +
-                Math.pow(mousePosition[1] - this.state.mouseDownPosition[1], 2)
-            );
-            if (distanceFromMouseDown > dragThreshold) {
+            const [startPageX, startPageY] = this.state.mouseDownPage || [];
+            const relStartX = startPageX - canvasRect.left;
+            const relStartY = startPageY - canvasRect.top;
+            const dx = relX - relStartX;
+            const dy = relY - relStartY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > dragThreshold) {
                 this.cancelMouseDownTimeout();
-                this.onStartDrag(...this.state.mouseDownPosition);
+                // ★保存したページ座標でドラッグ開始
+                this.onStartDrag(startPageX, startPageY);
             }
         }
+
+        // 実際にドラッグ中ならスプライト移動
         if (this.state.mouseDown && this.state.isDragging) {
-            // Editor drag style only updates the drag canvas, does full update at the end of drag
-            // Non-editor drag style just updates the sprite continuously.
             if (this.props.useEditorDragStyle) {
-                this.positionDragCanvas(mousePosition[0], mousePosition[1]);
+                this.positionDragCanvas(relX, relY);
             } else {
-                const spritePosition = this.getScratchCoords(mousePosition[0], mousePosition[1]);
+                const [scratchX, scratchY] = this.getScratchCoords(relX, relY);
                 this.props.vm.postSpriteInfo({
-                    x: spritePosition[0] + this.state.dragOffset[0],
-                    y: -(spritePosition[1] + this.state.dragOffset[1]),
+                    x: scratchX + this.state.dragOffset[0],
+                    y: -(scratchY + this.state.dragOffset[1]),
                     force: true
                 });
             }
         }
-        const coordinates = {
-            x: mousePosition[0],
-            y: mousePosition[1],
-            canvasWidth: this.rect.width,
-            canvasHeight: this.rect.height
-        };
-        this.props.vm.postIOData('mouse', coordinates);
+
+        // VM にマウスムーブ情報を送信
+        this.props.vm.postIOData('mouse', {
+            x: relX,
+            y: relY,
+            canvasWidth: canvasRect.width,
+            canvasHeight: canvasRect.height
+        });
     }
+
     onMouseUp (e) {
         const {x, y} = getEventXY(e);
-        const mousePosition = [x - this.rect.left, y - this.rect.top];
+        const canvasRect = this.canvas.getBoundingClientRect();
+        const mousePosition = [x - canvasRect.left, y - canvasRect.top];
         this.cancelMouseDownTimeout();
         this.setState({
             mouseDown: false,
             mouseDownPosition: null
         });
+
+
         const data = {
             isDown: false,
-            x: x - this.rect.left,
-            y: y - this.rect.top,
-            canvasWidth: this.rect.width,
-            canvasHeight: this.rect.height,
+            x: mousePosition[0],
+            y: mousePosition[1],
+            canvasWidth: canvasRect.width,
+            canvasHeight: canvasRect.height,
             wasDragged: this.state.isDragging
         };
         if (this.state.isDragging) {
@@ -235,8 +265,8 @@ class Stage extends React.Component {
         this.props.vm.postIOData('mouse', data);
 
         if (this.props.isColorPicking &&
-            mousePosition[0] > 0 && mousePosition[0] < this.rect.width &&
-            mousePosition[1] > 0 && mousePosition[1] < this.rect.height
+            mousePosition[0] > 0 && mousePosition[0] < canvasRect.width &&
+            mousePosition[1] > 0 && mousePosition[1] < canvasRect.height
         ) {
             const {r, g, b} = this.state.colorInfo.color;
             const componentToString = c => {
@@ -250,45 +280,55 @@ class Stage extends React.Component {
             this.pickY = null;
         }
     }
-    onMouseDown (e) {
+    /**
+     * マウス／タッチダウン時のハンドラ
+     * pageX/pageY（ページ座標）を state.mouseDownPage に保存し、
+     * ドラッグ開始時に正しく再計算できるようにする。
+     */
+    onMouseDown(e) {
         this.updateRect();
-        const {x, y} = getEventXY(e);
-        const mousePosition = [x - this.rect.left, y - this.rect.top];
+        // ページ座標を取得
+        const { x: pageX, y: pageY } = getEventXY(e);
+        const canvasRect = this.canvas.getBoundingClientRect();
+        // キャンバス相対座標（ポインタ座標）も計算しておく
+        const relX = pageX - canvasRect.left;
+        const relY = pageY - canvasRect.top;
+
         if (this.props.isColorPicking) {
-            // Set the pickX/Y for the color picker loop to pick up
-            this.pickX = mousePosition[0];
-            this.pickY = mousePosition[1];
-            // Immediately update the color picker info
-            this.setState({colorInfo: this.getColorInfo(this.pickX, this.pickY)});
+            // カラーピッカー中ならそのまま情報更新
+            this.pickX = relX;
+            this.pickY = relY;
+            this.setState({ colorInfo: this.getColorInfo(relX, relY) });
         } else {
+            // 左クリック or タッチならドラッグ準備
             if (e.button === 0 || (window.TouchEvent && e instanceof TouchEvent)) {
                 this.setState({
                     mouseDown: true,
-                    mouseDownPosition: mousePosition,
+                    mouseDownPage: [pageX, pageY],  // ★生のページ座標を保存
                     mouseDownTimeoutId: setTimeout(
-                        this.onStartDrag.bind(this, mousePosition[0], mousePosition[1]),
+                        () => this.onStartDrag(pageX, pageY),
                         400
                     )
                 });
             }
-            const data = {
+            // VM にマウスダウン情報を送信
+            this.props.vm.postIOData('mouse', {
                 isDown: true,
-                x: mousePosition[0],
-                y: mousePosition[1],
-                canvasWidth: this.rect.width,
-                canvasHeight: this.rect.height
-            };
-            this.props.vm.postIOData('mouse', data);
+                x: relX,
+                y: relY,
+                canvasWidth: canvasRect.width,
+                canvasHeight: canvasRect.height
+            });
             if (e.preventDefault) {
-                // Prevent default to prevent touch from dragging page
                 e.preventDefault();
-                // But we do want any active input to be blurred
                 if (document.activeElement && document.activeElement.blur) {
                     document.activeElement.blur();
                 }
             }
         }
     }
+
+
     onWheel (e) {
         const data = {
             deltaX: e.deltaX,
@@ -316,6 +356,7 @@ class Stage extends React.Component {
             width: boundsWidth,
             height: boundsHeight
         } = drawableData;
+
         this.dragCanvas.width = imageData.width;
         this.dragCanvas.height = imageData.height;
         // On high-DPI devices, the canvas size in layout-pixels is not equal to the size of the extracted data.
@@ -323,10 +364,8 @@ class Stage extends React.Component {
         this.dragCanvas.style.height = `${boundsHeight}px`;
 
         this.dragCanvas.getContext('2d').putImageData(imageData, 0, 0);
-        // Position so that pick location is at (0, 0) so that  positionDragCanvas()
-        // can use translation to move to mouse position smoothly.
-        this.dragCanvas.style.left = `${boundsX - x}px`;
-        this.dragCanvas.style.top = `${boundsY - y}px`;
+        this.dragCanvas.style.left = `${boundsX}px`;
+        this.dragCanvas.style.top  = `${boundsY}px`;
         this.dragCanvas.style.display = 'block';
     }
     clearDragCanvas () {
@@ -334,28 +373,42 @@ class Stage extends React.Component {
         this.dragCanvas.style.display = 'none';
     }
     positionDragCanvas (mouseX, mouseY) {
-        // mouseX/Y are relative to stage top/left, and dragCanvas is already
-        // positioned so that the pick location is at (0,0).
-        this.dragCanvas.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+        // Calculate how much the sprite has moved from its initial position
+        if (this.initialDragPosition) {
+            const deltaX = mouseX - this.initialDragPosition[0];
+            const deltaY = mouseY - this.initialDragPosition[1];
+            // Move dragCanvas by the same amount the mouse has moved
+            this.dragCanvas.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        }
     }
-    onStartDrag (x, y) {
+    /**
+     * ドラッグ開始処理
+     * 引数はページ座標（pageX, pageY）で受け取り、
+     * 最新のキャンバス位置から相対座標を再計算してから pick → startDrag へ。
+     */
+    onStartDrag(pageX, pageY) {
         if (this.state.dragId) return;
+        // 最新のキャンバス位置・サイズを取得
+        this.updateRect();
+        const canvasRect = this.canvas.getBoundingClientRect();
+        // ページ座標 → キャンバス相対座標
+        const x = pageX - canvasRect.left;
+        const y = pageY - canvasRect.top;
+
+        // 描画対象の取得
         const drawableId = this.renderer.pick(x, y);
         if (drawableId === null) return;
         const targetId = this.props.vm.getTargetIdForDrawableId(drawableId);
         if (targetId === null) return;
-
         const target = this.props.vm.runtime.getTargetById(targetId);
-
-        // Do not start drag unless in editor drag mode or target is draggable
         if (!(this.props.useEditorDragStyle || target.draggable)) return;
 
-        // Dragging always brings the target to the front
         target.goToFront();
 
+        // Scratch 座標系に変換
         const [scratchMouseX, scratchMouseY] = this.getScratchCoords(x, y);
         const offsetX = target.x - scratchMouseX;
-        const offsetY = -(target.y + scratchMouseY);
+        const offsetY = -target.y - scratchMouseY;
 
         this.props.vm.startDrag(targetId);
         this.setState({
@@ -363,15 +416,19 @@ class Stage extends React.Component {
             dragId: targetId,
             dragOffset: [offsetX, offsetY]
         });
+
+        // Store initial drag position for relative movement calculation
+        this.initialDragPosition = [x, y];
+
         if (this.props.useEditorDragStyle) {
-            // Extract the drawable art
             const drawableData = this.renderer.extractDrawableScreenSpace(drawableId);
             this.drawDragCanvas(drawableData, x, y);
             this.positionDragCanvas(x, y);
-            this.props.vm.postSpriteInfo({visible: false});
+            this.props.vm.postSpriteInfo({ visible: false });
             this.props.vm.renderer.draw();
         }
     }
+
     onStopDrag (mouseX, mouseY) {
         const dragId = this.state.dragId;
         const commonStopDragActions = () => {
@@ -381,13 +438,16 @@ class Stage extends React.Component {
                 dragOffset: null,
                 dragId: null
             });
+            // Clear initial drag position
+            this.initialDragPosition = null;
         };
         if (this.props.useEditorDragStyle) {
             // Need to sequence these actions to prevent flickering.
             const spriteInfo = {visible: true};
             // First update the sprite position if dropped in the stage.
-            if (mouseX > 0 && mouseX < this.rect.width &&
-                mouseY > 0 && mouseY < this.rect.height) {
+            const canvasRect = this.canvas.getBoundingClientRect();
+            if (mouseX > 0 && mouseX < canvasRect.width &&
+                mouseY > 0 && mouseY < canvasRect.height) {
                 const spritePosition = this.getScratchCoords(mouseX, mouseY);
                 spriteInfo.x = spritePosition[0] + this.state.dragOffset[0];
                 spriteInfo.y = -(spritePosition[1] + this.state.dragOffset[1]);
@@ -405,10 +465,18 @@ class Stage extends React.Component {
     setDragCanvas (canvas) {
         this.dragCanvas = canvas;
     }
+    onStageDimensionsChanged (dimensions) {
+        this.actualStageDimensions = dimensions;
+        // Update renderer size to match actual stage dimensions
+        if (this.renderer) {
+            this.renderer.resize(dimensions.width, dimensions.height);
+        }
+    }
     render () {
         const {
             vm, // eslint-disable-line no-unused-vars
             onActivateColorPicker, // eslint-disable-line no-unused-vars
+            stageSize, // eslint-disable-line no-unused-vars
             ...props
         } = this.props;
         return (
@@ -419,6 +487,7 @@ class Stage extends React.Component {
                 question={this.state.question}
                 onDoubleClick={this.handleDoubleClick}
                 onQuestionAnswered={this.handleQuestionAnswered}
+                onStageDimensionsChanged={this.onStageDimensionsChanged}
                 {...props}
             />
         );

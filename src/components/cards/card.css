@@ -13,7 +13,6 @@
     pointer-events: auto;
     z-index: $z-index-card;
     margin: 0.5rem 2rem;
-    min-width: 468px;
 }
 
 .left-card, .right-card {

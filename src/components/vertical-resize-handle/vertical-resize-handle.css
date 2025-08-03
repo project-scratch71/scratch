@@ -1,17 +1,16 @@
 @import "../../css/colors.css";
 
 .vertical-resize-handle {
+    box-sizing: border-box;
     width: 100%;
     height: 8px;
-    background-color: transparent;
+    margin-bottom: 0.5rem;
     cursor: row-resize;
     position: relative;
     z-index: 10;
     transition: all 0.2s ease;
     user-select: none;
     display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .vertical-resize-handle:hover {
@@ -22,7 +21,6 @@
     background-color: $error-primary;
 }
 
-/* 中央に丸っこい横線ハンドル表示 */
 .vertical-resize-handle::after {
     content: '';
     position: absolute;

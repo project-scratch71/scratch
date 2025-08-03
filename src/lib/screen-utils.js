@@ -36,10 +36,48 @@ const resolveStageSize = (stageSizeMode, isFullSize) => {
 };
 
 /**
- * Retrieve info used to determine the actual stage size based on the current GUI and browser state.
- * @param {STAGE_DISPLAY_SIZES} stageSize - the current fully-resolved stage size.
+ * Calculate stage dimensions based on parent container size while maintaining 4:3 aspect ratio.
+ * @param {number} containerWidth - the width of the parent container.
+ * @param {number} containerHeight - the height of the parent container.
  * @param {boolean} isFullScreen - true if full-screen mode is enabled.
  * @return {StageDimensions} - an object describing the dimensions of the stage.
+ */
+const getParentBasedStageDimensions = (containerWidth, containerHeight, isFullScreen = false) => {
+    const stageDimensions = {
+        heightDefault: layout.standardStageHeight,
+        widthDefault: layout.standardStageWidth,
+        height: 0,
+        width: 0,
+        scale: 1
+    };
+
+    if (!containerWidth || !containerHeight) {
+        stageDimensions.width = layout.standardStageWidth;
+        stageDimensions.height = layout.standardStageHeight;
+        return stageDimensions;
+    }
+
+    // Calculate scale to fit both width and height while maintaining 4:3 aspect ratio
+    const scaleX = containerWidth / stageDimensions.widthDefault;
+    const scaleY = containerHeight / stageDimensions.heightDefault;
+    
+    // Use the smaller scale to ensure both dimensions fit within the container
+    stageDimensions.scale = Math.min(scaleX, scaleY);
+    
+    // Apply the scale to get actual dimensions that fit within container
+    stageDimensions.width = stageDimensions.scale * stageDimensions.widthDefault;
+    stageDimensions.height = stageDimensions.scale * stageDimensions.heightDefault;
+
+    // Round off dimensions to prevent resampling/blurriness
+    stageDimensions.height = Math.round(stageDimensions.height);
+    stageDimensions.width = Math.round(stageDimensions.width);
+
+    return stageDimensions;
+};
+
+/**
+ * Legacy function for backward compatibility - will be deprecated
+ * @deprecated Use getParentBasedStageDimensions instead
  */
 const getStageDimensions = (stageSize, isFullScreen) => {
     const stageDimensions = {
@@ -99,6 +137,7 @@ const stageSizeToTransform = ({width, height, widthDefault, heightDefault}) => {
 
 export {
     getStageDimensions,
+    getParentBasedStageDimensions,
     resolveStageSize,
     stageSizeToTransform
 };

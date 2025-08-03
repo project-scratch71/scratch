@@ -1,14 +1,15 @@
+import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import omit from 'lodash.omit';
-import PropTypes from 'prop-types';
-import React, { useState, useEffect, useRef } from 'react';
-import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-intl';
-import {connect} from 'react-redux';
+import { defineMessages, FormattedMessage, injectIntl, intlShape } from 'react-intl';
+import { connect } from 'react-redux';
 import MediaQuery from 'react-responsive';
-import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import tabStyles from 'react-tabs/style/react-tabs.css';
 import VM from 'scratch-vm';
 import Renderer from 'scratch-render';
+import { FaPuzzlePiece } from 'react-icons/fa';
 
 import Blocks from '../../containers/blocks.jsx';
 import CostumeTab from '../../containers/costume-tab.jsx';
@@ -36,50 +37,44 @@ import ConnectionModal from '../../containers/connection-modal.jsx';
 import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx';
 
 import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
-import {resolveStageSize, getStageDimensions} from '../../lib/screen-utils';
+import { resolveStageSize } from '../../lib/screen-utils';
 import {themeMap} from '../../lib/themes';
 
 import styles from './gui.css';
-import { FaPuzzlePiece, FaCode, FaTshirt, FaVolumeUp } from 'react-icons/fa';
 import DebugModal from '../debug-modal/debug-modal.jsx';
 
 const messages = defineMessages({
     addExtension: {
         id: 'gui.gui.addExtension',
-        description: 'Button to add an extension in the target pane',
         defaultMessage: 'Add Extension'
     }
 });
 
-// Cache this value to only retrieve it once the first time.
-// Assume that it doesn't change for a session.
 let isRendererSupported = null;
 
-const GUIComponent = props => {
+const GUIComponent = (props) => {
     const [bodyWidth, setBodyWidth] = useState(600);
-    const [viewerTopPosition, setViewerTopPosition] = useState(400);
+    const [viewerHeight, setViewerHeight] = useState(400);
     const [isDragging, setIsDragging] = useState(false);
     const bodyWrapperRef = useRef(null);
     const stageAndTargetWrapperRef = useRef(null);
 
-    const handleResize = (newWidth) => {
+    const handleHorizontalResize = (newWidth) => {
         setBodyWidth(newWidth);
-        // Scratch Blocksワークスペースにリサイズを通知
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 0);
     };
 
-    const handleVerticalResize = (newTopPosition) => {
-        setViewerTopPosition(newTopPosition);
+    const handleVerticalResize = (newInstructionHeight) => {
+        setViewerHeight(newInstructionHeight);
     };
 
 
     useEffect(() => {
-        const resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                const width = entry.contentRect.width;
-                setBodyWidth(width);
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                setBodyWidth(entry.contentRect.width);
             }
         });
 
@@ -171,9 +166,8 @@ const GUIComponent = props => {
         return <Box {...componentProps}>{children}</Box>;
     }
 
-    // Handler functions for SpriteInfo
     const handleChangeSpriteDirection = (direction) => {
-        vm.postSpriteInfo({direction});
+        vm.postSpriteInfo({ direction });
     };
 
     const handleChangeSpriteName = (name) => {
@@ -181,35 +175,31 @@ const GUIComponent = props => {
     };
 
     const handleChangeSpriteRotationStyle = (rotationStyle) => {
-        vm.postSpriteInfo({rotationStyle});
+        vm.postSpriteInfo({ rotationStyle });
     };
 
     const handleChangeSpriteSize = (size) => {
-        vm.postSpriteInfo({size});
+        vm.postSpriteInfo({ size });
     };
 
     const handleChangeSpriteVisibility = (visible) => {
-        vm.postSpriteInfo({visible});
+        vm.postSpriteInfo({ visible });
     };
 
     const handleChangeSpriteX = (x) => {
-        vm.postSpriteInfo({x});
+        vm.postSpriteInfo({ x });
     };
 
     const handleChangeSpriteY = (y) => {
-        vm.postSpriteInfo({y});
+        vm.postSpriteInfo({ y });
     };
 
-    // Check if stage is selected
     const isStageSelected = stage && stage.id === editingTarget;
     
-    // Get selected sprite data
     let selectedSprite = sprites && selectedId ? sprites[selectedId] : null;
-    let spriteInfoDisabled = false;
     
     if (!selectedSprite || isStageSelected) {
         selectedSprite = {};
-        spriteInfoDisabled = true;
     }
 
     const tabClassNames = {
@@ -225,44 +215,30 @@ const GUIComponent = props => {
         isRendererSupported = Renderer.isSupported();
     }
 
-    return (<MediaQuery minWidth={layout.fullSizeMinWidth}>{isFullSize => {
-        const stageSize = resolveStageSize(stageSizeMode, isFullSize);
-        const dims = getStageDimensions(stageSize, isFullScreen);
+    return (
+        <MediaQuery minWidth={layout.fullSizeMinWidth}>
+            {(isFullSize) => {
+                const stageSize = resolveStageSize(stageSizeMode, isFullSize);
 
-        return (
-            <Box
-                className={styles.pageWrapper}
-                {...componentProps}
-            >
-                {loading ? (
-                    <Loader />
-                ) : null}
-                {isCreating ? (
-                    <Loader messageId="gui.loader.creating" />
-                ) : null}
-                {isRendererSupported ? null : (
-                    <WebGlModal />
-                )}
-                {alertsVisible ? (
-                    <Alerts className={styles.alertsContainer} />
-                ) : null}
-                {connectionModalVisible ? (
-                    <ConnectionModal
-                        vm={vm}
-                    />
-                ) : null}
-                {costumeLibraryVisible ? (
-                    <CostumeLibrary
-                        vm={vm}
-                        onRequestClose={onRequestCloseCostumeLibrary}
-                    />
-                ) : null}
-                {backdropLibraryVisible ? (
-                    <BackdropLibrary
-                        vm={vm}
-                        onRequestClose={onRequestCloseBackdropLibrary}
-                    />
-                ) : null}
+                return (
+                    <Box className={styles.pageWrapper} {...componentProps}>
+                        {loading && <Loader />}
+                        {isCreating && <Loader messageId="gui.loader.creating" />}
+                        {!isRendererSupported && <WebGlModal />}
+                        {alertsVisible && <Alerts className={styles.alertsContainer} />}
+                        {connectionModalVisible && <ConnectionModal vm={vm} />}
+                        {costumeLibraryVisible && (
+                            <CostumeLibrary
+                                vm={vm}
+                                onRequestClose={onRequestCloseCostumeLibrary}
+                            />
+                        )}
+                        {backdropLibraryVisible && (
+                            <BackdropLibrary
+                                vm={vm}
+                                onRequestClose={onRequestCloseBackdropLibrary}
+                            />
+                        )}
                 <Box className={styles.chunkWrapper}>
                     <Box 
                         className={styles.bodyWrapper} 
@@ -366,7 +342,7 @@ const GUIComponent = props => {
                         </Box>
                     </Box>
                     <ResizeHandle 
-                        onResize={handleResize} 
+                        onResize={handleHorizontalResize} 
                         currentWidth={bodyWidth}
                         onDragStart={() => setIsDragging(true)}
                         onDragEnd={() => setIsDragging(false)}
@@ -376,43 +352,29 @@ const GUIComponent = props => {
                         ref={stageAndTargetWrapperRef}
                         style={{ width: `calc(100vw - ${bodyWidth}px - 1rem)` }}
                     >
-                        <StageWrapper
-                            isFullScreen={isFullScreen}
-                            isRendererSupported={isRendererSupported}
-                            stageSize={stageSize}
-                            vm={vm}
-                        />
+                        <Box className={styles.stageSection}>
+                            <StageWrapper
+                                isFullScreen={isFullScreen}
+                                isRendererSupported={isRendererSupported}
+                                stageSize={stageSize}
+                                vm={vm}
+                            />
+                        </Box>
                         <Box 
                             className={styles.customInstructionSection}
-                            style={{ top: `${viewerTopPosition}px` }}
+                            style={{ height: `${viewerHeight}px` }}
                         >
                             <VerticalResizeHandle 
                                 onResize={handleVerticalResize} 
-                                currentHeight={viewerTopPosition}
+                                currentHeight={viewerHeight}
                                 onDragStart={() => setIsDragging(true)}
                                 onDragEnd={() => setIsDragging(false)}
                             />
 
-                            <CustomInstructionViewerComponent/>
+                            <CustomInstructionViewerComponent isDragging={isDragging} />
                         </Box>
                     </Box>
                 </Box>
-                {isDragging && (
-                    <Box 
-                        className={styles.dragOverlay}
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            zIndex: 2147483647,
-                            pointerEvents: 'auto',
-                            background: 'transparent'
-                        }}
-                        onMouseUp={() => setIsDragging(false)}
-                    />
-                )}
                 <DragLayer />
             </Box>
         );

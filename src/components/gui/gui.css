@@ -15,10 +15,9 @@
 .chunk-wrapper {
     display: flex;
     flex-direction: row;
+    min-width: 200px;
     height: 100%;
     flex: 1 1 auto;
-    min-height: 0;
-    background-color: $ui-primary;
     overflow: hidden;
 }
 
@@ -26,8 +25,6 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    min-width: 600px;
-    background-color: $ui-primary;
     overflow: hidden;
     margin: 0;
     padding: 0;
@@ -38,54 +35,38 @@
 }
 
 .editor-wrapper {
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 0;
+    flex: 1 1 0;
     position: relative;
     width: 100%;
-    max-width: 100%;
-    min-width: 600px;
-
     display: flex;
     flex-direction: column;
-
     padding: 0.5rem;
 }
 
 .target-wrapper {
     height: 8.5rem;
     width: 100%;
-    max-width: 100%;
-    min-width: 600px;
-
     padding: 0.5rem;
 }
 
 .tab-list {
     height: $stage-menu-height;
-    width: 100%; /* Match width of the toolbox */
+    width: 100%;
     display: flex;
-    align-items: flex-end;
-    flex-shrink: 0;
-
     border: none;
-    margin: 0; /* 上部のスキマを除去 */
-    padding: 0; /* 上部のスキマを除去 */
-
+    gap: 5px;
+    margin: 0;
+    padding: 0;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 500;
     font-size: 0.80rem;
 }
 
 .tab {
-    flex-grow: 1;
-    height: 100%;
-    padding: 0;
+    position: relative;
+    flex: 1;
 
     border-radius: 0;
-    border: 1px solid $ui-black-transparent;
-
-   
     font-size: 1.0rem;
 
     background-color: $ui-tertiary;
@@ -122,6 +103,7 @@
     height: 100%;
     color: $looks-secondary;
     background-color: $ui-white;
+    border: none;
     z-index: 4; /* Make sure selected is always above */
 }
 
@@ -142,7 +124,6 @@
 .tab.is-selected:focus {
     outline: none;
     box-shadow: none;
-    border-color: $ui-black-transparent;
 }
 
 .tab.is-selected:focus:after {
@@ -151,7 +132,6 @@
 
 /* Body of the tabs */
 .tabs {
-    width: 100%;
     position: relative;
     flex-grow: 1;
     display: flex;
@@ -161,23 +141,16 @@
 
 .tab-panel {
     position: relative;
-    flex-grow: 1;
-    display: none;
+    flex: 1 1 auto;         /* 残りスペースを埋める */
     width: 100%;
+    height: 0;              /* flexboxで高さを制限 */
 
-    border: 1px solid $ui-black-transparent;
-    border-bottom: none;
-    /* 完全に囲む境界線 */
-
-    /* 上端だけ角丸に */
     border-top-left-radius:  1rem;
     border-top-right-radius: 1rem;
-    /* 下端は角丸なし */
     border-bottom-left-radius:  0;
     border-bottom-right-radius: 0;
     
-    /* 子要素の背景はみ出しを防ぐ */
-    overflow: hidden;
+    overflow: auto;         /* スクロール可能にする */
 }
 
 .tab-panel.is-selected {
@@ -194,21 +167,33 @@
 }
 
 .stage-and-target-wrapper {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 1.5rem - 0.5rem); /* margin(1rem) + gap(0.5rem) */
+    gap: 0.5rem;
+
     position: relative;
-    flex: 0 1 auto;
-    min-width: 280px;
+    min-width: 100px;
     margin: 0.5rem;
-    height: calc(100vh - 1rem);
+}
+
+.stage-section {
+    flex: 1 1 auto;  /* 残りスペース全て占有 */
+    min-height: 0;   /* Flexboxのバグ対策 */
+
+    border-radius: 1rem;
+    background-color: $ui-primary;
+}
+
+.drag-overlay {
+    flex: 1 1 auto;  /* 残りスペース全て占有 */
+    min-height: 0;   /* Flexboxのバグ対策 */
 }
 
 .custom-instruction-section {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: $ui-primary;
-    display: flex;
-    flex-direction: column;
+    flex: 0 0 auto;       /* 絶対に伸び縮みさせない */
+    box-sizing: border-box;
 }
 
 .extension-button-container {
