@@ -60,6 +60,7 @@ const Selector = props => {
                                 name={item.name}
                                 number={index + 1 /* 1-indexed */}
                                 selected={index === selectedItemIndex}
+                                withDeleteConfirmation={true}
                                 onClick={onItemClick}
                                 onDeleteButtonClick={onDeleteClick}
                                 onDuplicateButtonClick={onDuplicateClick}

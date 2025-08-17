@@ -1,8 +1,8 @@
-$ui-primary: hsla(215, 50%, 95%, 1); /* #E5F0FF */
-$ui-secondary: hsla(215, 75%, 95%, 1); /* #E9F1FC */
-$ui-tertiary: hsla(215, 50%, 90%, 1); /* #D9E3F2 */
+$ui-primary: hsla(15, 65%, 95%, 1); /* #FFEEE8 */
+$ui-secondary: hsla(15, 70%, 92%, 1); /* #FFE3D6 */
+$ui-tertiary: hsla(15, 60%, 88%, 1); /* #FFD4C4 */
 
-$ui-modal-overlay: hsla(215, 100%, 65%, 0.9); /* 90% transparent version of motion-primary */
+$ui-modal-overlay: hsla(15, 85%, 65%, 0.9); /* 90% transparent version of coral-primary */
 
 $ui-white: hsla(0, 100%, 100%, 1); /* #FFFFFF */
 $ui-white-dim: hsla(0, 100%, 100%, 0.75); /* 25% transparent version of ui-white */
@@ -12,41 +12,42 @@ $ui-transparent: hsla(0, 100%, 100%, 0); /* 25% transparent version of ui-white 
 $ui-black-transparent: hsla(0, 0%, 0%, 0.3); /* 15% transparent version of black */
 $ui-black-transparent-10: hsla(0, 0%, 0%, 0.10); /* 10% transparent version of black */
 
-$ui-green: hsla(163, 85%, 35%, 1); /* #0DA57A */
-$ui-green-2: hsla(163, 85%, 40%, 1); /* #0FBD8C */
+$ui-green: hsla(140, 70%, 40%, 1); /* #33B366 */
+$ui-green-2: hsla(140, 75%, 45%, 1); /* #40C073 */
 
-$text-primary: hsla(225, 15%, 40%, 1); /* #575E75 */
-$text-primary-transparent: hsla(225, 15%, 40%, 0.75);
+$text-primary: hsla(20, 25%, 35%, 1); /* #6B4A3A */
+$text-primary-transparent: hsla(20, 25%, 35%, 0.75);
 
-$motion-primary: hsla(215, 100%, 65%, 1); /* #4C97FF */
-$motion-tertiary: hsla(215, 60%, 50%, 1); /* #3373CC */
+$motion-primary: hsla(15, 85%, 65%, 1); /* #FF8A65 */
+$motion-tertiary: hsla(15, 75%, 55%, 1); /* #E8704A */
 
-$looks-secondary: hsla(10, 70%, 50%, 1); /* #DB6B47 - 深いコーラル */
-$looks-transparent: hsla(10, 70%, 50%, 0.35); /* 35% transparent version of looks-secondary */
-$looks-light-transparent: hsla(10, 70%, 50%, 0.15); /* 15% transparent version of looks-secondary */
-$looks-secondary-dark: 	hsla(10, 60%, 42%, 1); /* #C4553A - darker version of looks-secondary */
+$looks-secondary: hsla(15, 80%, 55%, 1); /* #FF7043 - コーラル */
+$looks-transparent: hsla(15, 80%, 55%, 0.35); /* 35% transparent version of looks-secondary */
+$looks-light-transparent: hsla(15, 80%, 55%, 0.15); /* 15% transparent version of looks-secondary */
+$looks-secondary-dark: 	hsla(15, 75%, 45%, 1); /* #E85722 - darker version of looks-secondary */
 
-$red-primary: hsla(20, 100%, 55%, 1); /* #FF661A */
-$red-tertiary: hsla(20, 100%, 45%, 1); /* #E64D00 */
+$red-primary: hsla(15, 90%, 60%, 1); /* #FF7055 */
+$red-tertiary: hsla(15, 85%, 50%, 1); /* #E85D42 */
 
-$sound-primary: hsla(300, 53%, 60%, 1); /* #CF63CF */
-$sound-tertiary: hsla(300, 48%, 50%, 1); /* #BD42BD */
+$sound-primary: hsla(320, 65%, 65%, 1); /* #E08CC8 */
+$sound-tertiary: hsla(320, 60%, 55%, 1); /* #D470B8 */
 
-$control-primary: hsla(38, 100%, 55%, 1); /* #FFAB19 */
+$control-primary: hsla(30, 90%, 60%, 1); /* #FF9966 */
 
-$data-primary: hsla(30, 100%, 55%, 1); /* #FF8C1A */
+$data-primary: hsla(25, 85%, 60%, 1); /* #FF8555 */
 
-$pen-primary: hsla(163, 85%, 40%, 1); /* #0FBD8C */
-$pen-transparent: hsla(163, 85%, 40%, 0.25); /* #0FBD8C */
-$pen-tertiary: hsla(163, 86%, 30%, 1); /* #0B8E69 */
+$pen-primary: hsla(170, 70%, 50%, 1); /* #26B299 */
+$pen-transparent: hsla(170, 70%, 50%, 0.25); /* #26B299 */
+$pen-tertiary: hsla(170, 65%, 40%, 1); /* #1F9980 */
 
-$error-primary: hsla(30, 100%, 55%, 1); /* #FF8C1A */
-$error-light: hsla(30, 100%, 70%, 1); /* #FFB366 */
-$error-transparent: hsla(30, 100%, 55%, 0.25); /* #FF8C1A */
+$error-primary: hsla(8, 85%, 60%, 1); /* #F55A42 */
+$error-tertiary: hsla(8, 90%, 50%, 1); /* #E8472F */
+$error-light: hsla(8, 85%, 75%, 1); /* #FF9988 */
+$error-transparent: hsla(8, 85%, 60%, 0.25); /* #F55A42 */
 
-$extensions-primary: hsla(163, 85%, 40%, 1); /* #0FBD8C */
-$extensions-tertiary: hsla(163, 85%, 30%, 1); /* #0B8E69 */
-$extensions-transparent: hsla(163, 85%, 40%, 0.35); /* 35% transparent version of extensions-primary */
-$extensions-light: hsla(163, 57%, 85%, 1); /* opaque version of extensions-transparent, on white bg */
+$extensions-primary: hsla(170, 70%, 50%, 1); /* #26B299 */
+$extensions-tertiary: hsla(170, 65%, 40%, 1); /* #1F9980 */
+$extensions-transparent: hsla(170, 70%, 50%, 0.35); /* 35% transparent version of extensions-primary */
+$extensions-light: hsla(170, 50%, 85%, 1); /* opaque version of extensions-transparent, on white bg */
 
-$drop-highlight: hsla(215, 100%, 77%, 1); /* lighter than motion-primary */
+$drop-highlight: hsla(15, 85%, 77%, 1); /* lighter than coral motion-primary */

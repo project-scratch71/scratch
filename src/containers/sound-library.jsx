@@ -10,7 +10,7 @@ import LibraryComponent from '../components/library/library.jsx';
 import soundIcon from '../components/library-item/lib-icon--sound.svg';
 import soundIconRtl from '../components/library-item/lib-icon--sound-rtl.svg';
 
-import soundLibraryContent from '../lib/libraries/sounds.json';
+// import soundLibraryContent from '../lib/libraries/sounds.json'; // Replaced with dynamic loading
 import soundTags from '../lib/libraries/sound-tags';
 
 import {connect} from 'react-redux';
@@ -50,10 +50,40 @@ class SoundLibrary extends React.PureComponent {
          * function to call when the sound ends
          */
         this.handleStop = null;
+        
+        this.state = {
+            soundLibraryContent: [],
+            loading: true,
+            error: null
+        };
     }
-    componentDidMount () {
+    async componentDidMount () {
         this.audioEngine = new AudioEngine();
         this.playingSoundPromise = null;
+        
+        try {
+            const assetHost = process.env.ASSET_HOST || 'http://localhost:3000/api/assets';
+            const baseUrl = assetHost.replace('/api/assets', '');
+            const response = await fetch(`${baseUrl}/api/sounds/available`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch available sounds: ${response.status}`);
+            }
+            
+            const soundLibraryContent = await response.json();
+            console.log('Loaded sounds:', soundLibraryContent.length);
+            
+            this.setState({ 
+                soundLibraryContent, 
+                loading: false 
+            });
+        } catch (error) {
+            console.error('Error loading available sounds:', error);
+            this.setState({ 
+                error: error.message, 
+                loading: false 
+            });
+        }
     }
     componentWillUnmount () {
         this.stopPlayingSound();
@@ -150,8 +180,42 @@ class SoundLibrary extends React.PureComponent {
         });
     }
     render () {
+        if (this.state.loading) {
+            return (
+                <LibraryComponent
+                    showPlayButton
+                    data={[]}
+                    id="soundLibrary"
+                    setStopHandler={this.setStopHandler}
+                    tags={soundTags}
+                    title="Loading sounds..."
+                    onItemMouseEnter={this.handleItemMouseEnter}
+                    onItemMouseLeave={this.handleItemMouseLeave}
+                    onItemSelected={this.handleItemSelected}
+                    onRequestClose={this.props.onRequestClose}
+                />
+            );
+        }
+        
+        if (this.state.error) {
+            return (
+                <LibraryComponent
+                    showPlayButton
+                    data={[]}
+                    id="soundLibrary"
+                    setStopHandler={this.setStopHandler}
+                    tags={soundTags}
+                    title={`Error: ${this.state.error}`}
+                    onItemMouseEnter={this.handleItemMouseEnter}
+                    onItemMouseLeave={this.handleItemMouseLeave}
+                    onItemSelected={this.handleItemSelected}
+                    onRequestClose={this.props.onRequestClose}
+                />
+            );
+        }
+        
         // @todo need to use this hack to avoid library using md5 for image
-        const soundLibraryThumbnailData = soundLibraryContent.map(sound => {
+        const soundLibraryThumbnailData = this.state.soundLibraryContent.map(sound => {
             const {
                 md5ext,
                 ...otherData

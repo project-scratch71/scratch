@@ -154,6 +154,7 @@ class SpriteSelectorItem extends React.PureComponent {
                 onCancel={this.handleDeleteSpriteModalClose}
                 relativeElemRef={this.ref}
                 entityType={this.props.dragType}
+                entityName={this.props.name}
                 modalPosition={deleteConfirmationModalPosition}
             /> : null}
             <SpriteSelectorItemComponent

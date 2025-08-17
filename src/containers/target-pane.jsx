@@ -15,7 +15,7 @@ import {setRestore} from '../reducers/restore-deletion';
 import DragConstants from '../lib/drag-constants';
 import CustomTargetPaneComponent from '../components/custom-target-pane/custom-target-pane.jsx';
 import {BLOCKS_DEFAULT_SCALE} from '../lib/layout-constants';
-import spriteLibraryContent from '../lib/libraries/sprites.json';
+// import spriteLibraryContent from '../lib/libraries/sprites.json'; // Replaced with dynamic loading
 import {handleFileUpload, spriteUpload} from '../lib/file-uploader.js';
 import sharedMessages from '../lib/shared-messages';
 import {emptySprite} from '../lib/empty-assets';
@@ -105,14 +105,27 @@ class TargetPane extends React.Component {
             this.props.onHighlightTarget(id);
         }
     }
-    handleSurpriseSpriteClick () {
-        const surpriseSprites = spriteLibraryContent.filter(sprite =>
-            (sprite.tags.indexOf('letters') === -1) && (sprite.tags.indexOf('numbers') === -1)
-        );
-        const item = surpriseSprites[Math.floor(Math.random() * surpriseSprites.length)];
-        randomizeSpritePosition(item);
-        this.props.vm.addSprite(JSON.stringify(item))
-            .then(this.handleActivateBlocksTab);
+    async handleSurpriseSpriteClick () {
+        try {
+            const assetHost = process.env.ASSET_HOST || 'http://localhost:3000/api/assets';
+            const baseUrl = assetHost.replace('/api/assets', '');
+            const response = await fetch(`${baseUrl}/api/sprites/available`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch sprites: ${response.status}`);
+            }
+            
+            const spriteLibraryContent = await response.json();
+            const surpriseSprites = spriteLibraryContent.filter(sprite =>
+                (sprite.tags.indexOf('letters') === -1) && (sprite.tags.indexOf('numbers') === -1)
+            );
+            const item = surpriseSprites[Math.floor(Math.random() * surpriseSprites.length)];
+            randomizeSpritePosition(item);
+            this.props.vm.addSprite(JSON.stringify(item))
+                .then(this.handleActivateBlocksTab);
+        } catch (error) {
+            console.error('Error loading surprise sprite:', error);
+        }
     }
     handlePaintSpriteClick () {
         const formatMessage = this.props.intl.formatMessage;

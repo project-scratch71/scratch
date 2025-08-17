@@ -110,6 +110,9 @@ const distConfig = baseConfig.clone()
 // build the examples and debugging tools in `build/`
 const buildConfig = baseConfig.clone()
     .enableDevServer(process.env.PORT || 8601)
+    .addPlugin(new webpack.DefinePlugin({
+        'process.env.ASSET_HOST': JSON.stringify(process.env.ASSET_HOST)
+    }))
     .merge({
         entry: {
             gui: './src/playground/index.jsx',

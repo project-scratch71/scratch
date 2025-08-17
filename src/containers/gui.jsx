@@ -7,6 +7,7 @@ import VM from 'scratch-vm';
 import {injectIntl, intlShape} from 'react-intl';
 
 import ErrorBoundaryHOC from '../lib/error-boundary-hoc.jsx';
+import ProjectLoaderHOC from '../lib/project-loader-hoc.jsx';
 import {
     getIsError,
     getIsShowingProject
@@ -29,7 +30,6 @@ import {
 import FontLoaderHOC from '../lib/font-loader-hoc.jsx';
 import LocalizationHOC from '../lib/localization-hoc.jsx';
 import SBFileUploaderHOC from '../lib/sb-file-uploader-hoc.jsx';
-import ProjectFetcherHOC from '../lib/project-fetcher-hoc.jsx';
 import TitledHOC from '../lib/titled-hoc.jsx';
 import ProjectSaverHOC from '../lib/project-saver-hoc.jsx';
 import QueryParserHOC from '../lib/query-parser-hoc.jsx';
@@ -203,7 +203,7 @@ const WrappedGui = compose(
     ErrorBoundaryHOC('Top Level App'),
     FontLoaderHOC,
     QueryParserHOC,
-    ProjectFetcherHOC,
+    ProjectLoaderHOC,
     TitledHOC,
     ProjectSaverHOC,
     vmListenerHOC,

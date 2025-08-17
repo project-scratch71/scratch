@@ -2,13 +2,10 @@ import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-int
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { MdDelete, MdUndo, MdArrowLeft, MdArrowRight } from 'react-icons/md';
 
 import Box from '../box/box.jsx';
 import ReactModal from 'react-modal';
-import deleteIcon from './icon--delete.svg';
-import undoIcon from './icon--undo.svg';
-import arrowLeftIcon from './icon--arrow-left.svg';
-import arrowRightIcon from './icon--arrow-right.svg';
 
 import styles from './delete-confirmation-prompt.css';
 
@@ -46,35 +43,14 @@ const messages = defineMessages({
     }
 });
 
-const modalWidth = 300;
-const calculateModalPosition = (relativeElemRef, modalPosition) => {
-    const refPosition = relativeElemRef.getBoundingClientRect();
-
-    if (modalPosition === 'left') {
-        let left = refPosition.left - modalWidth - 25;
-        // 画面外に出る場合は右側に表示
-        if (left < 0) {
-            left = refPosition.right + 25;
-        }
-        return {
-            top: refPosition.top - refPosition.height,
-            left: left
-        };
-    }
-
-    if (modalPosition === 'right') {
-        let left = refPosition.right + 25;
-        // 画面外に出る場合は左側に表示
-        if (left + modalWidth > window.innerWidth) {
-            left = refPosition.left - modalWidth - 25;
-        }
-        return {
-            top: refPosition.top - refPosition.height,
-            left: left
-        };
-    }
-
-    return {};
+const modalWidth = 320;
+const calculateModalPosition = () => {
+    // 画面中央に表示
+    return {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)'
+    };
 };
 
 const getMessage = entityType => {
@@ -95,9 +71,10 @@ const DeleteConfirmationPrompt = ({
     onOk,
     modalPosition,
     entityType,
+    entityName,
     relativeElemRef
 }) => {
-    const modalPositionValues = calculateModalPosition(relativeElemRef, modalPosition);
+    const modalPositionValues = calculateModalPosition();
 
     return (<ReactModal
         isOpen
@@ -112,7 +89,7 @@ const DeleteConfirmationPrompt = ({
                 backgroundColor: 'transparent',
                 padding: 0,
                 margin: 0,
-                position: 'absolute',
+                position: 'fixed',
                 overflowX: 'hidden',
                 zIndex: 1000
             },
@@ -123,23 +100,21 @@ const DeleteConfirmationPrompt = ({
                 right: 0,
                 bottom: 0,
                 zIndex: 510,
-                backgroundColor: 'transparent'
+                backgroundColor: 'rgba(0, 0, 0, 0.3)'
             }
         }}
         contentLabel={intl.formatMessage(messages.confirmDeletionHeading)}
         onRequestClose={onCancel}
     >
         <Box className={styles.modalContainer}>
-            { modalPosition === 'left' ?
-                <Box className={classNames(styles.arrowContainer, styles.arrowContainerLeft)}>
-                    <img
-                        className={styles.deleteIcon}
-                        src={arrowLeftIcon}
-                    />
-                </Box> : null }
             <Box className={styles.body}>
                 <Box className={styles.label}>
                     <FormattedMessage {...getMessage(entityType)} />
+                    {entityName && (
+                        <Box className={styles.entityName}>
+                            "{entityName}"
+                        </Box>
+                    )}
                 </Box>
                 <Box className={styles.buttonRow}>
                     <button
@@ -147,10 +122,7 @@ const DeleteConfirmationPrompt = ({
                         onClick={onOk}
                         role="button"
                     >
-                        <img
-                            className={styles.deleteIcon}
-                            src={deleteIcon}
-                        />
+                        <MdDelete className={styles.deleteIcon} />
                         <div className={styles.message}>
                             <FormattedMessage {...messages.confirmOption} />
                         </div>
@@ -160,23 +132,13 @@ const DeleteConfirmationPrompt = ({
                         onClick={onCancel}
                         role="button"
                     >
-                        <img
-                            className={styles.deleteIcon}
-                            src={undoIcon}
-                        />
+                        <MdUndo className={styles.deleteIcon} />
                         <div className={styles.message}>
                             <FormattedMessage {...messages.cancelOption} />
                         </div>
                     </button>
                 </Box>
             </Box>
-            {modalPosition === 'right' ?
-                <Box className={classNames(styles.arrowContainer, styles.arrowContainerRight)}>
-                    <img
-                        className={styles.deleteIcon}
-                        src={arrowRightIcon}
-                    />
-                </Box> : null }
         </Box>
     </ReactModal>);
 };
@@ -186,6 +148,7 @@ DeleteConfirmationPrompt.propTypes = {
     onCancel: PropTypes.func.isRequired,
     relativeElemRef: PropTypes.object,
     entityType: PropTypes.string,
+    entityName: PropTypes.string,
     modalPosition: PropTypes.string,
     intl: intlShape.isRequired
 };

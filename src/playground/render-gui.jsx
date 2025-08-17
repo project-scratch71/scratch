@@ -61,6 +61,9 @@ export default appTarget => {
         window.onbeforeunload = () => true;
     }
 
+    // Configure asset host to use Next.js API
+    const assetHost = process.env.ASSET_HOST;
+
     ReactDOM.render(
         // important: this is checking whether `simulateScratchDesktop` is truthy, not just defined!
         simulateScratchDesktop ?
@@ -69,6 +72,7 @@ export default appTarget => {
                 isScratchDesktop
                 showTelemetryModal
                 canSave={false}
+                assetHost={assetHost}
                 onTelemetryModalCancel={handleTelemetryModalCancel}
                 onTelemetryModalOptIn={handleTelemetryModalOptIn}
                 onTelemetryModalOptOut={handleTelemetryModalOptOut}
@@ -79,6 +83,7 @@ export default appTarget => {
                 showComingSoon
                 backpackHost={backpackHost}
                 canSave={false}
+                assetHost={assetHost}
                 onClickLogo={onClickLogo}
             />,
         appTarget);

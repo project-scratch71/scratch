@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外部プロジェクト読み込みテスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        #scratch-iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        button {
+            margin-right: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scratch エディタ 外部プロジェクト読み込みテスト</h1>
+    
+    <div class="controls">
+        <button onclick="loadSampleProject()">サンプルプロジェクトを読み込み</button>
+        <button onclick="loadCustomProject()">カスタムプロジェクトを読み込み</button>
+        <button onclick="clearStatus()">ステータスクリア</button>
+    </div>
+
+    <details>
+        <summary>カスタムプロジェクトJSON（編集可能）</summary>
+        <textarea id="custom-project-json">
+{
+  "targets": [
+    {
+      "isStage": true,
+      "name": "Stage",
+      "variables": {},
+      "lists": {},
+      "broadcasts": {},
+      "blocks": {},
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "assetId": "cd21514d0531fdffb22204e0ec5ed84a",
+          "name": "背景1",
+          "md5ext": "cd21514d0531fdffb22204e0ec5ed84a.svg",
+          "dataFormat": "svg",
+          "rotationCenterX": 240,
+          "rotationCenterY": 180
+        }
+      ],
+      "sounds": [],
+      "volume": 100
+    },
+    {
+      "isStage": false,
+      "name": "テストスプライト",
+      "variables": {},
+      "lists": {},
+      "broadcasts": {},
+      "blocks": {},
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "assetId": "bcf454acf82e4504149f7ffe07081dbc",
+          "name": "コスチューム1",
+          "bitmapResolution": 1,
+          "md5ext": "bcf454acf82e4504149f7ffe07081dbc.svg",
+          "dataFormat": "svg",
+          "rotationCenterX": 48,
+          "rotationCenterY": 50
+        }
+      ],
+      "sounds": [],
+      "volume": 100,
+      "visible": true,
+      "x": 100,
+      "y": 50,
+      "size": 150,
+      "direction": 90,
+      "draggable": false,
+      "rotationStyle": "all around"
+    }
+  ],
+  "meta": {
+    "semver": "3.0.0",
+    "vm": "0.1.0",
+    "agent": "External Project Loader"
+  }
+}
+        </textarea>
+    </details>
+
+    <div class="status" id="status">
+        ステータス: 待機中
+    </div>
+
+    <iframe id="scratch-iframe" src="./build/index.html"></iframe>
+
+    <script>
+        const iframe = document.getElementById('scratch-iframe');
+        const statusDiv = document.getElementById('status');
+
+        // iframeからのメッセージを受信
+        window.addEventListener('message', function(event) {
+            if (event.source !== iframe.contentWindow) return;
+
+            const { data } = event;
+            console.log('iframe からのメッセージ:', data);
+
+            switch (data.type) {
+                case 'SCRATCH_EDITOR_READY':
+                    addStatus('✅ Scratchエディタ準備完了');
+                    break;
+                case 'SCRATCH_PROJECT_LOADED':
+                    addStatus('✅ プロジェクト読み込み完了');
+                    break;
+                case 'SCRATCH_PROJECT_ERROR':
+                    addStatus('❌ プロジェクト読み込みエラー: ' + data.error);
+                    break;
+            }
+        });
+
+        function addStatus(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            statusDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            statusDiv.scrollTop = statusDiv.scrollHeight;
+        }
+
+        function clearStatus() {
+            statusDiv.innerHTML = 'ステータス: クリア済み';
+        }
+
+        function loadSampleProject() {
+            const sampleProject = {
+                targets: [
+                    {
+                        isStage: true,
+                        name: "Stage",
+                        variables: {},
+                        lists: {},
+                        broadcasts: {},
+                        blocks: {},
+                        currentCostume: 0,
+                        costumes: [
+                            {
+                                assetId: "cd21514d0531fdffb22204e0ec5ed84a",
+                                name: "サンプル背景",
+                                md5ext: "cd21514d0531fdffb22204e0ec5ed84a.svg",
+                                dataFormat: "svg",
+                                rotationCenterX: 240,
+                                rotationCenterY: 180
+                            }
+                        ],
+                        sounds: [],
+                        volume: 100
+                    },
+                    {
+                        isStage: false,
+                        name: "サンプルスプライト",
+                        variables: {},
+                        lists: {},
+                        broadcasts: {},
+                        blocks: {},
+                        currentCostume: 0,
+                        costumes: [
+                            {
+                                assetId: "bcf454acf82e4504149f7ffe07081dbc",
+                                name: "サンプルコスチューム",
+                                bitmapResolution: 1,
+                                md5ext: "bcf454acf82e4504149f7ffe07081dbc.svg",
+                                dataFormat: "svg",
+                                rotationCenterX: 48,
+                                rotationCenterY: 50
+                            }
+                        ],
+                        sounds: [],
+                        volume: 100,
+                        visible: true,
+                        x: 0,
+                        y: 0,
+                        size: 100,
+                        direction: 90,
+                        draggable: false,
+                        rotationStyle: "all around"
+                    }
+                ],
+                meta: {
+                    semver: "3.0.0",
+                    vm: "0.1.0",
+                    agent: "Sample Project Loader"
+                }
+            };
+
+            sendProjectToIframe(sampleProject);
+        }
+
+        function loadCustomProject() {
+            const customJson = document.getElementById('custom-project-json').value;
+            try {
+                const projectData = JSON.parse(customJson);
+                sendProjectToIframe(projectData);
+            } catch (error) {
+                addStatus('❌ カスタムJSONの解析エラー: ' + error.message);
+            }
+        }
+
+        function sendProjectToIframe(projectData) {
+            addStatus('📤 プロジェクトデータを送信中...');
+            iframe.contentWindow.postMessage({
+                type: 'LOAD_PROJECT',
+                projectData: projectData
+            }, '*');
+        }
+    </script>
+</body>
+</html>

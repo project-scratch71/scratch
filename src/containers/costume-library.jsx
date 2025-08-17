@@ -4,7 +4,7 @@ import React from 'react';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import VM from 'scratch-vm';
 
-import costumeLibraryContent from '../lib/libraries/costumes.json';
+// import costumeLibraryContent from '../lib/libraries/costumes.json'; // Replaced with dynamic loading
 import spriteTags from '../lib/libraries/sprite-tags';
 import LibraryComponent from '../components/library/library.jsx';
 
@@ -23,6 +23,37 @@ class CostumeLibrary extends React.PureComponent {
         bindAll(this, [
             'handleItemSelected'
         ]);
+        this.state = {
+            costumeLibraryContent: [],
+            loading: true,
+            error: null
+        };
+    }
+    
+    async componentDidMount() {
+        try {
+            const assetHost = process.env.ASSET_HOST || 'http://localhost:3000/api/assets';
+            const baseUrl = assetHost.replace('/api/assets', '');
+            const response = await fetch(`${baseUrl}/api/costumes/available`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch available costumes: ${response.status}`);
+            }
+            
+            const costumeLibraryContent = await response.json();
+            console.log('Loaded costumes:', costumeLibraryContent.length);
+            
+            this.setState({ 
+                costumeLibraryContent, 
+                loading: false 
+            });
+        } catch (error) {
+            console.error('Error loading available costumes:', error);
+            this.setState({ 
+                error: error.message, 
+                loading: false 
+            });
+        }
     }
     handleItemSelected (item) {
         const vmCostume = {
@@ -35,9 +66,35 @@ class CostumeLibrary extends React.PureComponent {
         this.props.vm.addCostumeFromLibrary(item.md5ext, vmCostume);
     }
     render () {
+        if (this.state.loading) {
+            return (
+                <LibraryComponent
+                    data={[]}
+                    id="costumeLibrary"
+                    tags={spriteTags}
+                    title="Loading costumes..."
+                    onItemSelected={this.handleItemSelected}
+                    onRequestClose={this.props.onRequestClose}
+                />
+            );
+        }
+        
+        if (this.state.error) {
+            return (
+                <LibraryComponent
+                    data={[]}
+                    id="costumeLibrary"
+                    tags={spriteTags}
+                    title={`Error: ${this.state.error}`}
+                    onItemSelected={this.handleItemSelected}
+                    onRequestClose={this.props.onRequestClose}
+                />
+            );
+        }
+        
         return (
             <LibraryComponent
-                data={costumeLibraryContent}
+                data={this.state.costumeLibraryContent}
                 id="costumeLibrary"
                 tags={spriteTags}
                 title={this.props.intl.formatMessage(messages.libraryTitle)}
