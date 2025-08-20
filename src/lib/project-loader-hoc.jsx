@@ -35,12 +35,8 @@ const ProjectLoaderHOC = function (WrappedComponent) {
         componentDidMount () {
             window.addEventListener('message', this.handleMessage);
             
-            // 親ページに準備完了を通知
-            if (window.parent !== window) {
-                window.parent.postMessage({
-                    type: 'SCRATCH_EDITOR_READY'
-                }, '*');
-            }
+            // Register this component instance globally for cross-component communication
+            window.projectLoaderComponent = this;
         }
 
         componentDidUpdate (prevProps) {
@@ -58,6 +54,11 @@ const ProjectLoaderHOC = function (WrappedComponent) {
 
         componentWillUnmount () {
             window.removeEventListener('message', this.handleMessage);
+            
+            // Clean up global reference
+            if (window.projectLoaderComponent === this) {
+                window.projectLoaderComponent = null;
+            }
         }
 
         handleMessage (event) {
@@ -77,6 +78,11 @@ const ProjectLoaderHOC = function (WrappedComponent) {
                 return;
             }
             
+            console.log('🔄 Clearing VM state before loading external project...');
+            // Clear the VM state first to prevent data accumulation
+            this.props.vm.clear();
+            
+            console.log('📦 Loading external project data into VM...');
             this.props.vm.loadProject(projectData)
                 .then(() => {
                     this.setState({ waitingForExternalProject: false });

@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 
 import VM from 'scratch-vm';
 import AudioEngine from 'scratch-audio';
+import iframeCommunication from './iframe-communication';
 
 import {setProjectUnchanged} from '../reducers/project-changed';
 import {
@@ -44,6 +45,9 @@ const vmManagerHOC = function (WrappedComponent) {
             if (!this.props.isPlayerOnly && !this.props.isStarted) {
                 this.props.vm.start();
             }
+            
+            // Set VM reference for iframe communication
+            iframeCommunication.setVM(this.props.vm);
         }
         componentDidUpdate (prevProps) {
             // if project is in loading state, AND fonts are loaded,
