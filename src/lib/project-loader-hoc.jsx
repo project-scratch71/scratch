@@ -79,18 +79,40 @@ const ProjectLoaderHOC = function (WrappedComponent) {
             }
             
             console.log('🔄 Clearing VM state before loading external project...');
+            
+            // Clear paint editor state if in costume tab to prevent bounds errors
+            const currentTabIndex = window.__store ? 
+                window.__store.getState().scratchGui.editorTab.activeTabIndex : 0;
+            
+            if (currentTabIndex === 1) { // COSTUMES_TAB_INDEX
+                console.log('🎨 Clearing paint editor state for safe project switch...');
+                // Clear paper.js state to prevent bounds errors
+                try {
+                    if (typeof paper !== 'undefined' && paper.project) {
+                        paper.project.clear();
+                    }
+                    // Alternative: Force paint editor to reset via Redux
+                    if (window.__store) {
+                        // Dispatch a custom action to reset paint editor state
+                        window.__store.dispatch({ type: 'scratch-paint/CLEAR_STATE' });
+                    }
+                } catch (error) {
+                    console.log('Could not clear paper.js state:', error.message);
+                }
+            }
+            
             // Clear the VM state first to prevent data accumulation
             this.props.vm.clear();
             
             console.log('📦 Loading external project data into VM...');
             this.props.vm.loadProject(projectData)
                 .then(() => {
-                    this.setState({ waitingForExternalProject: false });
-                    
                     // プロジェクト状態をリセット
                     if (this.props.setProjectId) {
                         this.props.setProjectId('external');
                     }
+                    
+                    console.log('🎉 Project loaded successfully, no tab switching needed');
                     
                     // 親ページに読み込み完了を通知
                     if (window.parent !== window) {
@@ -118,21 +140,6 @@ const ProjectLoaderHOC = function (WrappedComponent) {
                 vm,
                 ...props
             } = this.props;
-
-            if (this.state.waitingForExternalProject) {
-                return (
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '100vh',
-                        fontSize: '18px',
-                        color: '#666'
-                    }}>
-                        プロジェクトデータを待機中...
-                    </div>
-                );
-            }
 
             return (
                 <WrappedComponent

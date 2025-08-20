@@ -220,7 +220,7 @@ class PaintEditorContainer extends React.Component {
     }
     
     updateViewBounds () {
-        if (this.state.canvas) {
+        if (this.state.canvas && paper.view && paper.view.bounds) {
             this.props.updateViewBounds(paper.view.bounds);
         }
     }

@@ -83,6 +83,9 @@ const AppStateHOC = function (WrappedComponent, localesOnly) {
                 initialState,
                 enhancer
             );
+            
+            // Expose store globally for project loading
+            window.__store = this.store;
         }
         componentDidUpdate (prevProps) {
             if (localesOnly) return;

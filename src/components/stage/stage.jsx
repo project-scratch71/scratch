@@ -94,6 +94,7 @@ const StageComponent = props => {
                         width: `${stageDimensions.width}px !important`,
                         height: `${stageDimensions.height}px !important`,
                         borderRadius: "0.5rem",
+                        border: "1px solid rgba(128, 128, 128, 0.3)",
                     }}
                     {...boxProps}
                 />

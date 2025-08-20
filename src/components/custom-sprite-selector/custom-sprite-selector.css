@@ -11,7 +11,7 @@ $header-height: calc($stage-menu-height - 0.5rem);
     gap: 1rem;
     padding-right: 1rem;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: $ui-primary;
+    /* background-color: $ui-primary; */
     border-radius: 1rem;
     height: 100%;
     width: 100%;
@@ -42,11 +42,12 @@ $header-height: calc($stage-menu-height - 0.5rem);
   height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.7rem;
+  padding: 0.9rem;
  
-  border-right: 5px solid white;
+  border-right: 2px solid rgb(225, 225, 225);
   -webkit-overflow-scrolling: touch;
 }
+
 
 .scroll-wrapper-dragging {
     background-color: $drop-highlight;
