@@ -40,6 +40,14 @@ const SpriteSelectorItem = props => (
                     />
                 </div>
             </div>
+        ) : props.icon ? (
+            <div className={styles.spriteImageOuter}>
+                <div className={styles.spriteImageInner}>
+                    <div className={styles.spriteIcon}>
+                        {props.icon}
+                    </div>
+                </div>
+            </div>
         ) : null}
         <div className={styles.spriteInfo}>
             <div className={styles.spriteName}>{props.name}</div>
@@ -93,6 +101,7 @@ SpriteSelectorItem.propTypes = {
     componentRef: PropTypes.func,
     costumeURL: PropTypes.string,
     details: PropTypes.string,
+    icon: PropTypes.node,
     name: PropTypes.string.isRequired,
     number: PropTypes.number,
     onClick: PropTypes.func,

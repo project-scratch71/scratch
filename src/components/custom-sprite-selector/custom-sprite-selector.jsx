@@ -1,44 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {defineMessages, injectIntl, intlShape, FormattedMessage} from 'react-intl';
+import {injectIntl, intlShape} from 'react-intl';
 
 import Box from '../box/box.jsx';
 import SpriteInfo from '../../containers/sprite-info.jsx';
 import SpriteList from './sprite-list.jsx';
-import ActionMenu from '../action-menu/action-menu.jsx';
 import {STAGE_DISPLAY_SIZES} from '../../lib/layout-constants.js';
-import {isRtl} from 'scratch-l10n';
 
 import styles from './custom-sprite-selector.css';
 
-import fileUploadIcon from '../action-menu/icon--file-upload.svg';
-import paintIcon from '../action-menu/icon--paint.svg';
-import surpriseIcon from '../action-menu/icon--surprise.svg';
-import searchIcon from '../action-menu/icon--search.svg';
-import { FaPlus } from 'react-icons/fa';
-
-const messages = defineMessages({
-    addSpriteFromLibrary: {
-        id: 'gui.spriteSelector.addSpriteFromLibrary',
-        description: 'Button to add a sprite in the target pane from library',
-        defaultMessage: 'Choose a Sprite'
-    },
-    addSpriteFromPaint: {
-        id: 'gui.spriteSelector.addSpriteFromPaint',
-        description: 'Button to add a sprite in the target pane from paint',
-        defaultMessage: 'Paint'
-    },
-    addSpriteFromSurprise: {
-        id: 'gui.spriteSelector.addSpriteFromSurprise',
-        description: 'Button to add a random sprite in the target pane',
-        defaultMessage: 'Surprise'
-    },
-    addSpriteFromFile: {
-        id: 'gui.spriteSelector.addSpriteFromFile',
-        description: 'Button to add a sprite in the target pane from file',
-        defaultMessage: 'Upload Sprite'
-    }
-});
 
 const CustomSpriteSelectorComponent = function (props) {
     const {
@@ -69,12 +39,6 @@ const CustomSpriteSelectorComponent = function (props) {
         stageSize,
         ...componentProps
     } = props;
-    let selectedSprite = sprites[selectedId];
-    let spriteInfoDisabled = false;
-    if (typeof selectedSprite === 'undefined') {
-        selectedSprite = {};
-        spriteInfoDisabled = true;
-    }
     return (
         <Box
             className={styles.spriteSelector}
@@ -88,17 +52,12 @@ const CustomSpriteSelectorComponent = function (props) {
                 items={Object.keys(sprites).map(id => sprites[id])}
                 raised={raised}
                 selectedId={selectedId}
+                onAddSprite={onNewSpriteClick}
                 onDeleteSprite={onDeleteSprite}
                 onDrop={onDrop}
                 onDuplicateSprite={onDuplicateSprite}
                 onExportSprite={onExportSprite}
                 onSelectSprite={onSelectSprite}
-            />
-
-
-            <ActionMenu
-                img={<FaPlus color={"white"} size={20} />}
-                onClick={onNewSpriteClick}
             />
         </Box>
     );

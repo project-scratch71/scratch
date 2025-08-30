@@ -40,7 +40,7 @@
     -webkit-overflow-scrolling: 'touch';
     user-select: none;
 
-    background-color: $ui-secondary;
+    background-color: #fafafa;
 
     /* Default modal resets */
     margin: 0;
@@ -67,7 +67,9 @@ $sides: 20rem;
 
     box-sizing: border-box;
     width: 100%;
-    background-color: $looks-secondary;
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 1rem;
@@ -79,7 +81,7 @@ $sides: 20rem;
     align-items: center;
     padding: 1rem;
     text-decoration: none;
-    color: $ui-white;
+    color: #333;
     user-select: none;
 }
 

@@ -7,8 +7,7 @@ import AudioEngine from 'scratch-audio';
 
 import LibraryComponent from '../components/library/library.jsx';
 
-import soundIcon from '../components/library-item/lib-icon--sound.svg';
-import soundIconRtl from '../components/library-item/lib-icon--sound-rtl.svg';
+import { FaVolumeUp } from 'react-icons/fa';
 
 // import soundLibraryContent from '../lib/libraries/sounds.json'; // Replaced with dynamic loading
 import soundTags from '../lib/libraries/sound-tags';
@@ -222,7 +221,7 @@ class SoundLibrary extends React.PureComponent {
             } = sound;
             return {
                 _md5: md5ext,
-                rawURL: this.props.isRtl ? soundIconRtl : soundIcon,
+                icon: <FaVolumeUp size={20} />,
                 ...otherData
             };
         });

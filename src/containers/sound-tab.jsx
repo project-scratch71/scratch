@@ -5,13 +5,7 @@ import {defineMessages, intlShape, injectIntl} from 'react-intl';
 import VM from 'scratch-vm';
 
 import AssetPanel from '../components/custom-asset-panel/custom-asset-panel.jsx';
-import soundIcon from '../components/asset-panel/icon--sound.svg';
-import soundIconRtl from '../components/asset-panel/icon--sound-rtl.svg';
-import addSoundFromLibraryIcon from '../components/asset-panel/icon--add-sound-lib.svg';
-import addSoundFromRecordingIcon from '../components/asset-panel/icon--add-sound-record.svg';
-import fileUploadIcon from '../components/action-menu/icon--file-upload.svg';
-import surpriseIcon from '../components/action-menu/icon--surprise.svg';
-import searchIcon from '../components/action-menu/icon--search.svg';
+import { FaVolumeUp } from 'react-icons/fa';
 
 import RecordModal from './record-modal.jsx';
 import SoundEditor from './sound-editor.jsx';
@@ -191,7 +185,8 @@ class SoundTab extends React.Component {
 
         const sounds = sprite.sounds ? sprite.sounds.map(sound => (
             {
-                url: isRtl ? soundIconRtl : soundIcon,
+                url: null,
+                icon: <FaVolumeUp size={16} />,
                 name: sound.name,
                 details: (sound.sampleCount / sound.rate).toFixed(2),
                 dragPayload: sound
@@ -226,7 +221,7 @@ class SoundTab extends React.Component {
                 buttons={[                    
                     {
                         title: intl.formatMessage(messages.addSound),
-                        img: <FaPlus color="white" size={20} />,
+                        img: <FaPlus size={16} />,
                         onClick: onNewSoundFromLibraryClick
                                     
                     },

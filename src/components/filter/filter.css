@@ -7,20 +7,25 @@
     align-items: center;
     flex-grow: 1;
 
-    background: $ui-white;
-    border-radius: 10rem;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
     user-select: none;
     height: $library-filter-bar-height;
+    transition: all 0.2s ease;
 
     position: relative;
+}
+
+.filter:focus-within {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .filter-icon {
     position: absolute;
     top: 0;
-
-    height: 1rem;
-    width: 1rem;
+    color: #666;
 }
 
 [dir="ltr"] .filter-icon {
@@ -92,6 +97,7 @@
     user-select: none;
     transform: translateX(0.5rem);
     transition: transform 0.085s cubic-bezier(0.78, 1, 1, 1);
+    color: #999;
 }
 
 /*
@@ -108,8 +114,8 @@
     -webkit-appearance: none;
     outline: none;
     border: 0;
-    color: $text-primary;
-    font-size: 0.75rem;
+    color: #333;
+    font-size: 0.875rem;
     letter-spacing: 0.15px;
     cursor: text;
 }
@@ -123,8 +129,7 @@
 }
 
 .filter-input::placeholder {
-    opacity: .5;
-    color: $text-primary;
+    color: #999;
     font-size: 0.875rem;
     letter-spacing: 0.15px;
 }

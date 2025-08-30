@@ -6,13 +6,13 @@ import styles from './custom-asset-panel.css';
 
 const AssetPanel = props => (
     <Box className={styles.wrapper} style={props.style}>
-        <Box className={styles.detailArea}>
-            {props.children}
-        </Box>
         <Selector
             className={styles.selector}
             {...props}
         />
+        <Box className={styles.detailArea}>
+            {props.children}
+        </Box>
     </Box>
 );
 

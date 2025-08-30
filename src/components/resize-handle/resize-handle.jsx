@@ -9,26 +9,34 @@ const ResizeHandle = ({ onResize, currentWidth, onDragStart, onDragEnd }) => {
 
     onResizeRef.current = onResize;
 
-    const handleMouseDown = useCallback((e) => {
+    const getClientX = (e) => {
+        return e.touches ? e.touches[0].clientX : e.clientX;
+    };
+
+    const handleStart = useCallback((e) => {
         e.preventDefault();
+        const clientX = getClientX(e);
         dragDataRef.current = {
-            startX: e.clientX,
+            startX: clientX,
             initialWidth: currentWidth
         };
         setIsDragging(true);
         onDragStart?.();
     }, [currentWidth, onDragStart]);
 
-    const handleMouseMove = useCallback((e) => {
+    const handleMove = useCallback((e) => {
+        if (!isDragging) return;
+        e.preventDefault();
         const { startX, initialWidth } = dragDataRef.current;
-        const deltaX = e.clientX - startX;
-        const minWidth = 600;
-        const maxWidth = window.innerWidth - 300;
+        const clientX = getClientX(e);
+        const deltaX = clientX - startX;
+        const minWidth = 100;
+        const maxWidth = window.innerWidth - 100;
         const newWidth = Math.max(minWidth, Math.min(maxWidth, initialWidth + deltaX));
         onResizeRef.current(newWidth);
-    }, []);
+    }, [isDragging]);
 
-    const handleMouseUp = useCallback(() => {
+    const handleEnd = useCallback(() => {
         setIsDragging(false);
         onDragEnd?.();
     }, [onDragEnd]);
@@ -36,20 +44,27 @@ const ResizeHandle = ({ onResize, currentWidth, onDragStart, onDragEnd }) => {
     useEffect(() => {
         if (!isDragging) return;
         
-        document.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('touchmove', handleMove, { passive: false });
+        window.addEventListener('mouseup', handleEnd);
+        window.addEventListener('touchend', handleEnd);
         
         return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('touchmove', handleMove);
+            window.removeEventListener('mouseup', handleEnd);
+            window.removeEventListener('touchend', handleEnd);
         };
-    }, [isDragging, handleMouseMove, handleMouseUp]);
+    }, [isDragging, handleMove, handleEnd]);
 
     return (
         <div 
             className={styles.resizeHandle}
-            onMouseDown={handleMouseDown}
-        />
+            onMouseDown={handleStart}
+            onTouchStart={handleStart}
+        >
+            <div className={styles.lowerLine} />
+        </div>
     );
 };
 

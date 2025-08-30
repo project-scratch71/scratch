@@ -1,4 +1,5 @@
 @import "../../css/units.css";
+@import "../../css/colors.css";
 
 .target-pane {
     /* Makes columns for the sprite library selector + and the stage selector */
@@ -15,8 +16,10 @@
 
 [dir="ltr"] .stage-selector-wrapper {
     margin-left: calc($space / 2);
+    border-left: 1px solid $ui-black-transparent;
 }
 
 [dir="rtl"] .stage-selector-wrapper {
     margin-right: calc($space / 2);
+    border-right: 1px solid $ui-black-transparent;
 }

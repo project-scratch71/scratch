@@ -7,6 +7,7 @@ import VM from 'scratch-vm';
 // import costumeLibraryContent from '../lib/libraries/costumes.json'; // Replaced with dynamic loading
 import spriteTags from '../lib/libraries/sprite-tags';
 import LibraryComponent from '../components/library/library.jsx';
+import { FaTshirt } from 'react-icons/fa';
 
 const messages = defineMessages({
     libraryTitle: {
@@ -92,9 +93,14 @@ class CostumeLibrary extends React.PureComponent {
             );
         }
         
+        const costumeDataWithIcons = this.state.costumeLibraryContent.map(costume => ({
+            ...costume,
+            icon: <FaTshirt size={48} />
+        }));
+        
         return (
             <LibraryComponent
-                data={this.state.costumeLibraryContent}
+                data={costumeDataWithIcons}
                 id="costumeLibrary"
                 tags={spriteTags}
                 title={this.props.intl.formatMessage(messages.libraryTitle)}

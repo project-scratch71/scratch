@@ -100,6 +100,16 @@ const SpriteList = function (props) {
                         </SortableAsset>
                     );
                 })}
+                <Box className={classNames(styles.spriteWrapper, styles.addButtonWrapper)}>
+                    <button 
+                        className={styles.addButton}
+                        onClick={props.onAddSprite}
+                        title="Add Sprite"
+                        type="button"
+                    >
+                        +
+                    </button>
+                </Box>
             </Box>
         </Box>
     );
@@ -127,6 +137,7 @@ SpriteList.propTypes = {
         order: PropTypes.number.isRequired
     })),
     onAddSortable: PropTypes.func,
+    onAddSprite: PropTypes.func,
     onDeleteSprite: PropTypes.func,
     onDuplicateSprite: PropTypes.func,
     onExportSprite: PropTypes.func,

@@ -61,6 +61,15 @@
     max-height: 32px;
 }
 
+.sprite-icon {
+    user-select: none;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $text-primary;
+}
+
 .sprite-info {
     padding: 0.25rem;
     border-bottom-left-radius: 0.25rem;

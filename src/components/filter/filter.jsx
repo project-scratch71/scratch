@@ -2,8 +2,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import filterIcon from './icon--filter.svg';
-import xIcon from './icon--x.svg';
+import { FaSearch, FaTimes } from 'react-icons/fa';
 import styles from './filter.css';
 
 const FilterComponent = props => {
@@ -21,9 +20,9 @@ const FilterComponent = props => {
                 [styles.isActive]: filterQuery.length > 0
             })}
         >
-            <img
+            <FaSearch
                 className={styles.filterIcon}
-                src={filterIcon}
+                size={16}
             />
             <input
                 className={classNames(styles.filterInput, inputClassName)}
@@ -36,9 +35,9 @@ const FilterComponent = props => {
                 className={styles.xIconWrapper}
                 onClick={onClear}
             >
-                <img
+                <FaTimes
                     className={styles.xIcon}
-                    src={xIcon}
+                    size={14}
                 />
             </div>
         </div>

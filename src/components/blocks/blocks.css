@@ -5,6 +5,7 @@
 .blocks {
     height: 100%;
     width: 100%;
+    touch-action: none;
 }
 
 .drag-over:after {
@@ -83,6 +84,18 @@
     */
     pointer-events: none;
     z-index: $z-index-drag-layer; /* make blocks match gui drag layer */
+}
+
+/* Enable touch events for block workspace */
+.blocks :global(.blocklyWorkspace),
+.blocks :global(.blocklyFlyout),
+.blocks :global(.blocklyToolboxDiv) {
+    touch-action: none;
+}
+
+/* Ensure blocks themselves can receive touch events */
+.blocks :global(.blocklyDraggable) {
+    touch-action: none;
 }
 
 /*

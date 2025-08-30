@@ -6,12 +6,13 @@
     justify-content: flex-start;
     align-content: flex-start;
     align-items: flex-start;
-    background: $ui-secondary;
+    background: #fafafa;
     flex-grow: 1;
     flex-wrap: wrap;
     overflow-y: auto;
     height: auto;
-    padding: 0.5rem;
+    padding: 1.5rem;
+    gap: 1rem;
     height: calc(100% - $library-header-height);
 }
 
@@ -43,9 +44,11 @@
     justify-content: flex-start;
     align-items: center;
     height: calc($library-filter-bar-height + 2rem); /* padding */
-    background-color: $looks-transparent;
-    padding: 0 1rem;
+    background-color: white;
+    padding: 1rem 1.5rem;
     font-size: .875rem;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .filter-bar-item {

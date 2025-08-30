@@ -7,8 +7,7 @@ import PlayButton from '../../containers/play-button.jsx';
 import styles from './library-item.css';
 import classNames from 'classnames';
 
-import bluetoothIconURL from './bluetooth.svg';
-import internetConnectionIconURL from './internet-connection.svg';
+import { FaBluetooth, FaWifi } from 'react-icons/fa';
 
 /* eslint-disable react/prefer-stateless-function */
 class LibraryItemComponent extends React.PureComponent {
@@ -74,10 +73,10 @@ class LibraryItemComponent extends React.PureComponent {
                                         className={styles.featuredExtensionMetadataDetail}
                                     >
                                         {this.props.bluetoothRequired ? (
-                                            <img src={bluetoothIconURL} />
+                                            <FaBluetooth size={16} />
                                         ) : null}
                                         {this.props.internetConnectionRequired ? (
-                                            <img src={internetConnectionIconURL} />
+                                            <FaWifi size={16} />
                                         ) : null}
                                     </div>
                                 </div>
@@ -127,10 +126,16 @@ class LibraryItemComponent extends React.PureComponent {
                         onMouseEnter={this.props.showPlayButton ? this.props.onMouseEnter : null}
                         onMouseLeave={this.props.showPlayButton ? this.props.onMouseLeave : null}
                     >
-                        <img
-                            className={styles.libraryItemImage}
-                            src={this.props.iconURL}
-                        />
+                        {this.props.icon ? (
+                            <div className={styles.libraryItemIcon}>
+                                {this.props.icon}
+                            </div>
+                        ) : (
+                            <img
+                                className={styles.libraryItemImage}
+                                src={this.props.iconURL}
+                            />
+                        )}
                     </Box>
                 </Box>
                 <span className={styles.libraryItemName}>{this.props.name}</span>
@@ -159,6 +164,7 @@ LibraryItemComponent.propTypes = {
     extensionId: PropTypes.string,
     featured: PropTypes.bool,
     hidden: PropTypes.bool,
+    icon: PropTypes.node,
     iconURL: PropTypes.string,
     insetIconURL: PropTypes.string,
     internetConnectionRequired: PropTypes.bool,

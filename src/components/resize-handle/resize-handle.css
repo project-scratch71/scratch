@@ -1,49 +1,73 @@
 @import "../../css/colors.css";
 
 .resize-handle {
+    position: relative;
     width: 8px;
     height: 100%;
-    min-height: 100vh;
-    background-color: transparent;
     cursor: col-resize;
-    position: relative;
-    z-index: 10;
-    transition: all 0.2s ease;
     user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    touch-action: none;
 }
 
-.resize-handle:hover {
-    background-color: $control-primary;
+@media (pointer: coarse) {
+    .resize-handle {
+        width: 20px;
+        padding: 0 6px;
+    }
 }
 
-.resize-handle:active {
-    background-color: $error-primary;
+/* Upper line */
+.resize-handle::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+    bottom: calc(50% + 23px);
+    width: 1px;
+    background-color: $ui-black-transparent;
+    transition: background-color 0.2s ease;
 }
 
+/* Lower line */
+.lower-line {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: calc(50% + 23px);
+    bottom: 0;
+    width: 1px;
+    background-color: $ui-black-transparent;
+    transition: background-color 0.2s ease;
+}
+
+/* Capsule handle */
 .resize-handle::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 4px;
-    height: 60px;
-    background-color: $ui-black-transparent;
-    border-radius: 2px;
-    transition: all 0.2s ease;
+    width: 6px;
+    height: 40px;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 20px;
+    background-color: transparent;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.resize-handle:hover::after {
-    background-color: $ui-white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    height: 80px;
+.resize-handle:hover::before,
+.resize-handle:active::before {
+    background-color: $control-primary;
 }
 
+.resize-handle:hover .lower-line,
+.resize-handle:active .lower-line {
+    background-color: $control-primary;
+}
+
+.resize-handle:hover::after,
 .resize-handle:active::after {
-    background-color: $ui-white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    height: 100px;
+    border-color: $control-primary;
+    background-color: rgba(64, 191, 255, 0.1);
 }

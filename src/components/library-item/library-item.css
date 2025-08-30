@@ -10,17 +10,16 @@
     position: relative;
     height: 160px;
     max-width: 160px;
-    margin: $space;
+    margin: 0;
     padding: 1rem 1rem 0 1rem;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: $text-primary;
-    background: white;
-    border-width: 2px;
-    border-style: solid;
-    border-color: $ui-black-transparent;
-    border-radius: $space;
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     text-align: center;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .library-item-extension {
@@ -28,8 +27,10 @@
 }
 
 .library-item:hover {
-    border-width: 2px;
-    border-color: $looks-secondary;
+    background: #f0f0f0;
+    border-color: #d0d0d0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .hidden {
@@ -42,7 +43,10 @@
 }
 
 .disabled:hover {
-    border-color: $ui-black-transparent;
+    background: #fafafa;
+    border-color: #e0e0e0;
+    transform: none;
+    box-shadow: none;
 }
 
 .library-item-image-container-wrapper {
@@ -82,6 +86,16 @@
 .library-item-image {
     max-width: 100%;
     max-height: 100%;
+}
+
+.library-item-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    color: #666;
+    opacity: 0.8;
 }
 
 .library-item-inset-image {

@@ -3,11 +3,8 @@ import React from 'react';
 import classNames from 'classnames';
 
 import styles from './close-button.css';
-import closeIcon from './icon--close.svg';
-import closeIconOrange from './icon--close-orange.svg';
-import backIcon from '../../lib/assets/icon--back.svg';
+import { FaTimes, FaArrowLeft } from 'react-icons/fa';
 
-let closeIcons = {};
 
 const CloseButton = props => (
     <div
@@ -25,24 +22,22 @@ const CloseButton = props => (
         tabIndex="0"
         onClick={props.onClick}
     >
-        {props.buttonType === 'back' ?
-            <img
+        {props.buttonType === 'back' ? (
+            <FaArrowLeft
                 className={styles.backIcon}
-                src={backIcon}
-            /> :
-            <img
+                size={16}
+            />
+        ) : (
+            <FaTimes
                 className={classNames(
                     styles.closeIcon,
                     {
                         [styles[props.color]]: (props.color !== CloseButton.COLOR_NEUTRAL)
                     }
                 )}
-                src={(props.color && closeIcons[props.color]) ?
-                    closeIcons[props.color] :
-                    closeIcon
-                }
+                size={16}
             />
-        }
+        )}
     </div>
 );
 
@@ -52,11 +47,6 @@ CloseButton.SIZE_LARGE = 'large';
 CloseButton.COLOR_NEUTRAL = 'neutral';
 CloseButton.COLOR_GREEN = 'green';
 CloseButton.COLOR_ORANGE = 'orange';
-closeIcons = {
-    [CloseButton.COLOR_NEUTRAL]: closeIcon,
-    [CloseButton.COLOR_GREEN]: closeIcon, // TODO: temporary, need green icon
-    [CloseButton.COLOR_ORANGE]: closeIconOrange
-};
 
 
 CloseButton.propTypes = {

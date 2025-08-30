@@ -47,13 +47,11 @@
     position: relative;
     margin: 0.25rem;
     user-select: none;
-    transform-origin: 50%;
-    transform: rotate(45deg);
+    color: white;
 }
 
 .close-icon.orange {
-    transform: rotate(45deg);
-    transform: scale(1.4);
+    color: #ff6b00;
 }
 
 .small .close-icon {
@@ -69,6 +67,7 @@
   position: relative;
   margin: 0.25rem;
   user-select: none;
+  color: white;
 }
 
 .small .back-icon {

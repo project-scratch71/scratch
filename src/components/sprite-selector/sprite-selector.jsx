@@ -11,11 +11,7 @@ import {isRtl} from 'scratch-l10n';
 
 import styles from './sprite-selector.css';
 
-import fileUploadIcon from '../action-menu/icon--file-upload.svg';
-import paintIcon from '../action-menu/icon--paint.svg';
-import spriteIcon from '../action-menu/icon--sprite.svg';
-import surpriseIcon from '../action-menu/icon--surprise.svg';
-import searchIcon from '../action-menu/icon--search.svg';
+import { FaUpload, FaPaintBrush, FaUser, FaRandom, FaSearch } from 'react-icons/fa';
 
 const messages = defineMessages({
     addSpriteFromLibrary: {

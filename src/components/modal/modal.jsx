@@ -8,8 +8,7 @@ import Box from '../box/box.jsx';
 import Button from '../button/button.jsx';
 import CloseButton from '../close-button/close-button.jsx';
 
-import backIcon from '../../lib/assets/icon--back.svg';
-import helpIcon from '../../lib/assets/icon--help.svg';
+import { FaArrowLeft, FaQuestionCircle } from 'react-icons/fa';
 
 import styles from './modal.css';
 
@@ -38,9 +37,9 @@ const ModalComponent = props => (
                     >
                         <Button
                             className={styles.helpButton}
-                            iconSrc={helpIcon}
                             onClick={props.onHelp}
                         >
+                            <FaQuestionCircle size={16} />
                             <FormattedMessage
                                 defaultMessage="Help"
                                 description="Help button in modal"
@@ -72,9 +71,9 @@ const ModalComponent = props => (
                     {props.fullScreen ? (
                         <Button
                             className={styles.backButton}
-                            iconSrc={backIcon}
                             onClick={props.onRequestClose}
                         >
+                            <FaArrowLeft size={16} />
                             <FormattedMessage
                                 defaultMessage="Back"
                                 description="Back button in modal"

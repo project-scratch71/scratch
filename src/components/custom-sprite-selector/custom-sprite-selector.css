@@ -2,77 +2,66 @@
 @import "../../css/units.css";
 @import "../../css/z-index.css";
 
-$header-height: calc($stage-menu-height - 0.5rem);
-
 .sprite-selector {
-    display: flex;              /* Flexbox を有効化 */
-    flex-direction: row;        /* 子要素を横一列に並べる */
-    align-items: center;    /* 高さ揃え（お好みで center などに） */
-    gap: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: calc($space);
     padding-right: 1rem;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    /* background-color: $ui-primary; */
     border-radius: 1rem;
     height: 100%;
     width: 100%;
 }
 
-/* 子要素 */
 .sprite-wrapper {
-   flex: 0 0 auto; 
-   width: 6.5rem;            /* 好きなカード幅 */
-   height: 5rem;
+    flex: 0 0 auto;
+    width: 6.5rem;
+    height: 5rem;
 }
 
 .scrollX {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: calc($space);
-  height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    height: 100%;
 }
 
 .sprite {
     height: 100%;
 }
 
-
 .scroll-wrapper {
-  height: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0.9rem;
- 
-  border-right: 2px solid rgb(225, 225, 225);
-  -webkit-overflow-scrolling: touch;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0.9rem;
+    -webkit-overflow-scrolling: touch;
 }
-
 
 .scroll-wrapper-dragging {
     background-color: $drop-highlight;
 }
 
-/* 親コンテナ */
 .items-wrapper {
-  flex-direction: row;
-  flex-wrap: nowrap;
-  overflow-x: hidden;   /* 横スクロールは OK */
-  overflow-y: auto; /* 縦スクロールを完全に切る */
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
-
-
 
 .header {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: $header-height;
+    height: 2.5rem;
     background-color: white;
     color: $text-primary;
-    border-top-left-radius: $space;
-    border-top-right-radius: $space;
+    border-top-left-radius: calc($space);
+    border-top-right-radius: calc($space);
     border-bottom: 1px solid $ui-black-transparent;
     width: 100%;
     transition: background-color 0.25s ease;
@@ -82,13 +71,9 @@ $header-height: calc($stage-menu-height - 0.5rem);
     font-size: 0.625rem;
     font-weight: bold;
     color: $text-primary;
-
-    /* @todo: make this a mixin for all UI text labels */
     user-select: none;
     transition: color 0.25s ease;
 }
-
-
 
 .raised {
     background-color: $drop-highlight;
@@ -109,11 +94,11 @@ $header-height: calc($stage-menu-height - 0.5rem);
 }
 
 @keyframes wiggle {
-    0% {transform: rotate(3deg) scale(1.05);}
-    25% {transform: rotate(-3deg) scale(1.05);}
-    50% {transform: rotate(5deg) scale(1.05);}
-    75% {transform: rotate(-2deg) scale(1.05);}
-    100% {transform: rotate(0deg) scale(1.05);}
+    0% { transform: rotate(3deg) scale(1.05); }
+    25% { transform: rotate(-3deg) scale(1.05); }
+    50% { transform: rotate(5deg) scale(1.05); }
+    75% { transform: rotate(-2deg) scale(1.05); }
+    100% { transform: rotate(0deg) scale(1.05); }
 }
 
 .receivedBlocks {
@@ -129,4 +114,33 @@ $header-height: calc($stage-menu-height - 0.5rem);
 .placeholder > .sprite {
     background: black;
     filter: opacity(15%) brightness(0%);
+}
+
+
+.add-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px dashed rgba(128, 128, 128, 0.5);
+    background-color: white;
+    color: rgba(128, 128, 128, 0.7);
+    font-size: 1.5rem;
+    font-weight: 300;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    outline: none;
+}
+
+.add-button:active {
+    background-color: rgba(128, 128, 128, 0.05);
+    border-color: rgba(128, 128, 128, 0.7);
+    transform: scale(0.98);
+}
+
+.add-button-wrapper {
+    order: 9999;
 }

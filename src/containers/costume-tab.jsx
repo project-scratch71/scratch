@@ -28,12 +28,6 @@ import {
 import {setRestore} from '../reducers/restore-deletion';
 import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 
-import addLibraryBackdropIcon from '../components/asset-panel/icon--add-backdrop-lib.svg';
-import addLibraryCostumeIcon from '../components/asset-panel/icon--add-costume-lib.svg';
-import fileUploadIcon from '../components/action-menu/icon--file-upload.svg';
-import paintIcon from '../components/action-menu/icon--paint.svg';
-import surpriseIcon from '../components/action-menu/icon--surprise.svg';
-import searchIcon from '../components/action-menu/icon--search.svg';
 
 import costumeLibraryContent from '../lib/libraries/costumes.json';
 import backdropLibraryContent from '../lib/libraries/backdrops.json';
@@ -264,7 +258,6 @@ class CostumeTab extends React.Component {
         const addFileMessage = isStage ? messages.addFileBackdropMsg : messages.addFileCostumeMsg;
         const addSurpriseFunc = isStage ? this.handleSurpriseBackdrop : this.handleSurpriseCostume;
         const addLibraryFunc = isStage ? onNewLibraryBackdropClick : onNewLibraryCostumeClick;
-        const addLibraryIcon = isStage ? addLibraryBackdropIcon : addLibraryCostumeIcon;
 
         const costumeData = target.costumes ? target.costumes.map(costume => ({
             name: costume.name,
@@ -277,7 +270,7 @@ class CostumeTab extends React.Component {
                 buttons={[
                     {
                         title: intl.formatMessage(addLibraryMessage),
-                        img: <FaPlus color="white" size={20} />,
+                        img: <FaPlus size={16} />,
                         onClick: addLibraryFunc
                     },
                 ]}

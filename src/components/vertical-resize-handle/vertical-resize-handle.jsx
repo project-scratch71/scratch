@@ -9,24 +9,34 @@ const VerticalResizeHandle = ({ onResize, currentHeight, onDragStart, onDragEnd 
 
     onResizeRef.current = onResize;
 
-    const handleMouseDown = useCallback((e) => {
+    const getClientY = (e) => {
+        return e.touches ? e.touches[0].clientY : e.clientY;
+    };
+
+    const handleStart = useCallback((e) => {
         e.preventDefault();
+        const clientY = getClientY(e);
         dragDataRef.current = {
-            startY: e.clientY,
+            startY: clientY,
             initialHeight: currentHeight
         };
         setIsDragging(true);
         onDragStart?.();
     }, [currentHeight, onDragStart]);
 
-    const handleMouseMove = useCallback((e) => {
+    const handleMove = useCallback((e) => {
+        if (!isDragging) return;
+        e.preventDefault();
         const { startY, initialHeight } = dragDataRef.current;
-        const deltaY = e.clientY - startY;
-        const newHeight = initialHeight - deltaY;
+        const clientY = getClientY(e);
+        const deltaY = clientY - startY;
+        const minHeight = 50;
+        const maxHeight = window.innerHeight - 50;
+        const newHeight = Math.max(minHeight, Math.min(maxHeight, initialHeight - deltaY));
         onResizeRef.current(newHeight);
-    }, []);
+    }, [isDragging]);
 
-    const handleMouseUp = useCallback(() => {
+    const handleEnd = useCallback(() => {
         setIsDragging(false);
         onDragEnd?.();
     }, [onDragEnd]);
@@ -34,20 +44,27 @@ const VerticalResizeHandle = ({ onResize, currentHeight, onDragStart, onDragEnd 
     useEffect(() => {
         if (!isDragging) return;
         
-        document.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('touchmove', handleMove, { passive: false });
+        window.addEventListener('mouseup', handleEnd);
+        window.addEventListener('touchend', handleEnd);
         
         return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('touchmove', handleMove);
+            window.removeEventListener('mouseup', handleEnd);
+            window.removeEventListener('touchend', handleEnd);
         };
-    }, [isDragging, handleMouseMove, handleMouseUp]);
+    }, [isDragging, handleMove, handleEnd]);
 
     return (
         <div 
             className={styles.verticalResizeHandle}
-            onMouseDown={handleMouseDown}
-        />
+            onMouseDown={handleStart}
+            onTouchStart={handleStart}
+        >
+            <div className={styles.rightLine} />
+        </div>
     );
 };
 
