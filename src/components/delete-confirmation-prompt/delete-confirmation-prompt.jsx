@@ -2,7 +2,7 @@ import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-int
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { MdDelete, MdUndo, MdArrowLeft, MdArrowRight } from 'react-icons/md';
+import { FaTrash, FaUndo, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 import Box from '../box/box.jsx';
 import ReactModal from 'react-modal';
@@ -122,7 +122,7 @@ const DeleteConfirmationPrompt = ({
                         onClick={onOk}
                         role="button"
                     >
-                        <MdDelete className={styles.deleteIcon} />
+                        <FaTrash className={styles.deleteIcon} />
                         <div className={styles.message}>
                             <FormattedMessage {...messages.confirmOption} />
                         </div>
@@ -132,7 +132,7 @@ const DeleteConfirmationPrompt = ({
                         onClick={onCancel}
                         role="button"
                     >
-                        <MdUndo className={styles.deleteIcon} />
+                        <FaUndo className={styles.deleteIcon} />
                         <div className={styles.message}>
                             <FormattedMessage {...messages.cancelOption} />
                         </div>

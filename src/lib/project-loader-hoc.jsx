@@ -78,14 +78,11 @@ const ProjectLoaderHOC = function (WrappedComponent) {
                 return;
             }
             
-            console.log('🔄 Clearing VM state before loading external project...');
-            
             // Clear paint editor state if in costume tab to prevent bounds errors
             const currentTabIndex = window.__store ? 
                 window.__store.getState().scratchGui.editorTab.activeTabIndex : 0;
             
             if (currentTabIndex === 1) { // COSTUMES_TAB_INDEX
-                console.log('🎨 Clearing paint editor state for safe project switch...');
                 // Clear paper.js state to prevent bounds errors
                 try {
                     if (typeof paper !== 'undefined' && paper.project) {
@@ -104,15 +101,12 @@ const ProjectLoaderHOC = function (WrappedComponent) {
             // Clear the VM state first to prevent data accumulation
             this.props.vm.clear();
             
-            console.log('📦 Loading external project data into VM...');
             this.props.vm.loadProject(projectData)
                 .then(() => {
                     // プロジェクト状態をリセット
                     if (this.props.setProjectId) {
                         this.props.setProjectId('external');
                     }
-                    
-                    console.log('🎉 Project loaded successfully, no tab switching needed');
                     
                     // 親ページに読み込み完了を通知
                     if (window.parent !== window) {

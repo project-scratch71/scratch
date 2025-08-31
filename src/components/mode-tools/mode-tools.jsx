@@ -3,18 +3,18 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {
-    MdBrush,
-    MdColorize,
-    MdContentCopy,
-    MdContentPaste,
-    MdDelete,
-    MdFlip,
-    MdCreate,
-    MdCrop,
-    MdCircle,
-    MdRectangle,
-    MdTimeline
-} from 'react-icons/md';
+    FaPaintBrush,
+    FaEyeDropper,
+    FaCopy,
+    FaPaste,
+    FaTrash,
+    FaExchangeAlt,
+    FaPen,
+    FaCrop,
+    FaCircle,
+    FaSquare,
+    FaVectorSquare
+} from 'react-icons/fa';
 
 import {changeBrushSize} from 'scratch-paint/src/reducers/brush-mode';
 import {changeBrushSize as changeEraserSize} from 'scratch-paint/src/reducers/eraser-mode';
@@ -118,7 +118,7 @@ const ModeToolsComponent = props => {
     case Modes.BIT_BRUSH:
     case Modes.BIT_LINE:
     {
-        const currentIcon = props.mode === Modes.BIT_LINE ? MdTimeline : MdBrush;
+        const currentIcon = props.mode === Modes.BIT_LINE ? FaVectorSquare : FaPaintBrush;
         const currentBrushValue = isBitmap(props.format) ? props.bitBrushSize : props.brushValue;
         const changeFunction = isBitmap(props.format) ? props.onBitBrushSliderChange : props.onBrushSliderChange;
         const currentMessage = props.mode === Modes.BIT_LINE ? messages.thickness : messages.brushSize;
@@ -147,7 +147,7 @@ const ModeToolsComponent = props => {
         return (
             <div className={classNames(props.className, styles.modeTools)}>
                 <div className={styles.iconContainer}>
-                    <MdColorize size="1.2rem" />
+                    <FaEyeDropper size="1.2rem" />
                 </div>
                 <LiveInput
                     range
@@ -166,13 +166,13 @@ const ModeToolsComponent = props => {
             <div className={classNames(props.className, styles.modeTools)}>
                 <InputGroup className={styles.buttonGroup}>
                     <CustomIconButton
-                        icon={MdCrop}
+                        icon={FaCrop}
                         title={props.intl.formatMessage(messages.curved)}
                         disabled={!props.hasSelectedUncurvedPoints}
                         onClick={props.onCurvePoints}
                     />
                     <CustomIconButton
-                        icon={MdCreate}
+                        icon={FaPen}
                         title={props.intl.formatMessage(messages.pointed)}
                         disabled={!props.hasSelectedUnpointedPoints}
                         onClick={props.onPointPoints}
@@ -180,7 +180,7 @@ const ModeToolsComponent = props => {
                 </InputGroup>
                 <InputGroup className={styles.buttonGroup}>
                     <CustomIconButton
-                        icon={MdDelete}
+                        icon={FaTrash}
                         title={props.intl.formatMessage(messages.delete)}
                         onClick={props.onDelete}
                     />
@@ -193,12 +193,12 @@ const ModeToolsComponent = props => {
             <div className={classNames(props.className, styles.modeTools)}>
                 <InputGroup className={styles.buttonGroup}>
                     <CustomIconButton
-                        icon={MdContentCopy}
+                        icon={FaCopy}
                         title={props.intl.formatMessage(messages.copy)}
                         onClick={props.onCopyToClipboard}
                     />
                     <CustomIconButton
-                        icon={MdContentPaste}
+                        icon={FaPaste}
                         title={props.intl.formatMessage(messages.paste)}
                         disabled={!(props.clipboardItems.length > 0)}
                         onClick={props.onPasteFromClipboard}
@@ -206,14 +206,14 @@ const ModeToolsComponent = props => {
                 </InputGroup>
                 <InputGroup className={styles.buttonGroup}>
                     <CustomIconButton
-                        icon={MdDelete}
+                        icon={FaTrash}
                         title={props.intl.formatMessage(messages.delete)}
                         onClick={props.onDelete}
                     />
                 </InputGroup>
                 <InputGroup className={styles.buttonGroup}>
                     <CustomIconButton
-                        icon={MdFlip}
+                        icon={FaExchangeAlt}
                         title={props.intl.formatMessage(messages.flipHorizontal)}
                         onClick={props.onFlipHorizontal}
                     />
@@ -222,7 +222,7 @@ const ModeToolsComponent = props => {
                         title={props.intl.formatMessage(messages.flipVertical)}
                         onClick={props.onFlipVertical}
                     >
-                        <MdFlip size="1rem" style={{transform: 'rotate(90deg)'}} />
+                        <FaExchangeAlt size="1rem" style={{transform: 'rotate(90deg)'}} />
                     </button>
                 </InputGroup>
             </div>
@@ -241,7 +241,7 @@ const ModeToolsComponent = props => {
     case Modes.BIT_RECT:
     case Modes.BIT_OVAL:
     {
-        const fillIcon = props.mode === Modes.BIT_RECT ? MdRectangle : MdCircle;
+        const fillIcon = props.mode === Modes.BIT_RECT ? FaSquare : FaCircle;
         return (
             <div className={classNames(props.className, styles.modeTools)}>
                 <InputGroup className={styles.buttonGroup}>

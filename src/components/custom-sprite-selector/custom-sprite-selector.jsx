@@ -1,42 +1,26 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {injectIntl, intlShape} from 'react-intl';
 
 import Box from '../box/box.jsx';
-import SpriteInfo from '../../containers/sprite-info.jsx';
 import SpriteList from './sprite-list.jsx';
-import {STAGE_DISPLAY_SIZES} from '../../lib/layout-constants.js';
 
 import styles from './custom-sprite-selector.css';
-
 
 const CustomSpriteSelectorComponent = function (props) {
     const {
         editingTarget,
         hoveredTarget,
-        intl,
-        onChangeSpriteDirection,
-        onChangeSpriteName,
-        onChangeSpriteRotationStyle,
-        onChangeSpriteSize,
-        onChangeSpriteVisibility,
-        onChangeSpriteX,
-        onChangeSpriteY,
         onDrop,
         onDeleteSprite,
         onDuplicateSprite,
         onExportSprite,
-        onFileUploadClick,
         onNewSpriteClick,
-        onPaintSpriteClick,
         onSelectSprite,
-        onSpriteUpload,
-        onSurpriseSpriteClick,
         raised,
         selectedId,
-        spriteFileInput,
         sprites,
-        stageSize,
+        stage,
+        vm,
         ...componentProps
     } = props;
     return (
@@ -44,14 +28,14 @@ const CustomSpriteSelectorComponent = function (props) {
             className={styles.spriteSelector}
             {...componentProps}
         >
-
-
             <SpriteList
                 editingTarget={editingTarget}
                 hoveredTarget={hoveredTarget}
                 items={Object.keys(sprites).map(id => sprites[id])}
                 raised={raised}
                 selectedId={selectedId}
+                stage={stage}
+                vm={vm}
                 onAddSprite={onNewSpriteClick}
                 onDeleteSprite={onDeleteSprite}
                 onDrop={onDrop}
@@ -69,27 +53,14 @@ CustomSpriteSelectorComponent.propTypes = {
         hoveredSprite: PropTypes.string,
         receivedBlocks: PropTypes.bool
     }),
-    intl: intlShape.isRequired,
-    onChangeSpriteDirection: PropTypes.func,
-    onChangeSpriteName: PropTypes.func,
-    onChangeSpriteRotationStyle: PropTypes.func,
-    onChangeSpriteSize: PropTypes.func,
-    onChangeSpriteVisibility: PropTypes.func,
-    onChangeSpriteX: PropTypes.func,
-    onChangeSpriteY: PropTypes.func,
     onDeleteSprite: PropTypes.func,
     onDrop: PropTypes.func,
     onDuplicateSprite: PropTypes.func,
     onExportSprite: PropTypes.func,
-    onFileUploadClick: PropTypes.func,
     onNewSpriteClick: PropTypes.func,
-    onPaintSpriteClick: PropTypes.func,
     onSelectSprite: PropTypes.func,
-    onSpriteUpload: PropTypes.func,
-    onSurpriseSpriteClick: PropTypes.func,
     raised: PropTypes.bool,
     selectedId: PropTypes.string,
-    spriteFileInput: PropTypes.func,
     sprites: PropTypes.shape({
         id: PropTypes.shape({
             costume: PropTypes.shape({
@@ -103,7 +74,12 @@ CustomSpriteSelectorComponent.propTypes = {
             order: PropTypes.number.isRequired
         })
     }),
-    stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)).isRequired
+    stage: PropTypes.shape({
+        id: PropTypes.string,
+        costume: PropTypes.object,
+        costumeCount: PropTypes.number
+    }),
+    vm: PropTypes.shape({})
 };
 
-export default injectIntl(CustomSpriteSelectorComponent);
+export default CustomSpriteSelectorComponent;

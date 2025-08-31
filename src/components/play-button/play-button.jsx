@@ -5,9 +5,7 @@ import classNames from 'classnames';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 
 import styles from './play-button.css';
-
-import playIcon from './icon--play.svg';
-import stopIcon from './icon--stop.svg';
+import { FaPlay, FaStop } from 'react-icons/fa';
 
 const messages = defineMessages({
     play: {
@@ -50,11 +48,17 @@ const PlayButtonComponent = ({
             ref={setButtonRef}
             {...props}
         >
-            <img
-                className={styles.playIcon}
-                draggable={false}
-                src={isPlaying ? stopIcon : playIcon}
-            />
+            {isPlaying ? (
+                <FaStop 
+                    className={styles.playIcon}
+                    size={20}
+                />
+            ) : (
+                <FaPlay 
+                    className={styles.playIcon}
+                    size={20}
+                />
+            )}
         </div>
     );
 };

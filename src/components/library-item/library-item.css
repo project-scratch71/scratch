@@ -14,9 +14,10 @@
     padding: 1rem 1rem 0 1rem;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: $text-primary;
-    background: #fafafa;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    background: white;
+    border: 1px solid #e8e9ea;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -27,10 +28,10 @@
 }
 
 .library-item:hover {
-    background: #f0f0f0;
-    border-color: #d0d0d0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-color: #007bff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .hidden {
@@ -94,18 +95,36 @@
     align-items: center;
     width: 100%;
     height: 100%;
-    color: #666;
-    opacity: 0.8;
+    color: #4f46e5;
+    transition: transform 0.2s ease;
+    position: relative;
+}
+
+.library-item:hover .library-item-icon {
+    transform: scale(1.1);
+    color: #3730a3;
 }
 
 .library-item-inset-image {
     width: 2.5rem;
 }
 
+/* Sound library items with play button styling */
+.library-item.withPlayButton .library-item-icon {
+    opacity: 0.4;
+}
+
+.library-item.withPlayButton:hover .library-item-icon {
+    opacity: 0.3;
+}
+
 .library-item-name {
-    width: 80%;
-    margin: 0.25rem 0;
+    width: 90%;
+    margin: 0.5rem 0;
     text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
 
     /*
         For truncating overflowing text gracefully

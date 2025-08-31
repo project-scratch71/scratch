@@ -1,23 +1,24 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
-import {
-    MdPlayArrow,
-    MdStop,
-    MdRedo,
-    MdUndo,
-    MdFastForward,
-    MdFastRewind,
-    MdVolumeUp,
-    MdVolumeDown,
-    MdAndroid,
-    MdVolumeOff,
-    MdDelete,
-    MdContentCopy,
-    MdContentPaste,
-    MdLibraryAdd
-} from 'react-icons/md';
-import { FiTrendingUp, FiTrendingDown, FiRefreshCcw } from 'react-icons/fi';
+import { 
+    FaPlay, 
+    FaStop, 
+    FaRedo, 
+    FaUndo, 
+    FaFastForward, 
+    FaFastBackward, 
+    FaVolumeUp, 
+    FaVolumeDown, 
+    FaRobot, 
+    FaVolumeMute, 
+    FaTrash, 
+    FaCopy, 
+    FaPaste, 
+    FaPlus,
+    FaChartLine,
+    FaExchangeAlt
+} from 'react-icons/fa';
 
 import Waveform from '../waveform/waveform.jsx';
 import Input from '../forms/input.jsx';
@@ -144,7 +145,7 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.undo)}
                     onClick={props.onUndo}
                 >
-                    <MdUndo size="1rem" />
+                    <FaUndo size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
@@ -152,7 +153,7 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.redo)}
                     onClick={props.onRedo}
                 >
-                    <MdRedo size="1rem" />
+                    <FaRedo size="1rem" />
                 </button>
             </div>
         </div>
@@ -181,7 +182,7 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.stop)}
                     onClick={props.onStop}
                 >
-                    <MdStop color="#C4553A" size="1.5rem" />
+                    <FaStop size="1.2rem" />
                 </button>
             ) : (
                 <button
@@ -189,7 +190,7 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.play)}
                     onClick={props.onPlay}
                 >
-                    <MdPlayArrow color="#C4553A" size="1.5rem" />
+                    <FaPlay size="1.2rem" />
                 </button>
             )}
         </div>
@@ -202,7 +203,7 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.copy)}
                     onClick={props.onCopy}
                 >
-                    <MdContentCopy size="1rem" />
+                    <FaCopy size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
@@ -210,7 +211,7 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.paste)}
                     onClick={props.onPaste}
                 >
-                    <MdContentPaste size="1rem" />
+                    <FaPaste size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
@@ -218,14 +219,14 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.delete)}
                     onClick={props.onDelete}
                 >
-                    <MdDelete size="1rem" />
+                    <FaTrash size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
                     title={props.intl.formatMessage(messages.copyToNew)}
                     onClick={props.onCopyToNew}
                 >
-                    <MdLibraryAdd size="1rem" />
+                    <FaPlus size="1rem" />
                 </button>
             </div>
 
@@ -236,14 +237,14 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.faster)}
                     onClick={props.onFaster}
                 >
-                    <MdFastForward size="1rem" />
+                    <FaFastForward size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
                     title={props.intl.formatMessage(messages.slower)}
                     onClick={props.onSlower}
                 >
-                    <MdFastRewind size="1rem" />
+                    <FaFastBackward size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
@@ -251,49 +252,49 @@ const SoundEditor = props => (
                     title={props.intl.formatMessage(messages.louder)}
                     onClick={props.onLouder}
                 >
-                    <MdVolumeUp size="1rem" />
+                    <FaVolumeUp size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
                     title={props.intl.formatMessage(messages.softer)}
                     onClick={props.onSofter}
                 >
-                    <MdVolumeDown size="1rem" />
+                    <FaVolumeDown size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
                     title={props.intl.formatMessage(messages.mute)}
                     onClick={props.onMute}
                 >
-                    <MdVolumeOff size="1rem" />
+                    <FaVolumeMute size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
                     title={props.intl.formatMessage(messages.robot)}
                     onClick={props.onRobot}
                 >
-                    <MdAndroid size="1rem" />
+                    <FaRobot size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
                     title={props.intl.formatMessage(messages.fadeIn)}
                     onClick={props.onFadeIn}
                 >
-                    <FiTrendingUp size="1rem" />
+                    <FaChartLine size="1rem" />
                 </button>
                 <button
                     className={styles.iconButton}
                     title={props.intl.formatMessage(messages.fadeOut)}
                     onClick={props.onFadeOut}
                 >
-                    <FiTrendingDown size="1rem" />
+                    <FaChartLine size="1rem" style={{transform: 'scaleY(-1)'}} />
                 </button>
                 <button
                     className={styles.iconButton}
                     title={props.intl.formatMessage(messages.reverse)}
                     onClick={props.onReverse}
                 >
-                    <FiRefreshCcw size="1rem" />
+                    <FaExchangeAlt size="1rem" />
                 </button>
             </div>
         </div>

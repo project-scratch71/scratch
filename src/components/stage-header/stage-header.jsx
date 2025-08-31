@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import VM from 'scratch-vm';
-import {MdFullscreen, MdFullscreenExit} from 'react-icons/md';
+import {FaExpand, FaCompress} from 'react-icons/fa';
 
 import Box from '../box/box.jsx';
 import Button from '../button/button.jsx';
@@ -33,7 +33,7 @@ const StageHeaderComponent = function (props) {
                         className={styles.stageButton}
                         onClick={onSetStageUnFull}
                     >
-                        <MdFullscreenExit className={styles.stageButtonIcon} />
+                        <FaCompress className={styles.stageButtonIcon} />
                     </Button>
                 </Box>
             </Box>
@@ -48,7 +48,7 @@ const StageHeaderComponent = function (props) {
                     className={styles.stageButton}
                     onClick={onSetStageFull}
                 >
-                    <MdFullscreen className={styles.stageButtonIcon} />
+                    <FaExpand className={styles.stageButtonIcon} />
                 </Button>
             </Box>
         </Box>

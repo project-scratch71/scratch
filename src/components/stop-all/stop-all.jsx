@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { MdStop } from 'react-icons/md';
+import { FaStop } from 'react-icons/fa';
 
 import styles from './stop-all.css';
 
@@ -14,7 +14,7 @@ const StopAllComponent = function (props) {
         ...componentProps
     } = props;
     return (
-        <MdStop
+        <FaStop
             className={classNames(
                 className,
                 styles.stopAll,

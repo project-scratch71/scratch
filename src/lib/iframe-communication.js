@@ -109,7 +109,7 @@ class IframeCommunication {
                 this.onGetProjectData();
                 break;
             default:
-                console.log('Unknown message type:', type);
+                // Unknown message types are ignored silently
         }
     }
 
@@ -134,64 +134,74 @@ class IframeCommunication {
     }
 
 
-    onGetProjectData() {
-        console.log('🔵 GET_PROJECT_DATA request received');
+    async onGetProjectData() {
         const vm = this.getVM();
-        console.log('🔍 VM status:', {
-            vmExists: !!vm,
-            vmIsReady: vm ? 'ready' : 'not ready'
-        });
         
         if (vm) {
             try {
-                console.log('📦 Getting project data from VM...');
-                let projectData = vm.toJSON();
+                // First, save all dirty assets before getting project data
+                const dirtyAssets = vm.assets.filter(asset => !asset.clean);
                 
-                // If vm.toJSON() returns a string, parse it to object
-                if (typeof projectData === 'string') {
-                    console.log('🔄 Project data is string, parsing to object...');
-                    projectData = JSON.parse(projectData);
+                if (dirtyAssets.length > 0) {
+                    const storage = await import('../lib/storage.js').then(m => m.default);
+                    
+                    await Promise.all(dirtyAssets.map(async (asset) => {
+                        try {
+                            const response = await storage.store(
+                                asset.assetType,
+                                asset.dataFormat,
+                                asset.data,
+                                asset.assetId
+                            );
+                            
+                            if (response.status === 'ok') {
+                                asset.clean = true;
+                            }
+                        } catch (error) {
+                            console.error('Asset save error:', error);
+                        }
+                    }));
                 }
                 
-                console.log('✅ Project data retrieved successfully:', {
-                    hasProjectData: !!projectData,
-                    projectDataType: typeof projectData,
-                    targets: projectData?.targets?.length || 0,
-                    dataSize: projectData ? JSON.stringify(projectData).length : 0,
-                    projectDataPreview: {
-                        targets: projectData?.targets?.map((target, index) => ({
-                            index,
-                            name: target.name,
-                            isStage: target.isStage,
-                            costumesCount: target.costumes?.length || 0,
-                            blocksCount: Object.keys(target.blocks || {}).length
-                        })) || []
+                let projectData;
+                try {
+                    projectData = vm.toJSON();
+                    
+                    // If vm.toJSON() returns a string, parse it to object
+                    if (typeof projectData === 'string') {
+                        projectData = JSON.parse(projectData);
                     }
-                });
+                } catch (serializationError) {
+                    console.warn('VM serialization failed:', serializationError);
+                    // Return a minimal project structure or skip serialization
+                    projectData = null;
+                    this.sendToParent({
+                        type: 'PROJECT_DATA_RESPONSE',
+                        projectData: null,
+                        error: `Serialization failed: ${serializationError.message}`
+                    });
+                    return;
+                }
                 
                 this.sendToParent({
                     type: 'PROJECT_DATA_RESPONSE',
                     projectData: projectData
                 });
                 
-                console.log('📤 PROJECT_DATA_RESPONSE sent to parent');
             } catch (error) {
-                console.error('❌ Error getting project data:', error);
+                console.error('Error getting project data:', error);
                 this.sendToParent({
                     type: 'PROJECT_DATA_RESPONSE',
                     projectData: null,
                     error: error.message
                 });
-                console.log('📤 PROJECT_DATA_RESPONSE (error) sent to parent');
             }
         } else {
-            console.warn('⚠️ Cannot get project data: VM not ready');
             this.sendToParent({
                 type: 'PROJECT_DATA_RESPONSE',
                 projectData: null,
                 error: 'VM not ready'
             });
-            console.log('📤 PROJECT_DATA_RESPONSE (VM not ready) sent to parent');
         }
     }
 

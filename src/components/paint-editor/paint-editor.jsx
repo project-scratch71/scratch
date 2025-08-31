@@ -3,29 +3,29 @@ import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    MdUndo,
-    MdRedo,
-    MdUnfoldLess,
-    MdUnfoldMore,
-    MdArrowUpward,
-    MdArrowDownward,
-    MdFlipToFront,
-    MdFlipToBack,
-    MdOpenWith,
-    MdBrush,
-    MdCreate,
-    MdAutoFixHigh,
-    MdFormatColorFill,
-    MdTextFields,
-    MdRemove,
-    MdCircle,
-    MdRectangle,
-    MdZoomIn,
-    MdZoomOut,
-    MdZoomOutMap,
-    MdViewModule,
-    MdGrid3X3
-} from 'react-icons/md';
+    FaUndo,
+    FaRedo,
+    FaCompressArrowsAlt,
+    FaExpandArrowsAlt,
+    FaArrowUp,
+    FaArrowDown,
+    FaArrowCircleUp,
+    FaArrowCircleDown,
+    FaCrosshairs,
+    FaPaintBrush,
+    FaPen,
+    FaMagic,
+    FaFillDrip,
+    FaFont,
+    FaMinus,
+    FaCircle,
+    FaSquare,
+    FaSearchPlus,
+    FaSearchMinus,
+    FaExpand,
+    FaTh
+    
+} from 'react-icons/fa';
 
 // Scratch Paint の必要なコンポーネントをimport
 import PaperCanvas from 'scratch-paint/src/containers/paper-canvas.jsx';
@@ -256,24 +256,24 @@ const PaintEditorComponent = props => {
 
     // Mode buttons configuration - 元のScratch Paintと同じ順序、より適切なアイコンを使用
     const modeButtons = isVectorFormat ? [
-        { mode: Modes.SELECT, icon: MdOpenWith, message: messages.select },
-        { mode: Modes.RESHAPE, icon: MdCreate, message: messages.reshape },
-        { mode: Modes.BRUSH, icon: MdBrush, message: messages.brush },
-        { mode: Modes.ERASER, icon: MdAutoFixHigh, message: messages.eraser },
-        { mode: Modes.FILL, icon: MdFormatColorFill, message: messages.fill },
-        { mode: Modes.TEXT, icon: MdTextFields, message: messages.text },
-        { mode: Modes.LINE, icon: MdRemove, message: messages.line },
-        { mode: Modes.OVAL, icon: MdCircle, message: messages.oval },
-        { mode: Modes.RECT, icon: MdRectangle, message: messages.rect }
+        { mode: Modes.SELECT, icon: FaCrosshairs, message: messages.select },
+        { mode: Modes.RESHAPE, icon: FaPen, message: messages.reshape },
+        { mode: Modes.BRUSH, icon: FaPaintBrush, message: messages.brush },
+        { mode: Modes.ERASER, icon: FaMagic, message: messages.eraser },
+        { mode: Modes.FILL, icon: FaFillDrip, message: messages.fill },
+        { mode: Modes.TEXT, icon: FaFont, message: messages.text },
+        { mode: Modes.LINE, icon: FaMinus, message: messages.line },
+        { mode: Modes.OVAL, icon: FaCircle, message: messages.oval },
+        { mode: Modes.RECT, icon: FaSquare, message: messages.rect }
     ] : [
-        { mode: Modes.BIT_BRUSH, icon: MdBrush, message: messages.brush },
-        { mode: Modes.BIT_LINE, icon: MdRemove, message: messages.line },
-        { mode: Modes.BIT_OVAL, icon: MdCircle, message: messages.oval },
-        { mode: Modes.BIT_RECT, icon: MdRectangle, message: messages.rect },
-        { mode: Modes.TEXT, icon: MdTextFields, message: messages.text },
-        { mode: Modes.BIT_FILL, icon: MdFormatColorFill, message: messages.fill },
-        { mode: Modes.BIT_ERASER, icon: MdAutoFixHigh, message: messages.eraser },
-        { mode: Modes.BIT_SELECT, icon: MdOpenWith, message: messages.select }
+        { mode: Modes.BIT_BRUSH, icon: FaPaintBrush, message: messages.brush },
+        { mode: Modes.BIT_LINE, icon: FaMinus, message: messages.line },
+        { mode: Modes.BIT_OVAL, icon: FaCircle, message: messages.oval },
+        { mode: Modes.BIT_RECT, icon: FaSquare, message: messages.rect },
+        { mode: Modes.TEXT, icon: FaFont, message: messages.text },
+        { mode: Modes.BIT_FILL, icon: FaFillDrip, message: messages.fill },
+        { mode: Modes.BIT_ERASER, icon: FaMagic, message: messages.eraser },
+        { mode: Modes.BIT_SELECT, icon: FaCrosshairs, message: messages.select }
     ];
 
     return (
@@ -296,20 +296,20 @@ const PaintEditorComponent = props => {
                                 />
                                 <div className={styles.historyButtons}>
                                     <button
-                                        className={styles.undoRedoButton}
+                                        className={styles.iconButton}
                                         disabled={!canUndo}
                                         title={intl.formatMessage(messages.undo)}
                                         onClick={onUndo}
                                     >
-                                        <MdUndo size="1.1rem" />
+                                        <FaUndo size="1.1rem" />
                                     </button>
                                     <button
-                                        className={styles.undoRedoButton}
+                                        className={styles.iconButton}
                                         disabled={!canRedo}
                                         title={intl.formatMessage(messages.redo)}
                                         onClick={onRedo}
                                     >
-                                        <MdRedo size="1.1rem" />
+                                        <FaRedo size="1.1rem" />
                                     </button>
                                 </div>
                             </div>
@@ -320,42 +320,42 @@ const PaintEditorComponent = props => {
                                     title={intl.formatMessage(messages.group)}
                                     onClick={handleGroup}
                                 >
-                                    <MdUnfoldLess size="1.1rem" />
+                                    <FaCompressArrowsAlt size="1.1rem" />
                                 </button>
                                 <button
                                     className={styles.iconButton}
                                     title={intl.formatMessage(messages.ungroup)}
                                     onClick={handleUngroup}
                                 >
-                                    <MdUnfoldMore size="1.1rem" />
+                                    <FaExpandArrowsAlt size="1.1rem" />
                                 </button>
                                 <button
                                     className={styles.iconButton}
                                     title={intl.formatMessage(messages.forward)}
                                     onClick={handleSendForward}
                                 >
-                                    <MdArrowUpward size="1.1rem" />
+                                    <FaArrowUp size="1.1rem" />
                                 </button>
                                 <button
                                     className={styles.iconButton}
                                     title={intl.formatMessage(messages.backward)}
                                     onClick={handleSendBackward}
                                 >
-                                    <MdArrowDownward size="1.1rem" />
+                                    <FaArrowDown size="1.1rem" />
                                 </button>
                                 <button
                                     className={styles.iconButton}
                                     title={intl.formatMessage(messages.front)}
                                     onClick={handleSendToFront}
                                 >
-                                    <MdFlipToFront size="1.1rem" />
+                                    <FaArrowCircleUp size="1.1rem" />
                                 </button>
                                 <button
                                     className={styles.iconButton}
                                     title={intl.formatMessage(messages.back)}
                                     onClick={handleSendToBack}
                                 >
-                                    <MdFlipToBack size="1.1rem" />
+                                    <FaArrowCircleDown size="1.1rem" />
                                 </button>
                             </div>
                         </div>
@@ -396,7 +396,7 @@ const PaintEditorComponent = props => {
                                     title={intl.formatMessage(messages.bitmap)}
                                     onClick={onSwitchToBitmap}
                                 >
-                                    <MdGrid3X3 size="1rem" />
+                                    <FaTh size="1rem" />
                                     <span className={styles.buttonText}>{intl.formatMessage(messages.bitmap)}</span>
                                 </button>
                             )}
@@ -406,7 +406,7 @@ const PaintEditorComponent = props => {
                                     title={intl.formatMessage(messages.vector)}
                                     onClick={onSwitchToVector}
                                 >
-                                    <MdViewModule size="1rem" />
+                                    <FaTh size="1rem" />
                                     <span className={styles.buttonText}>{intl.formatMessage(messages.vector)}</span>
                                 </button>
                             )}
@@ -510,21 +510,21 @@ const PaintEditorComponent = props => {
                                 title="Zoom Out"
                                 onClick={onZoomOut}
                             >
-                                <MdZoomOut size="1rem" />
+                                <FaSearchMinus size="1rem" />
                             </button>
                             <button
                                 className={styles.zoomButton}
                                 title="Reset Zoom"
                                 onClick={onZoomReset}
                             >
-                                <MdZoomOutMap size="1rem" />
+                                <FaExpand size="1rem" />
                             </button>
                             <button
                                 className={styles.zoomButton}
                                 title="Zoom In"
                                 onClick={onZoomIn}
                             >
-                                <MdZoomIn size="1rem" />
+                                <FaSearchPlus size="1rem" />
                             </button>
                         </div>
                     </div>

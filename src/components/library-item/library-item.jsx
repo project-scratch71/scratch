@@ -107,7 +107,8 @@ class LibraryItemComponent extends React.PureComponent {
             <Box
                 className={classNames(
                     styles.libraryItem, {
-                        [styles.hidden]: this.props.hidden
+                        [styles.hidden]: this.props.hidden,
+                        [styles.withPlayButton]: this.props.showPlayButton
                     }
                 )}
                 role="button"

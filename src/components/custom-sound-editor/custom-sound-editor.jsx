@@ -313,7 +313,6 @@ CustomSoundEditor.propTypes = {
     onCopy: PropTypes.func.isRequired,
     onCopyToNew: PropTypes.func.isRequired,
     onDelete: PropTypes.func,
-    onEcho: PropTypes.func.isRequired,
     onFadeIn: PropTypes.func.isRequired,
     onFadeOut: PropTypes.func.isRequired,
     onFaster: PropTypes.func.isRequired,

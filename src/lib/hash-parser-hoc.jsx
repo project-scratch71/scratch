@@ -26,11 +26,10 @@ const HashParserHOC = function (WrappedComponent) {
             this.handleHashChange();
         }
         componentDidUpdate (prevProps) {
-            // if we are newly fetching a non-hash project...
             if (this.props.isFetchingWithoutId && !prevProps.isFetchingWithoutId) {
-                // ...clear the hash from the url
-                history.pushState('new-project', 'new-project',
-                    window.location.pathname + window.location.search);
+                // DISABLED: Prevent iframe from interfering with parent page history
+                // history.pushState('new-project', 'new-project',
+                //     window.location.pathname + window.location.search);
             }
         }
         componentWillUnmount () {

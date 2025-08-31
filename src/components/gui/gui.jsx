@@ -9,7 +9,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import tabStyles from 'react-tabs/style/react-tabs.css';
 import VM from 'scratch-vm';
 import Renderer from 'scratch-render';
-import { FaPuzzlePiece } from 'react-icons/fa';
+import { FaCode } from 'react-icons/fa';
 
 import Blocks from '../../containers/blocks.jsx';
 import CostumeTab from '../../containers/costume-tab.jsx';
@@ -280,9 +280,9 @@ const GUIComponent = (props) => {
                                             title={intl.formatMessage(messages.addExtension)}
                                             onClick={onExtensionButtonClick}
                                         >
-                                            <FaPuzzlePiece
+                                            <FaCode
                                                 className={styles.extensionButtonIcon}
-                                                size={28}
+                                                size={20}
                                             />
                                         </button>
                                     </Box>

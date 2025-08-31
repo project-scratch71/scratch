@@ -141,6 +141,24 @@ $sides: 20rem;
     padding-left: 0;
 }
 
+.close-button-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.close-button-icon:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: #333;
+}
+
 [dir="rtl"] .back-button img {
     transform: scaleX(-1);
 }

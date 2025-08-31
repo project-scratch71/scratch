@@ -8,7 +8,7 @@ import Box from '../box/box.jsx';
 import Button from '../button/button.jsx';
 import CloseButton from '../close-button/close-button.jsx';
 
-import { FaArrowLeft, FaQuestionCircle } from 'react-icons/fa';
+import { FaTimes, FaQuestionCircle } from 'react-icons/fa';
 
 import styles from './modal.css';
 
@@ -69,17 +69,14 @@ const ModalComponent = props => (
                     )}
                 >
                     {props.fullScreen ? (
-                        <Button
-                            className={styles.backButton}
+                        <div
+                            className={styles.closeButtonIcon}
                             onClick={props.onRequestClose}
+                            role="button"
+                            tabIndex="0"
                         >
-                            <FaArrowLeft size={16} />
-                            <FormattedMessage
-                                defaultMessage="Back"
-                                description="Back button in modal"
-                                id="gui.modal.back"
-                            />
-                        </Button>
+                            <FaTimes size={18} />
+                        </div>
                     ) : (
                         <CloseButton
                             size={CloseButton.SIZE_LARGE}

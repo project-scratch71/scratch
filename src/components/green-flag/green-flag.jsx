@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { MdFlag } from 'react-icons/md';
+import { FaFlag } from 'react-icons/fa';
 
 import styles from './green-flag.css';
 
@@ -14,7 +14,7 @@ const GreenFlagComponent = function (props) {
         ...componentProps
     } = props;
     return (
-        <MdFlag
+        <FaFlag
             className={classNames(
                 className,
                 styles.greenFlag,

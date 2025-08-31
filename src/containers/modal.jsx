@@ -17,9 +17,8 @@ class Modal extends React.Component {
         this.addEventListeners();
     }
     componentDidMount () {
-        // Add a history event only if it's not currently for our modal. This
-        // avoids polluting the history with many entries. We only need one.
-        this.pushHistory(this.id, (history.state === null || history.state !== this.id));
+        // DISABLED: Prevent iframe from interfering with parent page history
+        // this.pushHistory(this.id, (history.state === null || history.state !== this.id));
     }
     componentWillUnmount () {
         this.removeEventListeners();
@@ -38,8 +37,9 @@ class Modal extends React.Component {
         return `modal-${this.props.id}`;
     }
     pushHistory (state, push) {
-        if (push) return history.pushState(state, this.id);
-        history.replaceState(state, this.id);
+        // DISABLED: Prevent iframe from interfering with parent page history
+        // if (push) return history.pushState(state, this.id);
+        // history.replaceState(state, this.id);
     }
     render () {
         return <ModalComponent {...this.props} />;

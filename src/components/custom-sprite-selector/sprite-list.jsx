@@ -30,7 +30,9 @@ const SpriteList = function (props) {
         ordering,
         raised,
         selectedId,
-        items
+        items,
+        stage,
+        vm
     } = props;
 
     const isSpriteDrag = draggingType === DragConstants.SPRITE;
@@ -45,6 +47,30 @@ const SpriteList = function (props) {
             <Box
                 className={styles.scrollX}
             >
+                {stage && (
+                    <Box className={classNames(styles.spriteWrapper, styles.stageWrapper)}>
+                        <ThrottledSpriteSelectorItem
+                            asset={stage.costume && stage.costume.asset}
+                            className={classNames(styles.sprite, {
+                                [styles.raised]: raised && stage.id !== editingTarget,
+                                [styles.receivedBlocks]: hoveredTarget.sprite === stage.id &&
+                                    stage.id !== editingTarget &&
+                                    hoveredTarget.receivedBlocks
+                            })}
+                            dragPayload={stage.id}
+                            dragType={DragConstants.SPRITE}
+                            id={stage.id}
+                            index={-1}
+                            key={stage.id}
+                            name={stage.name || 'Stage'}
+                            selected={stage.id === selectedId}
+                            onClick={onSelectSprite}
+                            onDeleteButtonClick={null}
+                            onDuplicateButtonClick={null}
+                            onExportButtonClick={null}
+                        />
+                    </Box>
+                )}
                 {items.map((sprite, index) => {
 
                     // If the sprite has just received a block drop, used for green highlight
@@ -145,7 +171,13 @@ SpriteList.propTypes = {
     onSelectSprite: PropTypes.func,
     ordering: PropTypes.arrayOf(PropTypes.number),
     raised: PropTypes.bool,
-    selectedId: PropTypes.string
+    selectedId: PropTypes.string,
+    stage: PropTypes.shape({
+        id: PropTypes.string,
+        costume: PropTypes.object,
+        costumeCount: PropTypes.number
+    }),
+    vm: PropTypes.shape({})
 };
 
 export default SortableHOC(SpriteList);

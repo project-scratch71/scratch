@@ -7,7 +7,6 @@ import randomizeSpritePosition from '../lib/randomize-sprite-position';
 import spriteTags from '../lib/libraries/sprite-tags';
 
 import LibraryComponent from '../components/library/library.jsx';
-import { FaUser } from 'react-icons/fa';
 
 const messages = defineMessages({
     libraryTitle: {
@@ -104,14 +103,9 @@ class SpriteLibrary extends React.PureComponent {
         console.log('Rendering LibraryComponent with data:', this.state.spriteLibraryContent.length, 'items');
         console.log('First item in render:', this.state.spriteLibraryContent[0]);
         
-        const spriteDataWithIcons = this.state.spriteLibraryContent.map(sprite => ({
-            ...sprite,
-            icon: <FaUser size={48} />
-        }));
-        
         return (
             <LibraryComponent
-                data={spriteDataWithIcons}
+                data={this.state.spriteLibraryContent}
                 id="spriteLibrary"
                 tags={spriteTags}
                 title={this.props.intl.formatMessage(messages.libraryTitle)}
