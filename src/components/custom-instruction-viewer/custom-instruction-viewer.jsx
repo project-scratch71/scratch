@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
-
 import Box from '../box/box.jsx';
 import styles from './custom-instruction-viewer.css';
 
 const CustomInstructionViewerComponent = ({ isDragging }) => {
-    const [instructionUrl, setInstructionUrl] = useState('http://localhost:3000/pdf-viewer?file=sample1.pdf');
+    const [instructionUrl, setInstructionUrl] = useState(process.env.MD_VIEWER_PATH);
 
 
     const isYouTubeUrl = (url) => {
