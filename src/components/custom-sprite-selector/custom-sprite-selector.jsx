@@ -21,6 +21,22 @@ const CustomSpriteSelectorComponent = function (props) {
         sprites,
         stage,
         vm,
+        // Custom props that should not be passed to DOM
+        spriteFileInput,
+        stageSize,
+        setProjectId,
+        isRtl,
+        onChangeSpriteDirection,
+        onChangeSpriteName,
+        onChangeSpriteRotationStyle,
+        onChangeSpriteSize,
+        onChangeSpriteVisibility,
+        onChangeSpriteX,
+        onChangeSpriteY,
+        onFileUploadClick,
+        onPaintSpriteClick,
+        onSpriteUpload,
+        onSurpriseSpriteClick,
         ...componentProps
     } = props;
     return (

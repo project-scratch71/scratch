@@ -7,6 +7,7 @@ class IframeCommunication {
         this.parentOrigin = null;
         this.messageQueue = [];
         this.vm = null; // Store VM reference here
+        this.blocksComponent = null; // Store Blocks component reference
         this.readySignalSent = false; // Prevent duplicate ready signals
         
         // Communication service for sending basic events to parent window
@@ -108,6 +109,12 @@ class IframeCommunication {
             case 'GET_PROJECT_DATA':
                 this.onGetProjectData();
                 break;
+            case 'SET_TOOLBOX_CONFIG':
+                this.onSetToolboxConfig(event.data.toolboxConfig);
+                break;
+            case 'SET_MATERIAL_ID':
+                this.onSetMaterialId(event.data.materialId);
+                break;
             default:
                 // Unknown message types are ignored silently
         }
@@ -131,6 +138,80 @@ class IframeCommunication {
     onProjectLoad(projectData) {
         console.log('Project load requested:', projectData);
         // TODO: Implement project loading logic
+    }
+
+    onSetToolboxConfig(toolboxConfig) {
+        // Store the toolbox config for later use
+        this.customToolboxConfig = toolboxConfig;
+        
+        // If blocks component is available, update immediately
+        if (this.blocksComponent) {
+            this.updateToolbox(toolboxConfig);
+        } else {
+            // Wait for blocks component to be ready and then update toolbox
+            this.pendingToolboxUpdate = toolboxConfig;
+        }
+    }
+
+    onSetMaterialId(materialId) {
+        // Store material ID for instruction viewer
+        this.currentMaterialId = materialId;
+        
+        // Use direct component reference if available
+        if (this.instructionViewerComponent && this.instructionViewerComponent.updateMaterialId) {
+            this.updateInstructionViewerDirect(materialId);
+        } else {
+            // Store as pending update until instruction viewer is ready
+            this.pendingMaterialId = materialId;
+        }
+    }
+
+
+    updateInstructionViewerDirect(materialId) {
+        try {
+            // Use direct component reference if available
+            if (this.instructionViewerComponent && this.instructionViewerComponent.updateMaterialId) {
+                this.instructionViewerComponent.updateMaterialId(materialId);
+                return;
+            }
+        } catch (error) {
+            console.error('Error updating instruction viewer:', error);
+        }
+    }
+
+
+    updateToolbox(toolboxConfig) {
+        try {
+            // Use blocks component reference if available
+            if (this.blocksComponent && this.blocksComponent.updateCustomToolboxConfig) {
+                this.blocksComponent.updateCustomToolboxConfig(toolboxConfig);
+                return;
+            }
+        } catch (error) {
+            console.error('Error updating toolbox:', error);
+        }
+    }
+
+    // Method to set Blocks component reference
+    setBlocksComponent(blocksComponent) {
+        this.blocksComponent = blocksComponent;
+        
+        // If there's a pending toolbox update, apply it now
+        if (blocksComponent && this.pendingToolboxUpdate) {
+            this.updateToolbox(this.pendingToolboxUpdate);
+            this.pendingToolboxUpdate = null;
+        }
+    }
+
+    // Method to set Instruction Viewer component reference
+    setInstructionViewerComponent(instructionViewerComponent) {
+        this.instructionViewerComponent = instructionViewerComponent;
+        
+        // If there's a pending material ID update, apply it now
+        if (instructionViewerComponent && this.pendingMaterialId) {
+            this.updateInstructionViewerDirect(this.pendingMaterialId);
+            this.pendingMaterialId = null;
+        }
     }
 
 
@@ -225,7 +306,6 @@ class IframeCommunication {
         if (this.vm === vm) return; // Avoid duplicate processing
         
         this.vm = vm;
-        console.log('VM reference set in iframe communication');
         
         // Send ready signal only once when VM is first set
         if (vm && this.isInitialized && !this.readySignalSent) {
@@ -233,6 +313,12 @@ class IframeCommunication {
             this.sendToParent({
                 type: 'SCRATCH_EDITOR_READY'
             });
+        }
+
+        // Apply pending toolbox update if exists and blocks component is available
+        if (vm && this.pendingToolboxUpdate && this.blocksComponent) {
+            this.updateToolbox(this.pendingToolboxUpdate);
+            this.pendingToolboxUpdate = null;
         }
     }
 

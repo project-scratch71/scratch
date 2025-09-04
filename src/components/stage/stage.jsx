@@ -72,7 +72,7 @@ const StageComponent = props => {
 
     const mainStage = (
         <Box
-            componentRef={stageWrapperRef}
+            componentRef={node => { stageWrapperRef.current = node; }}
             className={classNames(
                 styles.stageWrapper,
                 {[styles.withColorPicker]: !isFullScreen && isColorPicking})}

@@ -93,7 +93,7 @@ const Selector = props => {
 Selector.propTypes = {
     buttons: PropTypes.arrayOf(PropTypes.shape({
         title: PropTypes.string.isRequired,
-        img: PropTypes.string.isRequired,
+        img: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
         onClick: PropTypes.func
     })),
     containerRef: PropTypes.func,

@@ -60,10 +60,14 @@ const GUIComponent = (props) => {
     const stageAndTargetWrapperRef = useRef(null);
 
     const handleHorizontalResize = (newWidth) => {
+        const oldWidth = bodyWidth;
         setBodyWidth(newWidth);
-        setTimeout(() => {
-            window.dispatchEvent(new Event('resize'));
-        }, 0);
+        // 大きな変更の場合のみresizeイベントを発火（レスポンシブ環境での無限ループを防止）
+        if (Math.abs(newWidth - oldWidth) >= 10) {
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, 100); // debounceも追加
+        }
     };
 
     const handleVerticalResize = (newInstructionHeight) => {
@@ -72,9 +76,15 @@ const GUIComponent = (props) => {
 
 
     useEffect(() => {
+        let lastWidth = 0;
         const resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
-                setBodyWidth(entry.contentRect.width);
+                const newWidth = Math.floor(entry.contentRect.width);
+                // 幅の変更が5px以上の場合のみ更新（細かい変動を無視）
+                if (Math.abs(newWidth - lastWidth) >= 5) {
+                    lastWidth = newWidth;
+                    setBodyWidth(newWidth);
+                }
             }
         });
 
@@ -161,7 +171,24 @@ const GUIComponent = (props) => {
         theme,
         tipsLibraryVisible,
         ...componentProps
-    } = omit(props, 'dispatch');
+    } = omit(props, [
+        'dispatch',
+        // Custom props that should not be passed to DOM
+        'spriteFileInput',
+        'stageSize',
+        'setProjectId',
+        'isRtl',
+        'onChangeSpriteDirection',
+        'onChangeSpriteName', 
+        'onChangeSpriteRotationStyle',
+        'onChangeSpriteSize',
+        'onChangeSpriteVisibility',
+        'onChangeSpriteX',
+        'onChangeSpriteY',
+        'onFileUploadClick',
+        'onPaintSpriteClick',
+        'onSpriteUpload'
+    ]);
     if (children) {
         return <Box {...componentProps}>{children}</Box>;
     }
@@ -242,7 +269,7 @@ const GUIComponent = (props) => {
                 <Box className={styles.chunkWrapper}>
                     <Box 
                         className={styles.bodyWrapper} 
-                        ref={bodyWrapperRef}
+                        componentRef={node => { bodyWrapperRef.current = node; }}
                         style={{ width: `${bodyWidth}px` }}
                     >
                         <Box className={styles.targetWrapper}>
@@ -349,7 +376,7 @@ const GUIComponent = (props) => {
                     />
                     <Box 
                         className={styles.stageAndTargetWrapper}
-                        ref={stageAndTargetWrapperRef}
+                        componentRef={node => { stageAndTargetWrapperRef.current = node; }}
                         style={{ width: `calc(100vw - ${bodyWidth}px - 1rem)` }}
                     >
                         <Box className={styles.stageSection}>
@@ -408,7 +435,7 @@ GUIComponent.propTypes = {
     costumeLibraryVisible: PropTypes.bool,
     costumesTabVisible: PropTypes.bool,
     debugModalVisible: PropTypes.bool,
-    editingTarget: PropTypes.object,
+    editingTarget: PropTypes.string,
     enableCommunity: PropTypes.bool,
     intl: intlShape.isRequired,
     isCreating: PropTypes.bool,

@@ -1,3 +1,14 @@
+// Simple ResizeObserver error suppression
+(() => {
+    const originalError = console.error;
+    console.error = (...args) => {
+        if (String(args[0]).includes('ResizeObserver loop completed with undelivered notifications')) {
+            return;
+        }
+        originalError.apply(console, args);
+    };
+})();
+
 // Polyfills
 import 'es6-object-assign/auto';
 import 'core-js/fn/array/includes';
@@ -6,6 +17,7 @@ import 'intl'; // For Safari 9
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 
 import AppStateHOC from '../lib/app-state-hoc.jsx';
 import BrowserModalComponent from '../components/browser-modal/browser-modal.jsx';

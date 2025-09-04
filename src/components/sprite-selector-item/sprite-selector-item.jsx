@@ -101,6 +101,7 @@ SpriteSelectorItem.propTypes = {
     componentRef: PropTypes.func,
     costumeURL: PropTypes.string,
     details: PropTypes.string,
+    dragPayload: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     icon: PropTypes.node,
     name: PropTypes.string.isRequired,
     number: PropTypes.number,

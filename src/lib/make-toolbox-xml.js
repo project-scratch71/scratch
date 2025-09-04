@@ -153,6 +153,42 @@ const xmlEscape = function (unsafe) {
     });
 };
 
+/**
+ * Filter blocks in a category XML based on allowed block types
+ * @param {string} categoryXML - The full category XML
+ * @param {Array.<string>} allowedBlocks - Array of block types to include
+ * @returns {string} - Filtered category XML
+ */
+const filterCategoryBlocks = function (categoryXML, allowedBlocks) {
+    if (!allowedBlocks || allowedBlocks.length === 0) {
+        return categoryXML;
+    }
+
+    // Create a set for faster lookup
+    const allowedSet = new Set(allowedBlocks);
+    
+    // Use regex to find and keep only allowed blocks
+    const blockPattern = /<block[^>]*type="([^"]+)"[^>]*>[\s\S]*?<\/block>/g;
+    const singleBlockPattern = /<block[^>]*type="([^"]+)"[^>]*\/>/g;
+    
+    let result = categoryXML;
+    
+    // Remove multi-line blocks that are not allowed
+    result = result.replace(blockPattern, (match, blockType) => {
+        return allowedSet.has(blockType) ? match : '';
+    });
+    
+    // Remove single-line blocks that are not allowed  
+    result = result.replace(singleBlockPattern, (match, blockType) => {
+        return allowedSet.has(blockType) ? match : '';
+    });
+    
+    // Clean up extra whitespace and empty lines
+    result = result.replace(/\n\s*\n\s*\n/g, '\n\n');
+    
+    return result;
+};
+
 const looks = function (isInitialSetup, isStage, targetId, costumeName, backdropName, colors) {
     const hello = ScratchBlocks.ScratchMsgs.translate('LOOKS_HELLO', 'Hello!');
     const hmm = ScratchBlocks.ScratchMsgs.translate('LOOKS_HMM', 'Hmm...');
@@ -755,10 +791,13 @@ const xmlClose = '</xml>';
  * @param {?string} backdropName - The name of the default selected backdrop dropdown.
  * @param {?string} soundName -  The name of the default selected sound dropdown.
  * @param {?object} colors - The colors for the theme.
+ * @param {?object} customToolboxConfig - Custom toolbox configuration with categories and specific blocks.
+ * @property {Array.<string>} categories - Array of category IDs to include.
+ * @property {object} blocks - Object mapping category IDs to arrays of block types to include.
  * @returns {string} - a ScratchBlocks-style XML document for the contents of the toolbox.
  */
 const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categoriesXML = [],
-    costumeName = '', backdropName = '', soundName = '', colors = defaultColors) {
+    costumeName = '', backdropName = '', soundName = '', colors = defaultColors, customToolboxConfig = null) {
     isStage = isInitialSetup || isStage;
     const gap = [categorySeparator];
 
@@ -776,6 +815,78 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
         }
         // return `undefined`
     };
+    // Check if we should use custom toolbox configuration
+    if (customToolboxConfig && customToolboxConfig.categories) {
+        try {
+            const customCategories = [];
+            
+            // Process each category in the specified order
+            for (const categoryId of customToolboxConfig.categories) {
+                let categoryXML = null;
+                const allowedBlocks = customToolboxConfig.blocks && customToolboxConfig.blocks[categoryId];
+                
+                switch (categoryId) {
+            case 'motion':
+                categoryXML = moveCategory('motion') || motion(isInitialSetup, isStage, targetId, colors.motion);
+                break;
+            case 'looks':
+                categoryXML = moveCategory('looks') ||
+                    looks(isInitialSetup, isStage, targetId, costumeName, backdropName, colors.looks);
+                break;
+            case 'sound':
+                categoryXML = moveCategory('sound') || sound(isInitialSetup, isStage, targetId, soundName, colors.sounds);
+                break;
+            case 'events':
+                categoryXML = moveCategory('event') || events(isInitialSetup, isStage, targetId, colors.event);
+                break;
+            case 'control':
+                categoryXML = moveCategory('control') || control(isInitialSetup, isStage, targetId, colors.control);
+                break;
+            case 'sensing':
+                categoryXML = moveCategory('sensing') || sensing(isInitialSetup, isStage, targetId, colors.sensing);
+                break;
+            case 'operators':
+                categoryXML = moveCategory('operators') || operators(isInitialSetup, isStage, targetId, colors.operators);
+                break;
+            case 'variables':
+                categoryXML = moveCategory('data') || variables(isInitialSetup, isStage, targetId, colors.data);
+                break;
+            case 'myBlocks':
+                categoryXML = moveCategory('procedures') || myBlocks(isInitialSetup, isStage, targetId, colors.more);
+                break;
+            }
+            
+            if (categoryXML) {
+                // Filter blocks if specific blocks are specified for this category
+                if (allowedBlocks && allowedBlocks.length > 0) {
+                    categoryXML = filterCategoryBlocks(categoryXML, allowedBlocks);
+                }
+                customCategories.push(categoryXML);
+            }
+        }
+        
+        // Add remaining extension categories
+        for (const extensionCategory of categoriesXML) {
+            customCategories.push(extensionCategory.xml);
+        }
+        
+            const everything = [xmlOpen];
+            for (let i = 0; i < customCategories.length; i++) {
+                everything.push(customCategories[i]);
+                if (i < customCategories.length - 1) {
+                    everything.push(gap);
+                }
+            }
+            everything.push(xmlClose);
+            
+            return everything.join('\n');
+        } catch (error) {
+            console.error('❌ Error in custom toolbox generation:', error);
+            // Fall back to default toolbox
+        }
+    }
+
+    // Default behavior (full toolbox)
     const motionXML = moveCategory('motion') || motion(isInitialSetup, isStage, targetId, colors.motion);
     const looksXML = moveCategory('looks') ||
         looks(isInitialSetup, isStage, targetId, costumeName, backdropName, colors.looks);

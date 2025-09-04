@@ -112,7 +112,7 @@ const buildConfig = baseConfig.clone()
     .enableDevServer(process.env.PORT || 8601)
     .addPlugin(new webpack.DefinePlugin({
         'process.env.ASSET_HOST': JSON.stringify(process.env.ASSET_HOST),
-        'process.env.MD_VIEWER_PATH': JSON.stringify(process.env.MD_VIEWER_PATH)
+        'process.env.MATERIAL_VIEWER_BASE_URL': JSON.stringify(process.env.MATERIAL_VIEWER_BASE_URL)
     }))
     .merge({
         entry: {

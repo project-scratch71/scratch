@@ -9,6 +9,7 @@ import VM from 'scratch-vm';
 
 import log from '../lib/log.js';
 import codeChangeMonitor from '../lib/code-change-monitor';
+import iframeCommunication from '../lib/iframe-communication.js';
 import Prompt from './prompt.jsx';
 import BlocksComponent from '../components/blocks/blocks.jsx';
 import ExtensionLibrary from './extension-library.jsx';
@@ -78,7 +79,8 @@ class Blocks extends React.Component {
             'onWorkspaceUpdate',
             'onWorkspaceMetricsChange',
             'setBlocks',
-            'setLocale'
+            'setLocale',
+            'updateCustomToolboxConfig'
         ]);
         this.ScratchBlocks.prompt = this.handlePromptStart;
         this.ScratchBlocks.statusButtonCallback = this.handleConnectionModalStart;
@@ -89,6 +91,7 @@ class Blocks extends React.Component {
         };
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.toolboxUpdateQueue = [];
+        this.customToolboxConfig = null;
     }
     componentDidMount () {
         this.ScratchBlocks = VMScratchBlocks(this.props.vm, this.props.useCatBlocks);
@@ -280,6 +283,9 @@ class Blocks extends React.Component {
         
         // Initialize code change monitor
         codeChangeMonitor.initialize(this.props.vm, this.workspace);
+        
+        // Register this component with iframe communication for toolbox updates
+        iframeCommunication.setBlocksComponent(this);
     }
     detachVM () {
         this.props.vm.removeListener('SCRIPT_GLOW_ON', this.onScriptGlowOn);
@@ -357,6 +363,12 @@ class Blocks extends React.Component {
         try {
             let {editingTarget: target, runtime} = this.props.vm;
             const stage = runtime.getTargetForStage();
+            
+            // Check if stage and target are properly initialized
+            if (!stage) {
+                return null;
+            }
+            
             if (!target) target = stage; // If no editingTarget, use the stage
 
             const stageCostumes = stage.getCostumes();
@@ -366,14 +378,34 @@ class Blocks extends React.Component {
                 this.props.vm.runtime.getBlocksXML(target),
                 this.props.theme
             );
+            
+            // Debug: Check if custom toolbox config exists
+            if (this.customToolboxConfig) {
+                console.log('🎯 getToolboxXML using custom config');
+            } else {
+                console.log('📝 getToolboxXML using default config');
+            }
+            
             return makeToolboxXML(false, target.isStage, target.id, dynamicBlocksXML,
                 targetCostumes[targetCostumes.length - 1].name,
                 stageCostumes[stageCostumes.length - 1].name,
                 targetSounds.length > 0 ? targetSounds[targetSounds.length - 1].name : '',
-                getColorsForTheme(this.props.theme)
+                getColorsForTheme(this.props.theme),
+                this.customToolboxConfig // Pass custom toolbox config
             );
-        } catch {
+        } catch (error) {
+            console.error('❌ Error in getToolboxXML:', error);
             return null;
+        }
+    }
+
+    updateCustomToolboxConfig (customConfig) {
+        this.customToolboxConfig = customConfig;
+        
+        // Update the toolbox with the new config
+        const toolboxXML = this.getToolboxXML();
+        if (toolboxXML) {
+            this.props.updateToolboxState(toolboxXML);
         }
     }
     onWorkspaceUpdate (data) {

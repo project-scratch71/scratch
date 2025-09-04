@@ -174,7 +174,7 @@ class ActionMenu extends React.Component {
 
 ActionMenu.propTypes = {
     className: PropTypes.string,
-    img: PropTypes.string,
+    img: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     moreButtons: PropTypes.arrayOf(PropTypes.shape({
         img: PropTypes.string,
         title: PropTypes.node.isRequired,
