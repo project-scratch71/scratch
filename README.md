@@ -1,10 +1,31 @@
 # scratch-gui
 
-Scratch GUI is a set of React components that comprise the interface for creating and running Scratch 3.0 projects
+## **⚠️ NOTICE: Repository Migration to Mono-Repo ⚠️**
+
+The Scratch Team has migrated the `scratch-gui` module into a new mono-repo,
+[`scratch-editor`](https://github.com/scratchfoundation/scratch-editor). This independent `scratch-gui` repository
+**will be archived**. Any new issues or pull requests should be opened in the mono-repo.
+
+The new mono-repo version of `scratch-gui` is published to the NPM registry as
+[`@scratch/scratch-gui`](https://www.npmjs.com/package/@scratch/scratch-gui).
+
+**Contributors:**
+
+* I would like to thank all past contributors for their work on this repository.
+* If you are aware of valuable issues or pull requests, please consider re-opening them in the mono-repo. If you do
+  so, please link the new issue or pull request to the original one in this repository to help others find it and to
+  reduce the chance of duplicate work.
+* We apologize for the inconvenience and greatly appreciate your help with this transition!
+
+For more information, see the [`scratch-editor` repository on GitHub](https://github.com/scratchfoundation/scratch-editor).
+
+## Overview
+
+Scratch GUI is a set of React components that comprise the interface for creating and running Scratch 3.0 projects.
 
 To open the current build in your browser on Github Pages:
 
-https://scratchfoundation.github.io/scratch-gui/
+<https://scratchfoundation.github.io/scratch-gui/>
 
 ## Installation
 
@@ -45,7 +66,6 @@ Then go to [http://localhost:8601/](http://localhost:8601/) - the playground out
 
 ### Getting another repo to point to this code
 
-
 If you wish to develop `scratch-gui` alongside other scratch repositories that depend on it, you may wish
 to have the other repositories use your local `scratch-gui` build instead of fetching the current production
 version of the scratch-gui that is found by default using `npm install`.
@@ -70,7 +90,7 @@ Instead of `BUILD_MODE=dist npm run build`, you can use `BUILD_MODE=dist npm run
 changes to your `scratch-gui` code, and automatically rebuild when there are changes. Sometimes this has been
 unreliable; if you are having problems, try going back to `BUILD_MODE=dist npm run build` until you resolve them.
 
-#### Oh no! It didn't work!
+#### Oh no! It didn't work
 
 If you can't get linking to work right, try:
 
@@ -93,7 +113,7 @@ See [jest cli docs](https://facebook.github.io/jest/docs/en/cli.html#content) fo
 
 ### Running tests
 
-*NOTE: If you're a Windows user, please run these scripts in Windows `cmd.exe`  instead of Git Bash/MINGW64.*
+_NOTE: If you're a Windows user, please run these scripts in Windows `cmd.exe`  instead of Git Bash/MINGW64._
 
 Before running any tests, make sure you have run `npm install` from this (scratch-gui) repository's top level.
 
@@ -214,15 +234,6 @@ npm install  --no-optional --save-dev react-responsive@^5.0.0
 ```
 
 Further reading: [Stack Overflow](https://stackoverflow.com/questions/46602286/npm-requires-a-peer-of-but-all-peers-are-in-package-json-and-node-modules)
-
-## Troubleshooting
-
-If you run into npm install errors, try these steps:
-
-1. run `npm cache clean --force`
-2. Delete the node_modules directory
-3. Delete package-lock.json
-4. run `npm install` again
 
 ## Publishing to GitHub Pages
 
